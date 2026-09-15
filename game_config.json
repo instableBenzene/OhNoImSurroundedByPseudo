@@ -1,0 +1,14 @@
+{
+  "difficulty": "a-10",
+  "max_turns": 32,
+  "random_pseudo": false,
+  "default_pseudo": null,
+  "enabled_dlc": [],
+  "pack_order": [
+    "base"
+  ],
+  "resourcepack_order": [
+    "base"
+  ],
+  "show_full_skills": false
+}

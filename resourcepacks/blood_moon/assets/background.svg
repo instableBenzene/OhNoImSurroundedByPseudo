@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#04050a"/>
+      <stop offset="40%" stop-color="#100a11"/>
+      <stop offset="72%" stop-color="#280c12"/>
+      <stop offset="100%" stop-color="#12060a"/>
+    </linearGradient>
+    <radialGradient id="moonHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e5444f" stop-opacity=".42"/>
+      <stop offset="52%" stop-color="#8e1f28" stop-opacity=".14"/>
+      <stop offset="100%" stop-color="#8e1f28" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonBody" cx="38%" cy="34%" r="68%">
+      <stop offset="0" stop-color="#ff9d92"/>
+      <stop offset="50%" stop-color="#d9414a"/>
+      <stop offset="100%" stop-color="#6d151f"/>
+    </radialGradient>
+    <linearGradient id="hillsFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#180c12"/>
+      <stop offset="100%" stop-color="#0d070a"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0608"/>
+      <stop offset="100%" stop-color="#050405"/>
+    </linearGradient>
+    <radialGradient id="lanternGlow" cx="50%" cy="46%" r="54%">
+      <stop offset="0" stop-color="#ff7a63" stop-opacity=".60"/>
+      <stop offset="58%" stop-color="#c02a2c" stop-opacity=".18"/>
+      <stop offset="100%" stop-color="#c02a2c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lanternBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9b7c"/>
+      <stop offset="42%" stop-color="#e0402f"/>
+      <stop offset="100%" stop-color="#7e1618"/>
+    </linearGradient>
+    <radialGradient id="candleGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffd79a" stop-opacity=".9"/>
+      <stop offset="42%" stop-color="#e07a2a" stop-opacity=".28"/>
+      <stop offset="100%" stop-color="#e07a2a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fogBand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9414a" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#d9414a" stop-opacity=".13"/>
+      <stop offset="100%" stop-color="#d9414a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="wet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0402f" stop-opacity=".22"/>
+      <stop offset="100%" stop-color="#e0402f" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="blurBig" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <filter id="blurSoft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#night)"/>
+
+  <!-- 灯笼绳：放在血月之前，让月亮把绳子盖住（月亮保持干净） -->
+  <path d="M40 176 q360 96 780 66 q300-22 740 40" fill="none" stroke="#1b1214" stroke-width="4"/>
+
+  <!-- 血月 -->
+  <circle cx="1178" cy="232" r="330" fill="url(#moonHalo)"/>
+  <circle cx="1178" cy="232" r="112" fill="url(#moonBody)"/>
+  <g fill="#7c1a22" opacity=".22">
+    <circle cx="1136" cy="196" r="16"/>
+    <circle cx="1214" cy="270" r="21"/>
+    <circle cx="1206" cy="182" r="9"/>
+    <circle cx="1144" cy="286" r="7"/>
+  </g>
+
+  <!-- 远山（纵深层） -->
+  <path d="M0 700 L150 636 L286 682 L430 612 L590 676 L742 620 L900 690 L1060 626 L1210 688 L1360 634 L1600 692 L1600 900 L0 900 Z"
+        fill="url(#hillsFar)"/>
+  <rect x="0" y="640" width="1600" height="120" fill="url(#fogBand)"/>
+
+  <!-- 竹林（左右两侧；靠月一侧有血色轮廓光） -->
+  <g fill="#080b09">
+    <rect x="40" y="120" width="18" height="700" rx="9"/>
+    <rect x="96" y="60" width="22" height="760" rx="11"/>
+    <rect x="158" y="180" width="15" height="640" rx="7"/>
+    <rect x="8" y="250" width="13" height="570" rx="6"/>
+    <rect x="1382" y="90" width="20" height="730" rx="10"/>
+    <rect x="1442" y="40" width="15" height="780" rx="7"/>
+    <rect x="1496" y="150" width="24" height="670" rx="12"/>
+    <rect x="1556" y="210" width="13" height="610" rx="6"/>
+  </g>
+  <!-- 竹节 -->
+  <g stroke="#0d1210" stroke-width="3" opacity=".9">
+    <path d="M40 300h18M40 470h18M96 240h22M96 430h22M158 360h15M8 430h13"/>
+    <path d="M1382 260h20M1382 450h20M1442 220h15M1442 420h15M1496 320h24M1556 380h13"/>
+  </g>
+  <!-- 竹叶 -->
+  <g fill="#0c110e">
+    <path d="M112 210 q70-30 138-10 q-64 34-138 10z"/>
+    <path d="M126 352 q76-26 146-4 q-70 32-146 4z"/>
+    <path d="M60 470 q62-24 122-6 q-58 30-122 6z"/>
+    <path d="M22 600 q56-20 112-4 q-54 26-112 4z"/>
+    <path d="M1488 250 q-74-28-142-8 q66 32 142 8z"/>
+    <path d="M1504 400 q-82-24-152-2 q74 30 152 2z"/>
+    <path d="M1456 540 q-68-20-128 2 q62 26 128-2z"/>
+    <path d="M1560 620 q-58-16-112 4 q54 22 112-4z"/>
+  </g>
+  <g fill="#8d1f27" opacity=".40" filter="url(#blurSoft)">
+    <rect x="96" y="60" width="5" height="760"/>
+    <rect x="1382" y="90" width="5" height="730"/>
+    <rect x="1496" y="150" width="6" height="670"/>
+  </g>
+
+  <!-- 鸟居（正门，落在中景） -->
+  <g>
+    <!-- 柱（底部略外撇） -->
+    <path d="M258 336 L300 336 L310 792 L268 792 Z" fill="#070506"/>
+    <path d="M560 336 L602 336 L592 792 L550 792 Z" fill="#070506"/>
+    <!-- 贯（第二道横梁） -->
+    <rect x="248" y="376" width="364" height="18" fill="#070506"/>
+    <!-- 额束（中央小竖板） -->
+    <rect x="418" y="336" width="26" height="40" fill="#070506"/>
+    <!-- 笠木（顶梁，两端微微上翘） -->
+    <path d="M196 300 q234-30 468 0 l0 24 q-234-28-468 0z" fill="#070506"/>
+    <!-- 岛木（笠木下的一道） -->
+    <path d="M214 336 q216-22 432 0 l0 16 q-216-20-432 0z" fill="#070506"/>
+    <!-- 柱子基座 -->
+    <rect x="252" y="770" width="72" height="22" fill="#0a0709"/>
+    <rect x="546" y="770" width="72" height="22" fill="#0a0709"/>
+    <!-- 血色轮廓光（只描靠月的一侧） -->
+    <g fill="#c0333a" opacity=".42" filter="url(#blurSoft)">
+      <path d="M596 340 L606 340 L598 792 L588 792 Z"/>
+      <path d="M660 300 q0 12 0 22 q-8 0-14 0 q0-10 0-22z"/>
+      <path d="M606 376 L616 376 L616 394 L606 394 Z"/>
+    </g>
+  </g>
+
+  <!-- 红灯笼（四盏，错开血月） -->
+  <g>
+    <g transform="translate(212,282)">
+      <circle cx="0" cy="4" r="86" fill="url(#lanternGlow)"/>
+      <rect x="-4" y="-62" width="8" height="20" fill="#150a0c"/>
+      <path d="M-38-40 q38-12 76 0 q-6 84-38 94 q-32-10-38-94z" fill="url(#lanternBody)"/>
+      <rect x="-14" y="44" width="28" height="11" fill="#150a0c"/>
+      <path d="M-2 55 h4 v14 h-4z" fill="#150a0c"/>
+      <g stroke="#3d1013" stroke-width="1.5" opacity=".5" fill="none">
+        <path d="M-22-34 q22 52 0 116"/><path d="M22-34 q-22 52 0 116"/>
+        <path d="M-38 6 h76M-38 40 h76"/>
+      </g>
+    </g>
+    <g transform="translate(600,318)">
+      <circle cx="0" cy="4" r="74" fill="url(#lanternGlow)"/>
+      <rect x="-4" y="-56" width="8" height="18" fill="#150a0c"/>
+      <path d="M-33-36 q33-11 66 0 q-5 74-33 82 q-28-8-33-82z" fill="url(#lanternBody)"/>
+      <rect x="-12" y="38" width="24" height="10" fill="#150a0c"/>
+      <path d="M-2 48 h4 v12 h-4z" fill="#150a0c"/>
+      <g stroke="#3d1013" stroke-width="1.4" opacity=".45" fill="none">
+        <path d="M-19-30 q19 46 0 102"/><path d="M19-30 q-19 46 0 102"/>
+      </g>
+    </g>
+    <g transform="translate(918,300)">
+      <circle cx="0" cy="4" r="70" fill="url(#lanternGlow)"/>
+      <rect x="-4" y="-54" width="8" height="17" fill="#150a0c"/>
+      <path d="M-31-34 q31-10 62 0 q-5 70-31 78 q-26-8-31-78z" fill="url(#lanternBody)"/>
+      <rect x="-11" y="36" width="22" height="9" fill="#150a0c"/>
+      <path d="M-2 45 h4 v12 h-4z" fill="#150a0c"/>
+    </g>
+    <g transform="translate(1382,320)">
+      <circle cx="0" cy="4" r="64" fill="url(#lanternGlow)"/>
+      <rect x="-4" y="-50" width="8" height="16" fill="#150a0c"/>
+      <path d="M-28-32 q28-10 56 0 q-4 64-28 72 q-24-8-28-72z" fill="url(#lanternBody)"/>
+      <rect x="-10" y="34" width="20" height="9" fill="#150a0c"/>
+      <path d="M-2 43 h4 v11 h-4z" fill="#150a0c"/>
+    </g>
+  </g>
+
+  <!-- 地面（湿石反光 + 雾） -->
+  <path d="M0 792 q260-22 560-6 q340 20 620-6 q220-20 420-2 l0 122 l-1600 0z" fill="url(#ground)"/>
+  <g opacity=".9">
+    <path d="M300 792 h30 l-8 108 h-14z" fill="url(#wet)"/>
+    <path d="M572 792 h26 l-7 104 h-12z" fill="url(#wet)"/>
+    <path d="M212 796 h40 l-12 96 h-16z" fill="url(#wet)" opacity=".7"/>
+    <path d="M918 794 h34 l-10 100 h-14z" fill="url(#wet)" opacity=".7"/>
+    <path d="M1382 794 h30 l-9 98 h-12z" fill="url(#wet)" opacity=".6"/>
+  </g>
+  <rect x="0" y="740" width="1600" height="130" fill="url(#fogBand)" opacity=".5"/>
+  <rect x="0" y="784" width="1600" height="116" fill="#07050a" opacity=".45"/>
+
+  <!-- 石灯笼（中景偏右）+ 烛火 -->
+  <g transform="translate(1096,690)">
+    <rect x="-26" y="66" width="52" height="34" fill="#0c0709"/>
+    <rect x="-32" y="34" width="64" height="36" fill="#12100f"/>
+    <rect x="-20" y="-4" width="40" height="42" fill="#151211"/>
+    <path d="M-38-14 q38-26 76 0 l0 12 q-38-22-76 0z" fill="#0e0a0b"/>
+    <circle cx="0" cy="16" r="40" fill="url(#candleGlow)"/>
+    <rect x="-9" y="4" width="18" height="22" fill="#ffd79a"/>
+    <rect x="-2" y="8" width="4" height="14" fill="#fff2d2"/>
+  </g>
+  <g>
+    <circle cx="1268" cy="812" r="34" fill="url(#candleGlow)"/>
+    <path d="M1264 794 q6-16 8 0 q0 14-4 18 q-4-6-4-18z" fill="#ffd79a"/>
+    <rect x="1261" y="812" width="9" height="18" fill="#120a0c"/>
+  </g>
+  <g>
+    <circle cx="1338" cy="826" r="26" fill="url(#candleGlow)"/>
+    <path d="M1335 812 q5-12 6 0 q0 10-3 14 q-3-5-3-14z" fill="#ffd79a"/>
+    <rect x="1332" y="826" width="8" height="15" fill="#120a0c"/>
+  </g>
+
+  <!-- 地面光斑 -->
+  <g opacity=".22" filter="url(#blurBig)">
+    <ellipse cx="212" cy="800" rx="150" ry="30" fill="#e0402f"/>
+    <ellipse cx="918" cy="802" rx="140" ry="28" fill="#e0402f"/>
+    <ellipse cx="1096" cy="800" rx="120" ry="26" fill="#ff9a5a"/>
+    <ellipse cx="1382" cy="804" rx="130" ry="26" fill="#e0402f"/>
+  </g>
+
+  <!-- 飘散的火星 -->
+  <g fill="#ff9a6a" opacity=".55">
+    <circle cx="356" cy="470" r="2.6"/><circle cx="392" cy="386" r="1.8"/>
+    <circle cx="760" cy="500" r="2.2"/><circle cx="1046" cy="430" r="1.9"/>
+    <circle cx="1250" cy="520" r="2.4"/><circle cx="1466" cy="452" r="1.7"/>
+    <circle cx="520" cy="560" r="2"/><circle cx="980" cy="566" r="2.1"/>
+  </g>
+</svg>

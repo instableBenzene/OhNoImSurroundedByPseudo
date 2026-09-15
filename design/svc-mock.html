@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>SVC · 完蛋，我被伪人包围了！？ · 界面设计稿</title>
+<style>
+  /* 风格参数沿用旧 Web 端 styles.css（暖深绿底 + 琥珀强调 + 纸白字） */
+  :root{
+    --bg:#0b0f10; --panel:#171e1e; --panel2:#1d2625; --line:#33403d; --line2:#27312f;
+    --ink:#e6eadf; --ink2:#9aa79f; --ink3:#6f7d76;
+    --ok:#68b998; --danger:#d46b63; --warn:#e2a84d; --info:#71a6c4;
+    --amber:#e2a84d; --amber-soft:#6d4a21; --jade-deep:#274c3e;
+    /* 品质色：直接给图标与物品名上色 */
+    --q0:#c4c9c4; --q1:#66b875; --q2:#6b9fd1; --q3:#a77ad1; --q4:#d6aa45; --q5:#d86459;
+    /* 羁绊位阶（云顶式）：铜 / 银 / 金 / 棱彩 */
+    --bronze:#b07a4a; --silver:#c3ccd0; --gold:#e2a84d; --prism:#d98ad6;
+    --mono:Consolas,"Cascadia Mono","Courier New",monospace;
+    --sans:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;
+    --serif:"STKaiti","KaiTi",serif;
+    --slot:54px; --w:1.5px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.5;
+    height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  }
+  button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px}
+  .defs{position:absolute;width:0;height:0;overflow:hidden}
+  svg.ic{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:var(--w);
+    stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-3px}
+  svg.ic.lg{width:26px;height:26px}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .eyebrow{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--amber);text-transform:uppercase}
+  .muted{color:var(--ink2)} .dim{color:var(--ink3)}
+  h1,h2,h3{margin:0;font-weight:600}
+  h1{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.03em} h2{font-size:18px} h3{font-size:16px}
+  button{font:inherit}
+
+  /* ---------- topbar ---------- */
+  .topbar{display:flex;align-items:stretch;border-bottom:1px solid var(--line);
+    background:#0e1314;box-shadow:0 8px 22px rgba(0,0,0,.3)}
+  .brand-block{padding:10px 16px;border-right:1px solid var(--line);min-width:280px}
+  .brand-block h1{margin-top:2px}
+  .compact-hud{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-top:3px}
+  .hud-stats{display:flex;flex:1}
+  .stat{padding:8px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:96px}
+  .stat .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ink3)}
+  .stat .v{font-family:var(--mono);font-size:17px}
+  .top-actions{display:flex;align-items:center;gap:0;border-left:1px solid var(--line)}
+  .top-actions button{background:none;border:0;border-right:1px solid var(--line);color:var(--ink2);
+    padding:0 15px;height:100%;cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em}
+  .top-actions button:hover{color:var(--ink);background:rgba(226,168,77,.10)}
+  .top-actions button.danger{color:var(--danger)}
+
+  /* ---------- shell ---------- */
+  .shell{display:grid;gap:12px;padding:12px;flex:1;min-height:0;
+    grid-template-columns:340px minmax(0,1fr) 320px;
+    grid-template-rows:minmax(0,1fr) auto;
+    grid-template-areas:
+      "log board detail"
+      "log dock  detail";}
+  /* 羁绊：顶部常驻细条，平时只列已激活性格与等级 */
+  .bonds-strip{display:flex;align-items:center;gap:12px;padding:6px 14px;
+    border-bottom:1px solid var(--line);background:#0e1314;flex-wrap:wrap}
+  .bond-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .bond-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+    padding:3px 11px;font-family:var(--mono);font-size:14px;color:var(--ink2)}
+  .bond-chip.on{border-color:var(--jade-deep);color:var(--ink)}
+  .bond-chip .lv{color:var(--amber);font-weight:600}
+  .bond-chip.none{border-style:dashed;color:var(--ink3)}
+  .bond-chip{position:relative}
+  .tip{position:absolute;left:0;top:calc(100% + 8px);width:300px;display:none;z-index:60;
+    background:#101517;border:1px solid var(--line);padding:10px 12px;
+    box-shadow:0 12px 28px rgba(0,0,0,.5);font-family:var(--sans);font-size:12.5px;
+    line-height:1.6;color:var(--ink2);text-align:left;font-weight:400}
+  .bond-chip:hover .tip{display:block}
+  .tip .tip-eff{display:block;margin:6px 0;color:var(--ink)}
+  .tip .tip-line{display:block;color:var(--ink2)}
+  .tip .tip-line.on{color:var(--ink)}
+  .tip .tip-line b{color:var(--amber);margin-right:6px}
+  .bond-eff{color:var(--ink2);font-size:12.5px;margin:5px 0 3px}
+  .bond-base{color:var(--ink2);font-size:12.5px;margin:5px 0 2px}
+  .bond-effs{list-style:none;margin:2px 0 4px;padding:0;font-size:12.5px}
+  .bond-effs li{color:var(--ink3);padding:1px 0 1px 12px;position:relative}
+  .bond-effs li::before{content:"";position:absolute;left:2px;top:8px;width:4px;height:4px;background:currentColor;opacity:.6}
+  .bond-effs li.on{color:var(--ink)}
+  .tiernums{font-family:var(--mono);font-size:12.5px;color:var(--ink3);display:inline-flex;align-items:center;gap:1px}
+  .purple{color:var(--q3)}
+  .bar i.neg-hp{background:var(--danger)}
+  .bar i.neg-san{background:var(--q3)}
+  .tenant{display:flex;flex-direction:column;gap:8px}
+  .tenant{width:212px;height:200px;overflow:hidden}
+  .tenant .chips{height:22px;overflow:hidden;align-content:flex-start;margin-top:auto;margin-bottom:5px}
+  .tenant .chips::-webkit-scrollbar{width:8px}
+  .tenant .chips::-webkit-scrollbar-thumb{background:var(--line)}
+  .ability.disabled{opacity:.5}
+  .ability.disabled b{text-decoration:line-through}
+  .badge.seal{border-color:var(--danger);color:var(--danger)}
+  .tenant .t-top{display:flex;gap:10px;align-items:flex-start}
+  .tenant .av svg.ic{width:42px;height:42px}
+  .tenant .t-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;justify-content:center}
+  .tenant .t-vitals{display:flex;flex-direction:column;gap:3px;margin-top:-4px}
+  .tenant .vit{gap:2px}
+  .tenant .bar{height:6px}
+  .tenant .t-persona{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:12.5px}
+  .tenant .t-persona i{color:var(--ink3);font-style:normal}
+  .tenant .t-tags{display:flex;flex-wrap:nowrap;overflow:hidden;gap:4px}
+  .tenant .t-tags .tag{font-size:9.5px;color:var(--ink3);border-color:var(--line2)}
+  .chip{cursor:help}
+  .td-inline{cursor:pointer}
+  .tiernums b{font-weight:600}
+  .tiernums b.on{color:var(--amber);text-shadow:0 0 7px rgba(226,168,77,.7)}
+  .tiernums i{font-style:normal;color:var(--ink3);margin:0 2px}
+  .bond-effs li b{color:var(--amber);margin-right:7px;font-weight:600}
+  .tip{width:340px}
+  .bond-own{color:var(--ink3);font-size:12px;line-height:1.6}
+  .bond-drawer{position:fixed;left:0;top:0;height:100vh;width:400px;z-index:45;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,var(--panel),var(--panel2));border-right:1px solid var(--line);
+    transform:translateX(-100%);transition:transform .22s ease;box-shadow:8px 0 26px rgba(0,0,0,.45)}
+  .bond-drawer.open{transform:none}
+  .bond-drawer .head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .bond-drawer .body{overflow:auto;padding:12px 14px}
+  .drawer-backdrop{position:fixed;inset:0;background:rgba(6,8,10,.45);opacity:0;pointer-events:none;
+    transition:opacity .22s;z-index:44}
+  .drawer-backdrop.open{opacity:1;pointer-events:auto}
+  /* 位阶符号：小六边形徽记 + 文本同色；棱彩用渐变 */
+  .tier-badge{display:inline-block;width:11px;height:12px;flex:none;
+    clip-path:polygon(50% 0,100% 27%,100% 73%,50% 100%,0 73%,0 27%);background:currentColor}
+  .bond-chip.t-bronze,.t-bronze{color:var(--bronze)}
+  .bond-chip.t-silver,.t-silver{color:var(--silver)}
+  .bond-chip.t-gold,.t-gold{color:var(--gold)}
+  .bond-chip.t-prism,.t-prism{color:var(--prism)}
+  .bond-chip.t-prism .tier-badge,.t-prism .tier-badge{
+    background:linear-gradient(135deg,#66b875,#6b9fd1 35%,#a77ad1 65%,#e2a84d)}
+  .tier-badge.t-prism{background:linear-gradient(135deg,#66b875,#6b9fd1 35%,#a77ad1 65%,#e2a84d)}
+  /* 权重归零（休克 / 高消沉等）：性格变暗 */
+  .p-off{color:var(--ink3)!important;opacity:.45}
+  .tier-legend{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .tier-legend span{display:inline-flex;align-items:center;gap:5px}
+  .board{grid-area:board;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+  .detail-panel{grid-area:detail;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden}
+  .inventory-dock{grid-area:dock}
+  .log-panel{grid-area:log}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);position:relative;min-height:0}
+  .panel::before{content:"";position:absolute;left:-1px;top:10px;width:2px;height:20px;background:var(--line2)}
+  .panel > .head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .panel > .body{padding:10px 12px;overflow:auto;min-height:0}
+  .detail-panel .panel,.log-panel{display:flex;flex-direction:column;min-height:0}
+  .detail-panel .panel > .body,.log-panel > .body{flex:1;min-height:0;overflow:auto}
+  .panel > .body,.log-list{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .panel > .body::-webkit-scrollbar,.log-list::-webkit-scrollbar{width:9px;height:9px}
+  .panel > .body::-webkit-scrollbar-thumb,.log-list::-webkit-scrollbar-thumb{background:var(--line)}
+  .panel > .body::-webkit-scrollbar-thumb:hover,.log-list::-webkit-scrollbar-thumb:hover{background:var(--amber-soft)}
+  .panel > .body::-webkit-scrollbar-track,.log-list::-webkit-scrollbar-track{background:transparent}
+
+  /* ---------- bonds ---------- */
+  .bond{padding:7px 0;border-bottom:1px dashed var(--line)}
+  .bond:last-child{border-bottom:0}
+  .bond .row{display:flex;align-items:center;gap:8px}
+  .bond .name{flex:1}
+  .bond .seg{display:flex;gap:3px}
+  .bond .seg i{width:7px;height:12px;border:1px solid var(--line2);display:block}
+  .bond .seg i.on{border-color:var(--ok);background:rgba(104,185,152,.24)}
+  .bond .lv{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px;text-align:right}
+
+  /* ---------- board ---------- */
+  .board-topline{display:flex;align-items:flex-end;justify-content:space-between;padding:2px 2px 0}
+  .turn-controls{display:flex;gap:6px}
+  .turn-controls button{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink2);
+    background:transparent;border:1px solid var(--line2);padding:6px 12px;cursor:pointer}
+  .turn-controls button:hover{color:var(--ink);border-color:var(--ink2)}
+  .turn-controls button.p{color:var(--warn);border-color:var(--warn)}
+
+  .door-zone{display:grid;grid-template-columns:minmax(180px,1fr) 152px minmax(180px,.85fr);gap:12px;
+    border:1px solid var(--line);padding:12px;background:linear-gradient(180deg,var(--panel),var(--panel2))}
+  .door-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:transparent;border:1px solid var(--line2);color:var(--ink2);cursor:pointer;padding:10px;position:relative;
+    transition:.15s}
+  .door-button:hover{border-color:var(--info);color:var(--ink)}
+  .door-frame{width:54px;height:60px;border:1px solid var(--ink2);display:flex;align-items:center;justify-content:center;position:relative}
+  .door-button:hover .door-frame{border-color:var(--info)}
+  .door-badge{position:absolute;top:6px;right:6px;font-family:var(--mono);font-size:10px;color:var(--danger)}
+  .pseudo-card{border:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:6px}
+
+  .section-heading{display:flex;align-items:flex-end;justify-content:space-between;margin:4px 2px 8px}
+  .tenant-grid{display:grid;grid-template-columns:repeat(auto-fill,212px);gap:10px}
+  .tenant{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));padding:10px;cursor:pointer;
+    display:flex;flex-direction:column;gap:5px;transition:.15s}
+  .tenant:hover{border-color:var(--line2);transform:translateY(-1px)}
+  .tenant.sel{border-color:var(--info)}
+  .tenant.searching{border-color:var(--warn);border-style:dashed}
+  .tenant.searching .av{opacity:.6}
+  .tag.search{border-color:var(--warn);color:var(--warn)}
+  .tenant .av{width:56px;height:74px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 1px,transparent 1px 6px)}
+  .tenant .tn{display:flex;align-items:baseline;gap:6px}
+  .tenant .tn b{font-size:15.5px}
+  .tenant .tag{font-family:var(--mono);font-size:10.5px;color:var(--ink3);border:1px solid var(--line);padding:0 4px}
+  .vit{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+  .vit .lab{font-family:var(--mono);font-size:10.5px;color:var(--ink3);display:flex;justify-content:space-between}
+  .bar{height:6px;border:1px solid var(--line2);display:flex;gap:2px;padding:1px}
+  .bar i{flex:1;display:block}
+  .bar i.f{background:var(--ok)} .bar i.h{background:var(--q3)} .bar i.d{background:var(--danger)} .bar i.w{background:var(--warn)}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);padding:1px 6px;
+    font-family:var(--mono);font-size:11px}
+  .chip.danger{border-color:var(--danger);color:var(--danger)} .chip.warn{border-color:var(--warn);color:var(--warn)}
+  .chip.info{border-color:var(--info);color:var(--info)}
+
+  .mission{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .mission:last-child{border-bottom:0}
+
+  /* ---------- detail / intel ---------- */
+  .detail-card{border:1px solid var(--line);padding:10px;display:flex;gap:10px}
+  .intel{padding:7px 0;border-bottom:1px dashed var(--line)}
+  .intel:last-child{border-bottom:0}
+  .intel .it{display:flex;align-items:center;gap:6px}
+  .badge{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);padding:0 6px;color:var(--ink3)}
+  .badge.pending{border-color:var(--warn);color:var(--warn)}
+  .badge.true{border-color:var(--ok);color:var(--ok)}
+  .badge.false{border-color:var(--danger);color:var(--danger)}
+  .count-chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line);padding:1px 7px;color:var(--ink2)}
+
+  /* ---------- inventory dock ---------- */
+  .inventory-layout{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+  .inventory-dock > .body{overflow:hidden}
+  .transfer{display:flex;align-items:center;justify-content:center;color:var(--ink3);padding-top:26px}
+  .slot-grid{display:grid;gap:4px}
+  .slot-grid.warehouse{grid-template-columns:repeat(9,var(--slot))}
+  .wh-scroll{max-height:186px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .wh-scroll::-webkit-scrollbar{width:9px}
+  .wh-scroll::-webkit-scrollbar-thumb{background:var(--line)}
+  .wh-scroll::-webkit-scrollbar-thumb:hover{background:var(--amber-soft)}
+  .slot-grid.backpack{grid-template-columns:repeat(5,var(--slot))}
+  .slot{width:var(--slot);height:var(--slot);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;position:relative;transition:.15s;border-left-width:2px;overflow:hidden}
+  .slot:hover{border-color:var(--line2)}
+  /* 品质：图标与名称直接上色 */
+  .slot.q0{color:var(--q0);border-left-color:var(--q0)}
+  .slot.q1{color:var(--q1);border-left-color:var(--q1)}
+  .slot.q2{color:var(--q2);border-left-color:var(--q2)}
+  .slot.q3{color:var(--q3);border-left-color:var(--q3)}
+  .slot.q4{color:var(--q4);border-left-color:var(--q4)}
+  .slot.q5{color:var(--q5);border-left-color:var(--q5)}
+  .slot .n{font-family:var(--mono);font-size:8.5px;text-align:center;padding:0 2px;line-height:1.05;max-width:100%;word-break:break-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .slot .c{position:absolute;top:1px;right:3px;font-family:var(--mono);font-size:10.5px;color:var(--ink);background:rgba(0,0,0,.35);padding:0 3px;border-radius:2px}
+  .slot svg.ic{width:22px;height:22px}
+  .slot{padding:6px 4px}
+  .slot svg.ic{width:20px;height:20px}
+  .td-inline{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2))}
+  .td-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .td-head b{font-size:17px}
+  .td-body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;padding:12px}
+  .ab-list{display:flex;flex-direction:column;gap:8px}
+  .ability{display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;
+    border:1px solid var(--line);padding:8px 10px;background:rgba(255,255,255,.015)}
+  .ability b{color:var(--ink)}
+  .ability .ab-text{color:var(--ink2);font-size:13px}
+  .ability .btn{padding:4px 10px}
+  .slot.empty{opacity:.3;border-style:dashed;border-left-color:var(--line)}
+
+  .slot{overflow:visible}
+  .item-tip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);width:300px;display:none;z-index:80;
+    background:#0f1416;border:1px solid var(--line);padding:10px 12px;box-shadow:0 14px 30px rgba(0,0,0,.55);
+    font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--ink2);text-align:left;font-weight:400}
+  .slot:hover .item-tip{display:block}
+  .item-tip b{display:flex;align-items:baseline;gap:6px;font-size:13.5px;color:var(--ink)}
+  .item-tip .it-q{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .item-tip .it-tags{display:block;color:var(--ink3);font-size:11px;margin:2px 0 6px}
+  .item-tip .it-desc{display:block;color:var(--ink)}
+  .item-tip .it-flavor{display:block;color:var(--ink2);font-size:12px;margin-top:6px}
+  .item-tip .it-dur{display:block;color:var(--ink3);font-family:var(--mono);font-size:11px;margin-top:4px}
+  .item-tip .it-act{display:block;margin-top:8px;padding-top:6px;border-top:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px}
+
+  .tip-layer{position:fixed;z-index:300;display:none;pointer-events:none;width:320px;background:#0f1416;
+    border:1px solid var(--line);padding:10px 12px;box-shadow:0 16px 36px rgba(0,0,0,.6);
+    font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--ink2)}
+  .tip-layer b{display:flex;align-items:baseline;gap:6px;font-size:13.5px;color:var(--ink)}
+  .tip-layer .it-q{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .tip-layer .it-tags{display:block;color:var(--ink3);font-size:11px;margin:2px 0 6px}
+  .tip-layer .it-desc{display:block;color:var(--ink)}
+  .tip-layer .it-flavor{display:block;color:var(--ink2);font-size:12px;margin-top:6px}
+  .tip-layer .it-dur{display:block;color:var(--ink3);font-family:var(--mono);font-size:11px;margin-top:4px}
+  .tip-layer .tip-line{display:block;color:var(--ink2);padding:1px 0}
+  .tip-layer .tip-line b{color:var(--amber);margin-right:6px}
+  .tip-layer .tip-eff{display:block;color:var(--ink);margin:4px 0}
+  .tip-layer .it-act{display:block;margin-top:8px;padding-top:6px;border-top:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px}
+  .pick-row{display:flex;flex-wrap:wrap;gap:8px}
+  .pick-card{display:flex;align-items:center;gap:6px;border:1px solid var(--line);padding:8px 12px;cursor:pointer;background:rgba(255,255,255,.015)}
+  .pick-card:hover{border-color:var(--line2)}
+  .pick-card.sel{border-color:var(--amber);background:rgba(226,168,77,.1)}
+  .slot[draggable="true"]{cursor:grab}
+  .slot.drop,.tenant.drop{border-color:var(--amber);background:rgba(226,168,77,.12)}
+  .acc{border:1px solid var(--line);margin-bottom:6px}
+  .acc-head{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer}
+  .acc-head:hover{background:rgba(226,168,77,.06)}
+  .acc-title{flex:1}
+  .acc .chev{color:var(--ink3);transition:transform .15s}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-body{display:none;padding:8px 10px 10px;border-top:1px dashed var(--line);font-size:12.5px}
+  .acc.open .acc-body{display:block}
+  .acc-eff{color:var(--ink2);margin:4px 0}
+  .card.sel{border-color:var(--amber);background:rgba(226,168,77,.08)}
+  .field{display:flex;flex-direction:column;gap:4px;margin:10px 0;font-size:13px}
+  .field select{background:var(--ink-2);color:var(--ink);border:1px solid var(--line);padding:6px}
+
+  .bond-chip .nm{font-weight:600}
+  .detail-panel .body{font-size:14px}
+  .bond .name{font-weight:600}
+
+  /* ---------- log ---------- */
+  .log-list{list-style:none;margin:0;padding:0;max-height:none}
+  .log-panel{display:flex;flex-direction:column;min-height:0}
+  .log-panel > .body{overflow:auto;min-height:0}
+  .board{overflow:hidden}
+  .roster{display:flex;flex-direction:column;min-height:0;flex:1}
+  .roster .section-heading{flex:none}
+  .roster .tenant-grid{flex:1;min-height:0;overflow-y:auto;align-content:flex-start;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .roster .tenant-grid::-webkit-scrollbar{width:9px}
+  .roster .tenant-grid::-webkit-scrollbar-thumb{background:var(--line)}
+  .log-list li{display:grid;grid-template-columns:58px 1fr;gap:8px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .log-list .t{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .log-list em{font-style:italic;color:var(--ink)}
+  .log-list strong{color:#f2f5ea}
+
+  /* ---------- dialogs ---------- */
+  .mask{position:fixed;inset:0;background:rgba(6,8,10,.72);backdrop-filter:blur(2px);display:none;
+    align-items:center;justify-content:center;z-index:20}
+  .mask.on{display:flex}
+  .dialog{width:min(560px,92vw);background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line2)}
+  .dialog.wide{width:min(880px,94vw)}
+  .dialog .dhead{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .dialog .dbody{padding:14px}
+  .dialog .dfoot{display:flex;justify-content:flex-end;gap:8px;padding:11px 14px;border-top:1px solid var(--line)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:var(--info);background:rgba(226,168,77,.08)}
+  .card .cn{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;background:transparent;color:var(--ink2);
+    border:1px solid var(--line2);padding:7px 14px;cursor:pointer;transition:.15s}
+  .btn:hover{color:var(--ink);border-color:var(--ink2)}
+  .btn.p{color:var(--info);border-color:var(--info)}
+  .search-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px}
+  .loc{border:1px solid var(--line);padding:8px 10px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between}
+  .loc:hover,.loc.sel{border-color:var(--info)}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:10px}
+</style>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true">
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-gate" viewBox="0 0 24 24"><path d="M5 21V6l7-3 7 3v15"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8 12V6a1.6 1.6 0 013.2 0v5"/><path d="M11.2 11V5a1.6 1.6 0 013.2 0v6"/><path d="M14.4 11V7a1.6 1.6 0 013.2 0v8a6 6 0 01-6 6h-1a6 6 0 01-6-6v-3a1.6 1.6 0 013.2 0"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2z"/><path d="M8 3v18"/></symbol>
+  <symbol id="i-cross" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8v8M8 12h8"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 105 5L21 13l-8 8-2-2 8-8z"/><path d="M6 6l4 4M4 10l4-4"/></symbol>
+  <symbol id="i-armor" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 3v18"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="4"/><path d="M12 8v8"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></symbol>
+  <symbol id="i-trauma" viewBox="0 0 24 24"><path d="M4 18L18 4"/><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/></symbol>
+  <symbol id="i-disorder" viewBox="0 0 24 24"><path d="M4 9c4-4 8 4 12 0M4 15c4-4 8 4 12 0"/></symbol>
+  <symbol id="i-shock" viewBox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 8-11h-6z"/></symbol>
+  <symbol id="i-emotion" viewBox="0 0 24 24"><path d="M5 12s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="12" cy="12" r="1.6"/></symbol>
+  <symbol id="i-mark" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 5.9L12 16.9 6.7 19.3l1.2-5.9L3.4 9.3l6-.7z"/></symbol>
+    <symbol id="i-av1" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.6"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/><path d="M12 14v6M9 17h6"/></symbol>
+  <symbol id="i-av2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/><path d="M12 5.2c1.4-2 3.8-1.6 3.8 .6-1.7 1.4-3.2 1-3.8-.6z"/></symbol>
+  <symbol id="i-av3" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.6"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/><path d="M12 15l3 5h-6z"/></symbol>
+  <symbol id="i-av4" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.6"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></symbol>
+  <symbol id="i-seal" viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 4-3 6-7 8-4-2-7-4-7-8V7z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-craft" viewBox="0 0 24 24"><path d="M6 10l6-5 6 5v8H6z"/><path d="M9 18v-5h6v5"/></symbol>
+  <symbol id="i-drink" viewBox="0 0 24 24"><path d="M6 4h12l-1 15H7z"/><path d="M8 9h8"/></symbol>
+  <symbol id="i-ammo" viewBox="0 0 24 24"><rect x="9" y="7" width="6" height="12" rx="3"/><path d="M12 3v4"/></symbol>
+  <symbol id="i-snack" viewBox="0 0 24 24"><path d="M7 3h10l-1 18H8z"/><path d="M8 10h8M8 14h8"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="9" cy="9" r="4"/><path d="M11.6 11.6L20 20M17 17l2-2"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="3" y="8" width="15" height="8"/><path d="M20 10v4"/></symbol>
+  <symbol id="i-torch" viewBox="0 0 24 24"><path d="M12 3v5"/><path d="M8 8h8l-2 13h-4z"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+<symbol id="i-b-cheerful" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+  <symbol id="i-b-loner" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><rect x="9" y="9" width="4" height="4"/></symbol>
+  <symbol id="i-b-keen" viewBox="0 0 24 24"><path d="M4 15l6-6 4 4 6-6"/><path d="M16 7h4v4"/></symbol>
+  <symbol id="i-b-stubborn" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10"/><path d="M12 7v10M4 12h16"/></symbol>
+  <symbol id="i-b-steady" viewBox="0 0 24 24"><path d="M12 4l7 12H5z"/><path d="M4 20h16"/></symbol>
+  <symbol id="i-b-impatient" viewBox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 8-11h-6z"/></symbol>
+  <symbol id="i-b-gentle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M6 12c2-2 4 2 6 0s4-2 6 0"/></symbol>
+  <symbol id="i-b-suspicious" viewBox="0 0 24 24"><path d="M5 12s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="12" cy="12" r="1.6"/><path d="M4 20L20 4"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="brand-block">
+    <div class="eyebrow">LOCAL SHELTER / NIGHT WATCH</div>
+    <h1>完蛋，我被伪人包围了！？</h1>
+    <div class="compact-hud">回合 12 / 32 · 难度 a0 · 阶段 玩家行动</div>
+  </div>
+  <div class="hud-stats">
+    <div class="stat"><span class="k">回合</span><span class="v">12 / 32</span></div>
+    <div class="stat" style="cursor:help" onmouseover="showDiffTip(this)" onmouseout="hideTip()"><span class="k">难度</span><span class="v">a3</span></div>
+    <div class="stat"><span class="k">种子</span><span class="v">7F3A-11C2</span></div>
+    <div class="stat"><span class="k">屋内</span><span class="v">3</span></div>
+    <div class="stat"><span class="k">门口</span><span class="v" style="color:var(--warn)">2</span></div>
+  </div>
+  <nav class="top-actions">
+    <button onclick="showSave()">保存</button><button onclick="showLoad()">读取</button><button>导出日志</button><button class="danger" onclick="alert('演示：开始新对局')">新对局</button>
+  </nav>
+</header>
+
+<section class="bonds-strip">
+  <span class="eyebrow">SYNERGY · 羁绊</span>
+  <span class="bond-chips" id="bondChips"></span>
+  <button class="btn" onclick="toggleBonds()">羁绊概况 ›</button>
+</section>
+
+<aside class="bond-drawer" id="bondDrawer">
+  <div class="head"><span class="eyebrow">SYNERGY</span><h2 style="margin-left:6px">羁绊概况</h2>
+    <button class="btn" style="margin-left:auto" onclick="toggleBonds()">收起 ‹</button></div>
+  <div class="body" id="bondDrawerBody"></div>
+</aside>
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleBonds()"></div>
+
+<main class="shell">
+
+  <!-- 避难所 -->
+  <section class="board">
+    <div class="board-topline">
+      <div><span class="eyebrow">SAFEHOUSE FLOOR</span><h2>避难所</h2></div>
+      <div class="turn-controls">
+        <button onclick="showDoor()">处理门口</button>
+        <button onclick="showSearch()">指派搜索</button>
+        <button class="p" onclick="endTurn()">结束回合 ▸</button>
+      </div>
+    </div>
+
+    <section class="door-zone">
+      <div>
+        <span class="eyebrow">THRESHOLD EVENT</span>
+        <h3>门口</h3>
+        <p class="muted" id="doorSummary">门外有 2 个事件等待处理。</p>
+      </div>
+      <button class="door-button" onclick="showDoor()">
+        <span class="door-frame"><svg class="ic lg"><use href="#i-gate"/></svg></span>
+        <span>查看门外</span>
+        <span class="door-badge">2</span>
+      </button>
+      <div class="pseudo-card">
+        <span class="eyebrow">PSEUDO · 已知威胁</span>
+        <div class="mono" style="font-size:12px;color:var(--danger)">无眠怪医 · 苯环</div>
+        <div class="vit"><span class="lab"><span>恐惧印记</span><span class="mono">7 / 20</span></span>
+          <span class="bar" id="pbar"></span></div>
+        <div class="dim mono" style="font-size:10px">到访 4 次 · 下次来访 预计 T15</div>
+      </div>
+    </section>
+
+    <section class="roster">
+      <div class="section-heading">
+        <div><span class="eyebrow">TENANT ROSTER</span><h3>房客席位</h3></div>
+        <span class="muted" style="font-size:11px">点选房客查看背包与状态</span>
+      </div>
+      <div class="tenant-grid" id="tenantGrid"></div>
+    </section>
+
+  </section>
+
+  <!-- 现有信息 + 外出搜索 -->
+  <aside class="detail-panel">
+    <section class="panel" style="flex:2;min-height:0">
+      <div class="head"><span class="eyebrow">INTELLIGENCE</span><h3 style="margin-left:6px">现有信息</h3>
+        <span class="count-chip" style="margin-left:auto" id="intelCount">3</span></div>
+      <div class="body" id="intelList"></div>
+    </section>
+    <section class="panel" style="flex:1;min-height:0">
+      <div class="head"><span class="eyebrow">FIELD TEAM</span><h3 style="margin-left:6px">外出搜索</h3></div>
+      <div class="body" id="missionList"></div>
+    </section>
+  </aside>
+
+  <!-- 仓库 / 背包 -->
+  <section class="panel inventory-dock">
+    <div class="head"><span class="eyebrow">OWNER STORAGE</span><h2 style="margin-left:6px">屋主仓库</h2>
+      <span class="muted" style="font-size:11px">拖动可在格间自由摆放</span>
+</div>
+    <div class="body">
+      <div class="inventory-layout">
+        <div>
+          <div class="muted mono" style="font-size:10px;margin-bottom:6px">仓库 <span class="dim" id="whCount"></span></div>
+          <div class="wh-scroll"><div class="slot-grid warehouse" id="warehouseGrid"></div></div>
+        </div>
+        <div class="transfer"><svg class="ic lg"><use href="#i-search"/></svg></div>
+        <div>
+          <div class="muted mono" style="font-size:11.5px;margin-bottom:6px">房客背包 · <span id="bpLabel">苯环</span> · <span id="bpCapacity"></span></div>
+          <div class="slot-grid backpack" id="backpackGrid" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="dropOnBackpack(event)"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 日志 -->
+  <section class="panel log-panel">
+    <div class="head"><span class="eyebrow">VISIBLE EVENT FEED</span><h2 style="margin-left:6px">可视日志</h2>
+      <button class="btn" style="margin-left:auto">清空显示</button></div>
+    <div class="body"><ol class="log-list" id="logList"></ol></div>
+  </section>
+</main>
+
+<div class="tip-layer" id="tipLayer"></div>
+
+<div class="mask" id="mask">
+  <div class="dialog" id="dialog">
+    <div class="dhead"><svg class="ic"><use href="#i-info"/></svg><b class="mono" id="dTitle">事件</b>
+      <span class="muted mono" style="margin-left:auto;font-size:10px" id="dSub"></span></div>
+    <div class="dbody" id="dBody"></div>
+    <div class="dfoot"><button class="btn" onclick="closeDialog()">取消</button>
+      <button class="btn p" onclick="confirmDialog()">确认</button></div>
+  </div>
+</div>
+
+<script>
+/* UI 只认识这份假 state；真实实现里它来自 /api/state */
+const STATE = {
+  bonds:[
+    {name:"开朗",icon:"i-b-cheerful",lv:5,tiers:[2,5,8],
+     base:"开朗房客的昂扬获取量 +20%。",
+     effects:[["2 档","全体房客回合末理智消耗 -1，每回合回复 1 理智。"],
+              ["5 档","全体房客回合末理智消耗 -2，每回合回复 2 理智；开朗房客昂扬获取量 +50%。"],
+              ["8 档","全体房客回合末理智消耗 -5，每回合回复 5 理智；开朗房客昂扬获取量 +100%，并在回合开始令随机侵蚀情绪强度 -1、层数 -1（重复 8 次）。"]],
+     providers:["青桃（副）"],potential:["比格小星","薯条"]},
+    {name:"孤僻",icon:"i-b-loner",lv:5,tiers:[1,5],
+     base:"孤僻房客的生命消耗 -20%。仅当加权 = 1 或 ≥ 5 时激活；未激活时孤僻房客消沉获取 +20%。",
+     effects:[["1 档","孤僻房客搜索回合数 -1，搜索行为成功率固定 100%；生命消耗/伤害额外 -20%。"],
+              ["5 档","孤僻房客回合末理智消耗固定为 0，每回合回复 10 理智；生命消耗/伤害额外 -50%；搜索回合数 -2（至少 1）且成功率 100%；未拥有孤僻的房客回合末理智消耗 +3。"]],
+     providers:["久孤"],potential:["小五"]},
+    {name:"机敏",icon:"i-b-keen",lv:2,tiers:[2,4],
+     base:"机敏房客搜索时获得紫色及以上品质物资概率 +50%。",
+     effects:[["2 档","全体使用【易损品】消耗概率 -10%；机敏房客搜索紫色及以上概率 +100%。（消耗概率最低 5%）"],
+              ["4 档","全体搜索紫色及以上概率 +100%、金色及以上额外 +100%；使用【易损品】消耗概率 -15%；机敏房客使用易损品额外 -15%。（最低 5%）"]],
+     providers:["错潮"],potential:["罗丁"]},
+    {name:"固执",icon:"i-b-stubborn",lv:4,tiers:[4,7,10],
+     base:"固执房客搜索基础回合数 +2 ~ +4。仅当加权 = 4 / 7 / 10 时生效。",
+     effects:[["4 档","固执房客可携带物资 +1；搜索行为成功率 +10%。"],
+              ["7 档","可携带物资 +2；搜索行为成功率 +20%，且必定获得一个蓝色及以上品质物资。"],
+              ["10 档","可携带物资 +4；搜索行为成功率 +40%，必定获得一个蓝色及以上、以及一个紫色及以上品质物资。"]],
+     providers:["堤谧特"],potential:["罗兹"]},
+    {name:"稳重",icon:"i-b-steady",lv:8,tiers:[2,5,8],
+     base:"稳重房客的生命消耗 -20%（加权向上取整）。",
+     effects:[["2 档","全体生命消耗/伤害 -10%；稳重房客额外 -10%。"],
+              ["5 档","全体生命消耗/伤害 -20%；稳重房客额外 -30%。"],
+              ["8 档","稳重房客生命消耗/伤害 -60%；非稳重房客亦 -60%，其中 50% 由稳重房客平均分摊（视作生命值流失，不受增减影响）。"]],
+     providers:["苯环（副）","厄瑞玻斯（副）"],potential:["沙白"]},
+    {name:"急躁",icon:"i-b-impatient",lv:8,tiers:[2,4,6,8],
+     base:"急躁房客每回合 20% 概率受到 5 点生命伤害；搜索回合数 -1（至少 1）；搜索行为成功率 -20%。首次激活各档时获得一个【强心剂】。",
+     effects:[["2 档","每回合 30% 概率受到 5 点生命伤害，搜索回合数 -2，成功率 -15%。"],
+              ["4 档","每回合 35% 概率受到 5 点生命伤害，搜索回合数 -4，成功率 -15%。"],
+              ["6 档","每回合 40% 概率受到 5 点生命伤害，搜索回合数 -6，成功率 -10%。"],
+              ["8 档","每回合 40% 概率受到 5 点生命伤害，搜索回合数固定为 1，成功率 -10%。"]],
+     providers:["薯条"],potential:["青桃"]},
+    {name:"温和",icon:"i-b-gentle",lv:6,tiers:[3,6,9],
+     base:"温和房客回合末生命流失 +2；每当有访客被接纳时回复生命。温和被激活时若无法出现新访客，则以“神秘的补给”替代。",
+     effects:[["3 档","每 4 回合必定有 1 个额外访客；有访客被接纳时，温和房客回复 5 生命、5 理智。"],
+              ["6 档","每 3 回合必定有 1 个额外访客；接纳时全体房客回复 5 生命、5 理智；温和房客与被接纳访客额外回复 5 生命、10 理智。"],
+              ["9 档","每 2 回合必定有 1 个额外访客；接纳时全体房客回复 15 生命、15 理智。"]],
+     providers:["青桃（主）"],potential:["沙白","花尔维纳"]},
+    {name:"多疑",icon:"i-b-suspicious",lv:8,tiers:[2,4,8],
+     base:"多疑房客使用物资时 10% 概率直接消耗且无效果；生命消耗 -5%，消沉获取 +5%。",
+     effects:[["2 档","每回合开始获得 1 条待验证信息；多疑房客每 2 回合识破 1 条信息。"],
+              ["4 档","每回合开始获得 1 条已证实信息与 1 条待验证信息；多疑房客每 1 回合识破 1 条虚假信息。"],
+              ["8 档","每回合开始获得 2 条已证实信息与 1 条待验证信息；多疑房客每 1 回合识破 1 条虚假信息，并额外获得 1 条待验证信息。"]],
+     providers:["苯环（主）","厄瑞玻斯（主）"],potential:["小五","零叁②玖"]},
+  ],
+  tenants:[
+    {id:2,name:"苯环",avatar:"i-av1",tags:["医生","夜班","男性","成年人"],pf:"无眠怪医的躯壳。白大褂上还沾着没干透的血。",persona:"多疑-稳重",searching:true,hp:78,san:52,carry:4,carryNote:"基础 3 +1（固执 4 档）",
+     statuses:[["i-trauma","创伤 3/2","warn"],["i-disorder","紊乱 1/4","info"],["i-shock","休克 1/2","danger"],["i-emotion","烦躁 6/3",""],["i-emotion","焦虑 4/2",""],["i-emotion","忧郁 3/3",""],["i-emotion","恐慌 2/1",""],["i-shield","高生命免疫",""],["i-mark","恐惧印记 7",""]],
+     emotions:[["烦躁 6/3"],["焦虑 4/2"]],mark:"恐惧印记 7",attrs:"爆发- 焦躁-",
+     abilities:[
+       {kind:"主动",name:"紧急处置",text:"移除一名房客的创伤或紊乱，并使其消耗 强度×层数 点理智值。"},
+       {kind:"被动",name:"重症监护",text:"屋内心神不宁者被即时拉回警戒线（生命 <20 抬到 20），每次生命变动后判定。"}]},
+    {id:3,name:"青桃",avatar:"i-av2",tags:["学生","女性","温和"],pf:"总把“没事的”挂在嘴边，自己却先撑不住。",persona:"温和-开朗",personaOff:true,searching:true,hp:-78,san:-30,carry:3,carryNote:"基础 3",
+     statuses:[["i-shock","休克 1/2","danger"],["i-mark","持之以恒 1",""]],emotions:[["快乐 3/3"]],mark:"",attrs:"缓慢- 守护+",
+     abilities:[
+       {kind:"被动",name:"持之以缓",text:"理智从 ≥50 跌破 50 的瞬间夹回 50，并挂 1 回合保护（到本回合结束）；一次性。"},
+       {kind:"主动",name:"正义执行",text:"阻止一次伪人突破，并压制该伪人到访两回合；触发后本能力失效。"}]},
+    {id:4,name:"厄瑞玻斯",avatar:"i-av3",tags:["高中生","16-18岁","女性","白发","神秘学研究者"],pf:"17岁白发女高中生，热衷于占卜术。",persona:"多疑-稳重",hp:88,san:41,carry:3,carryNote:"基础 3",
+     statuses:[["i-trauma","创伤 1/1","warn"],["i-seal","伟大的封印","warn"]],emotions:[["专注 7/2"]],mark:"命运牌 22",attrs:"占卜+",
+     abilities:[
+       {kind:"被动",name:"占卜直觉",text:"获得待验证信息时有 5% 可能直接识破。"},
+       {kind:"主动",name:"命运抽牌",text:"从命运牌堆抽三选一，可反悔；每回合最多使用 1 次。",disabled:true},
+       {kind:"被动",name:"古老而崭新的传说",text:"由《星云传说》习得（永久）：回合末理智消耗降低，并减轻侵蚀情绪。",learned:true}]},
+  ],
+  /* [图标, 名称, 品质, 数量, 是否可堆叠]。耐久/易损/装备类不可堆叠，故不显示数量。 */
+  warehouse:[
+    ["i-snack","简陋食物",0,10,true],["i-snack","常见食物",1,7,true],["i-snack","美味食物",2,4,true],["i-drink","精致食物",3,2,true],["i-drink","无糖可乐",1,3,true],["i-snack","斐济巧克力",4,3,true],["i-cross","星云手术包",5,1,false],["i-cross","手术包",3,1,false],["i-pill","药箱",2,1,false],["i-torch","手电筒",2,1,false],["i-tool","撬棍",3,1,false],["i-armor","防刺服",2,1,false],["i-armor","吉利服",4,1,false],["i-book","BLS",3,1,false],["i-note","日报",1,1,false],["i-snack","巧克力棒",2,6,true],["i-note","智能手机",5,1,false],["i-craft","可爱的玩偶",3,1,false],["i-key","燧发枪",4,1,false],["i-pill","强心剂",2,4,true],["i-ammo","弹药-燧发枪",3,16,true],["i-drink","矿泉水",1,5,true],["i-snack","口香糖",1,8,true],["i-snack","曲多多曲奇",3,4,true],["i-tool","指南针",2,1,false],["i-armor","越野摩托头盔",3,1,false],["i-cross","家用急救包",0,1,false]],
+  backpack:[["i-armor","防刺服",2],["i-tool","撬棍",3],["i-tool","手电筒",2],["i-book","BLS",3],["i-info","日报",1]],
+  missions:[
+    {who:"苯环", place:"县级综合医院", eta:2, carry:["手术包","撬棍"], rate:"62%", note:"遭遇伪人概率 +15%"},
+    {who:"青桃", place:"便利店", eta:1, carry:[], rate:"50%", note:"搜索回合 -1"},
+  ],
+  intel:[
+    {t:"某访客将在 T14 到访", state:"pending", desc:"来源：《乡野日报》。推测一位人类访客将在第 14 回合来访。", effect:"验证：到达该回合确实有访客来访即证实；若到访回合被能力/物资改变则失效。", expire:"持续 5 回合未验证则失效"},
+    {t:"《星云传说》位于大型工农商超市", state:"true", desc:"来源：令人不安的绘本。", effect:"验证：前往该地点搜索时，必然获得《星云传说》。", expire:"物资被获得后失效"},
+    {t:"智能手机的失主在便利店逗留", state:"false", desc:"来源：智能手机。", effect:"已证伪：便利店并无该失主，周边监控亦无此人。", expire:"—"},
+  ],
+  log:[["12:04","<strong>苯环</strong> 到访。门外脚步声在走廊尽头停住。"],
+    ["12:05",'<em>“可能会留疤，不过为了防止伤口感染，请稍微忍耐一下哦~”</em>'],
+    ["12:06","搜索返程：<strong>青桃</strong> 带回 2 件物资，受到 10 生命 / 10 理智伤害。"],
+    ["12:07","<span style='color:var(--danger)'>警告</span>：青桃进入休克。"]],
+};
+const QUALITY_NAMES=["白色","绿色","蓝色","紫色","金色","红色"];
+const ITEM_INFO={
+ "星云手术包":{tags:["医疗用品","手术包","耐久度消耗品"],desc:"治疗 ≤10 级创伤：强度 -6 / 层数 -5；每次使用消耗 10 耐久。",flavor:"碳纤维箱体，铝合金锁扣，工具精度远高于国家临床标准。“用星云的话走不了医保报销，费用呢比较昂贵。”",dur:"100 / 100"},
+ "手术包":{tags:["医疗用品","手术包","耐久度消耗品"],desc:"治疗 ≤6 级创伤：强度 -4 / 层数 -3；每次使用消耗 7 耐久。",flavor:"星尘集团的集采医用耗材，凭借极高性价比广泛出现在地段医院。“用这个吧，进医保。”",dur:"50 / 50"},
+ "药箱":{tags:["医疗用品","医药箱","耐久度消耗品"],desc:"治疗 ≤3 级紊乱：强度 -2 / 层数 -2；每次使用消耗 4 耐久。",flavor:"每个家庭几乎都有的白色小药箱，感冒药、退烧药、止泻药一应俱全。",dur:"20 / 20"},
+ "简陋食物":{tags:["食物","消耗品","占位符"],desc:"使用后回复 5 生命。"},
+ "常见食物":{tags:["食物","消耗品","占位符"],desc:"使用后回复 8 生命。"},
+ "美味食物":{tags:["食物","消耗品","占位符"],desc:"使用后回复 12 生命、3 理智。"},
+ "精致食物":{tags:["食物","消耗品","占位符"],desc:"使用后回复 20 生命、5 理智。"},
+ "斐济巧克力":{tags:["食物","零食","消耗品"],desc:"回复 5 生命、10 理智，侵蚀情绪 -3/-3；3 回合内消沉获取 -20%。",flavor:"法兰妮当地最有名的巧克力，采用顶级可可豆与传统手工工艺制作。"},
+ "手电筒":{tags:["工具","易损品"],desc:"搜索成功率 +10%；返回后有 25% 可能被消耗。",flavor:"斯旺浦骑士系列的基础款，防水防摔。在没有路灯的地方，它就是你的眼睛。"},
+ "撬棍":{tags:["工具","易损品"],desc:"蓝色及以上掉率 +25%；15% 损坏；可 25% 抵御伪人技能。",flavor:"斯旺浦骑士系列的重型工具，通体高碳钢锻造。“不要小看物理学圣剑的力量。”"},
+ "防刺服":{tags:["防具","耐久度消耗品"],desc:"装备后生命伤害 -3；触发消耗 2 耐久。",flavor:"护林员巡林时所用的装备，里面夹着防切割的硬质塑料板。",dur:"50 / 50"},
+ "吉利服":{tags:["工具","防具","易损品"],desc:"搜索遭遇率 -75%，返程生命消耗 -5，并避免返程状态恶化。",flavor:"斯旺浦领主系列尖端产品，集成热信号抑制与轮廓模糊技术，几乎可溶于任何背景。"},
+ "BLS":{tags:["信息载体","书籍","耐久度消耗品"],desc:"持有 5 回合习得 BLS：医疗用品成功率 +10%。",flavor:"哥伦比亚心脏协会出版的急救手册，语言通俗、配图清晰。",dur:"25 / 25"},
+ "日报":{tags:["信息载体","消耗品"],desc:"获得时兑换 1 条待验证的物资或来访信息。",flavor:"充满本地广告与琐碎新闻的报纸，里面似乎潜藏着一些有用的消息。"},
+ "智能手机":{tags:["信息载体","易损品"],desc:"获得时取得 10 条待验证信息；使用回复 15 理智并减轻消沉，50% 损坏。",flavor:"一台崭新的智能手机，本地相册、聊天记录和备忘录里塞满了原主人留下的庞大数据。"},
+ "可爱的玩偶":{tags:["工具","工艺品","消耗品"],desc:"仅比格小星可用，使用后回复 25 理智。",flavor:"一个“快乐恶魂”玩偶，比格小星总喜欢带着她，为她拍摄不同的照片。"},
+ "燧发枪":{tags:["工具","易损品"],desc:"搜索中 25% 抵御伪人技能；消耗 1 枚弹药时提升至 100%。",flavor:"一个较为古典的燧发枪，不到必要关头，薯条不会浪费他的子弹。"},
+ "强心剂":{tags:["医疗用品","消耗品"],desc:"使用后主性格改为急躁，并回复 20 生命。"},
+};
+const $=(id)=>document.getElementById(id);
+const ic=(id,cls="")=>`<svg class="ic ${cls}"><use href="#${id}"/></svg>`;
+const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const STATUS_INFO={"创伤":"外伤：按强度每回合流失生命；额外效果削弱搜索与能力。","紊乱":"内科疾病：按强度每回合流失理智；额外效果削弱能力。","休克":"生命体征崩塌：主动/被动失效，回合末有概率死亡。","烦躁":"侵蚀情绪：累积消沉值，越高越危险。","焦虑":"侵蚀情绪：累积消沉值。","忧郁":"侵蚀情绪：累积消沉值。","恐慌":"侵蚀情绪：累积消沉值。","快乐":"觉醒情绪：抵扣消沉值。","专注":"觉醒情绪：抵扣消沉值。","信任":"觉醒情绪：抵扣消沉值。","兴奋":"觉醒情绪：抵扣消沉值。","满足":"觉醒情绪：抵扣消沉值。","恐惧印记":"苯环专属印记：累计到阈值会发动“希波克拉底诅咒”。","命运牌":"厄瑞玻斯的命运牌堆：抽三选一。","伟大的封印":"厄瑞玻斯被封印：命运抽牌能力失效。"};
+const STATUS_FLAVOR={"创伤":"皮肉之下留下了难以消退的痛楚，连呼吸都牵着伤口。","紊乱":"内科的毛病缠上身，忽冷忽热、时好时坏，把人的精神一点点磨掉。","休克":"生命体征正在崩塌边缘，意识一点点滑向黑暗。","烦躁":"一点小事就能点着，耐性薄得像纸。","焦虑":"心口发紧，总觉得坏事就在下一刻。","忧郁":"低落像潮水漫上来，连抬手都嫌费力。","恐慌":"恐惧接管了身体，只想逃，却无处可逃。","快乐":"难得的轻松，嘴角不由自主地翘起来。","专注":"世界安静下来，只剩下手头这一件事。","恐惧印记":"每一次到访都在喂食那个影子。","伟大的封印":"牌堆已经封死，命运不再给出第二次机会。"};
+const TIER_CLASS=["","t-bronze","t-silver","t-gold","t-prism"];
+const TIER_NAMES=["","铜","银","金","棱彩"];
+/* 位阶随档数：2 档=银/金，3 档=铜/银/金，4 档=铜/银/金/棱彩 */
+const tierFor=(b)=>{const r=b.tiers.filter(t=>b.lv>=t).length;if(!r)return 0;return b.tiers.length<=2?r+1:r;};
+const bondOf=(name)=>STATE.bonds.find(b=>b.name===name);
+let selectedTenant=null;
+function selectTenant(id){selectedTenant=id;renderTenants();renderBackpack();}
+function personaPart(t,name){const b=bondOf(name);const tr=b?tierFor(b):0;const cls=(tr?TIER_CLASS[tr]:"")+(t.personaOff?" p-off":"");return `<span class="${cls}">${name}</span>`;}
+function personaHtml(t){return t.persona.split("-").map(n=>personaPart(t,n)).join("<br>");}
+function sortedBonds(){return STATE.bonds.slice().sort((a,b)=>(tierFor(b)-tierFor(a))||(b.lv-a.lv));}
+function curTierIdx(b){return b.tiers.filter(x=>b.lv>=x).length;}
+function bondDetailHtml(){
+  return sortedBonds().map(b=>{
+    const tr=tierFor(b), cur=curTierIdx(b);
+    const nums=b.tiers.map((x,i)=>`<b class="${(cur&&i===cur-1)?"on":""}">${x}</b>`).join("<i>/</i>");
+    const effs=b.effects.map((e,i)=>`<li class="${(cur&&i===cur-1)?"on":""}"><b>（${b.tiers[i]}）</b>${e[1]}</li>`).join("");
+    return `<div class="bond"><div class="row"><span class="${TIER_CLASS[tr]||"dim"}">${ic(b.icon)}</span>
+      <span class="name ${TIER_CLASS[tr]}">${b.name}</span>
+      <span class="tiernums">${nums}</span>
+      <span class="badge" style="margin-left:auto">${b.lv?(TIER_NAMES[tr]+" "+b.lv):"未激活"}</span></div>
+      <div class="bond-base">基础：${b.base}</div>
+      <ul class="bond-effs">${effs}</ul>
+      <div class="bond-own">激活他的人：${b.providers.length?b.providers.join("、"):"—"}</div>
+      <div class="bond-own">拥有此羁绊的人：${b.potential.join("、")}</div></div>`;
+  }).join("")
+  + `<div class="tier-legend"><span><i class="tier-badge t-bronze"></i>铜</span><span><i class="tier-badge t-silver"></i>银</span><span><i class="tier-badge t-gold"></i>金</span><span><i class="tier-badge t-prism"></i>棱彩</span><span class="dim">2档=银/金 · 3档=铜/银/金 · 4档=铜/银/金/棱彩</span></div>`;
+}
+function bondTipHtml(b,tr){
+  const cur=curTierIdx(b);
+  const effs=b.effects.map((e,i)=>`<span class="tip-line ${(cur&&i===cur-1)?"on":""}"><b>（${b.tiers[i]}）</b>${e[1]}</span>`).join("");
+  return `<span class="tip"><b class="${TIER_CLASS[tr]}">${b.name}</b> · ${TIER_NAMES[tr]}（${b.lv}）
+    <span class="tip-eff">基础：${b.base}</span>${effs}
+    <span class="tip-line">激活他的人：${b.providers.length?b.providers.join("、"):"—"}</span>
+    <span class="tip-line">拥有此羁绊的人：${b.potential.join("、")}</span></span>`;
+}
+function renderBondStrip(){
+  const active=sortedBonds().filter(b=>b.lv>0);
+  $("bondChips").innerHTML = active.length
+    ? active.map(b=>{const tr=tierFor(b);
+        return `<span class="bond-chip on"><span class="${TIER_CLASS[tr]}">${ic(b.icon)}</span><span class="nm ${TIER_CLASS[tr]}">${b.name}</span><span class="lv">${b.lv}</span>${bondTipHtml(b,tr)}</span>`;}).join("")
+    : `<span class="bond-chip none">尚无激活羁绊</span>`;
+}
+function toggleBonds(){
+  const drawer=$("bondDrawer"), backdrop=$("drawerBackdrop");
+  const open=drawer.classList.toggle("open");
+  backdrop.classList.toggle("open",open);
+  if(open) $("bondDrawerBody").innerHTML=bondDetailHtml();
+}
+function tenantDetailHtml(id){
+  const t=STATE.tenants.find(x=>x.id===id);
+  const hp=vitalBar(t.hp,100,"hp"), san=vitalBar(t.san,100,"san");
+  const chips=[...t.statuses.map(s=>chip(s[1],s[0],s[2])),
+    ...t.emotions.map(e=>chip(e[0],"i-emotion","")),
+    t.mark?chip(t.mark,"i-mark",""):""].join("");
+  const abil=(t.abilities||[]).map(a=>`<div class="ability${a.disabled?" disabled":""}"><span class="badge">${a.kind}${a.learned?"·习得":""}</span>
+    <b>${a.name}</b><span class="ab-text">${a.text}</span>
+    ${a.disabled?`<span class="badge seal">已封印</span>`:(a.kind==="主动"?`<button class="btn" onclick="event.stopPropagation();useAbility('${a.name}')">使用</button>`:"")}</div>`).join("");
+  return `<div class="td-inline" onclick="selectTenant(null)">
+    <div class="td-head"><button class="btn" onclick="event.stopPropagation();selectTenant(null)">‹ 返回席位</button>
+      <b>${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>
+      <span style="margin-left:auto;font-size:13px">${personaHtml(t)}</span></div>
+    <div class="td-body">
+      <div class="td-left"><div class="av">${ic(t.avatar||"i-person","lg")}</div>
+        <div class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
+        <div class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
+        <div class="chips">${chips}</div></div>
+      <div class="td-right">
+        <div class="it-flavor" style="margin:0 0 6px">${t.pf||""}</div>
+        <div class="muted mono" style="font-size:11.5px;margin-bottom:6px">携带物资 ${t.carry} 格 · ${t.carryNote}</div>
+        <div class="ab-list">${abil}</div></div>
+    </div></div>`;
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function vitalBar(v,max,kind){
+  const n=10, filled=Math.min(n,Math.round(Math.abs(v)/(max/n))), neg=v<0;
+  const body=Array.from({length:n},(_,i)=>`<i class="${i<filled?(neg?("neg-"+kind):(kind==="hp"?"f":"h")):""}"></i>`).join("");
+  const val=`<span class="${neg?(kind==="hp"?"danger":"purple"):""}">${v}</span>/${max}`;
+  return {body,val};
+}
+function renderTenants(){
+  if(selectedTenant!==null){ const g=$("tenantGrid"); g.style.gridTemplateColumns="1fr"; g.innerHTML=tenantDetailHtml(selectedTenant); return; }
+  $("tenantGrid").style.gridTemplateColumns="";
+  $("tenantGrid").innerHTML = STATE.tenants.map((t,i)=>{
+    const hp=vitalBar(t.hp,100,"hp"), san=vitalBar(t.san,100,"san"), ps=t.persona.split("-");
+    const chips=[...t.statuses.map(s=>chip(s[1],s[0],s[2])),
+      ...t.emotions.map(e=>chip(e[0],"i-emotion","")),
+      t.mark?chip(t.mark,"i-mark",""):""].join("");
+    return `<div class="tenant${i===0?" sel":""}${t.searching?" searching":""}" onclick="selectTenant(${t.id})" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="dropOnTenant(event,${t.id})">
+      <div class="t-top"><div class="av">${ic(t.avatar||"i-person","av")}</div>
+        <div class="t-main">
+          <div class="tn"><b>${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>${t.searching?`<span class="tag search">搜索中</span>`:""}</div>
+          <div class="t-persona"><span>${personaPart(t,ps[0])}</span><i>·</i><span>${personaPart(t,ps[1])}</span></div>
+          <div class="t-tags">${(t.tags||[]).slice(0,2).map(x=>`<span class="tag">${x}</span>`).join("")}</div>
+        </div></div>
+      <div class="t-vitals">
+        <div class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
+        <div class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
+      </div>
+      <div class="chips" onmouseover="statusZoneOver(event,${t.id})" onmouseout="hideTip()">${chips}</div></div>`;
+  }).join("");
+}
+function slotCell(item,index,kind){
+  const drop = kind ? ' ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="'+(kind==="wh"?("dropOnWarehouse(event,"+index+")"):("dropOnBackpack(event,"+index+")"))+'"' : "";
+  if(!item) return '<div class="slot empty"'+drop+'></div>';
+  const [i,n,q,c,stack]=item;
+  const drag = kind ? ' draggable="true" ondragstart="onDragStart(event,\''+n+'\',\''+kind+'\','+index+')" ondragend="onDragEnd()"' : "";
+  return '<div class="slot q'+q+'"'+drag+drop+' onmouseenter="showItemTip(this,\''+n+'\','+q+')" onmouseleave="hideTip()" onclick="showItemUse(\''+n+'\')">'
+    + ic(i)+'<span class="n">'+n+'</span>'+((stack&&c>1)?'<span class="c">×'+c+'</span>':'')+'</div>';
+}
+const WH_ROWS=3, WH_COLS=9;
+function ensureWarehouse(){
+  const used=STATE.warehouse.filter(x=>x).length;
+  if(used>=STATE.warehouse.length){ for(let i=0;i<9;i++) STATE.warehouse.push(null); }
+}
+function renderWarehouse(){
+  ensureWarehouse();
+  const used=STATE.warehouse.filter(x=>x).length;
+  $("whCount").textContent="· "+used+" / "+STATE.warehouse.length;
+  $("warehouseGrid").innerHTML=STATE.warehouse.map((item,k)=>slotCell(item,k,"wh")).join("");
+}
+function renderBackpack(){
+  const t=STATE.tenants.find(x=>x.id===selectedTenant)||STATE.tenants[0];
+  const carry=Math.max(1,t.carry||3);
+  $("bpLabel").textContent=t.name;
+  $("bpCapacity").textContent=carry+" 格"+(t.carryNote?"（"+t.carryNote+"）":"");
+  const grid=$("backpackGrid");
+  grid.style.gridTemplateColumns="repeat("+carry+",var(--slot))";
+  const items=STATE.backpack||[];
+  grid.innerHTML=Array.from({length:carry},(_,k)=>slotCell(items[k],k,"bp")).join("");
+}
+function renderMissions(){
+  $("missionList").innerHTML=STATE.missions.map(m=>`<div class="acc">
+    <div class="acc-head" onclick="toggleAcc(this)">${ic("i-search")}
+      <span class="acc-title">${m.who} → ${m.place}</span>
+      <span class="badge pending">剩 ${m.eta} 回合</span><span class="chev">▾</span></div>
+    <div class="acc-body"><div class="it-desc">携带：${m.carry.length?m.carry.join("、"):"—"}</div>
+      <div class="it-desc">当前成功率 ${m.rate}　·　${m.note}</div>
+      <div class="dim mono" style="font-size:11px">返程：10 生命伤害 / 10 理智伤害，既有创伤/紊乱会恶化、延长</div></div></div>`).join("");
+}
+function renderIntel(){
+  const label={pending:"待验证",true:"已证实",false:"已证伪"};
+  $("intelCount").textContent=STATE.intel.length;
+  $("intelList").innerHTML=STATE.intel.map(x=>`<div class="acc">
+    <div class="acc-head" onclick="toggleAcc(this)"><span class="badge ${x.state}">${label[x.state]}</span>
+      <span class="acc-title">${esc(x.t)}</span><span class="chev">▾</span></div>
+    <div class="acc-body"><div class="it-desc">${x.desc}</div>
+      <div class="acc-eff">${x.effect}</div>
+      <div class="dim mono" style="font-size:11px">${x.expire}</div></div></div>`).join("");
+}
+function renderLog(){
+  $("logList").innerHTML = STATE.log.map(([t,html])=>`<li><span class="t">${t}</span><div>${html}</div></li>`).join("");
+}
+function renderPbar(){ $("pbar").innerHTML=[...Array(20)].map((_,i)=>`<i class="${i<7?"d":""}"></i>`).join(""); }
+
+/* 对话框：门口 / 新对局 / 搜索 / 发现（旧 Web 缺失）/ 命运抽牌（旧 Web 缺失） */
+const D={mask:null,dialog:null};
+let _confirmCb=null;
+function openDialog(title,sub,html,wide,cb){
+  $("dTitle").textContent=title; $("dSub").textContent=sub||""; $("dBody").innerHTML=html;
+  $("dialog").className="dialog"+(wide?" wide":""); _confirmCb=cb||null; $("mask").classList.add("on");
+}
+function closeDialog(){ $("mask").classList.remove("on"); _confirmCb=null; }
+function confirmDialog(){ const cb=_confirmCb; _confirmCb=null; $("mask").classList.remove("on"); if(cb) cb(); }
+let _dragItem=null;
+let _dragSrc=null;
+function onDragStart(ev,name,kind,index){ hideTip(); _dragItem=name; _dragSrc={name:name,kind:kind,index:index}; ev.dataTransfer.setData("text/plain",name); ev.dataTransfer.effectAllowed="move"; }
+function onDragEnd(){ _dragItem=null; _dragSrc=null; }
+function onDragOver(ev){ if(_dragItem){ ev.preventDefault(); ev.currentTarget.classList.add("drop"); } }
+function onDragLeave(ev){ ev.currentTarget.classList.remove("drop"); }
+function _isEquip(name){ const tags=(ITEM_INFO[name]||{}).tags||[]; return tags.some(x=>["防具","工具","信息载体","工艺品"].includes(x)); }
+function dropOnTenant(ev,id){ ev.preventDefault(); ev.currentTarget.classList.remove("drop");
+  const name=_dragItem; onDragEnd(); if(!name) return;
+  const t=STATE.tenants.find(x=>x.id===id); if(!t) return;
+  alert("演示："+(_isEquip(name)?"装备":"使用")+"「"+name+"」→ "+t.name);
+  renderBackpack();
+}
+function dropOnWarehouse(ev,index){ ev.preventDefault(); ev.currentTarget.classList.remove("drop");
+  const src=_dragSrc; onDragEnd(); if(!src) return;
+  const a=STATE.warehouse, b=STATE.backpack;
+  if(src.kind==="wh"){ const tmp=a[index]; a[index]=a[src.index]; a[src.index]=tmp; }
+  else if(src.kind==="bp"){ const moved=b[src.index]; if(!moved) return; const tmp=a[index]; a[index]=moved; b[src.index]=(tmp||null); }
+  renderWarehouse(); renderBackpack();
+}
+function dropOnBackpack(ev,index){ ev.preventDefault(); ev.currentTarget.classList.remove("drop");
+  const src=_dragSrc; onDragEnd(); if(!src) return;
+  const t=STATE.tenants.find(x=>x.id===selectedTenant)||STATE.tenants[0];
+  const carry=Math.max(1,t.carry||3);
+  if(src.kind==="wh"){ const it=STATE.warehouse[src.index]; if(!it) return;
+    if(index==null||index>=carry){ if(STATE.backpack.length<carry) STATE.backpack.push(it); else return; STATE.warehouse[src.index]=null; }
+    else { const old=STATE.backpack[index]||null; STATE.backpack[index]=it; STATE.warehouse[src.index]=old; }
+  } else if(src.kind==="bp" && index!=null){ const tmp=STATE.backpack[index]; STATE.backpack[index]=STATE.backpack[src.index]; STATE.backpack[src.index]=tmp; }
+  renderWarehouse(); renderBackpack();
+}
+function endTurn(){ alert("演示：结束回合（先检查门口事件与未结算塔罗）"); }
+function showItemTip(el,name,q){
+  if(_dragItem) return;
+  const info=ITEM_INFO[name]||{}, L=$("tipLayer");
+  L.innerHTML=`<b class="q${q}">${name}<span class="it-q">${QUALITY_NAMES[q]}</span></b>
+    <span class="it-tags">${(info.tags||[]).join(" · ")}</span>
+    <span class="it-desc">${info.desc||"—"}</span>
+    ${info.flavor?`<em class="it-flavor">${info.flavor}</em>`:""}
+    ${info.dur?`<span class="it-dur">耐久 ${info.dur}</span>`:""}
+    <span class="it-act">单击使用/装备 · 拖拽给房客或背包</span>`;
+  L.style.display="block";
+  const r=el.getBoundingClientRect(), w=320, pad=8;
+  L.style.left=Math.min(window.innerWidth-w-pad, Math.max(pad, r.left+r.width/2-w/2))+"px";
+  let top=r.top-L.offsetHeight-10; if(top<pad) top=r.bottom+10; L.style.top=top+"px";
+}
+function hideTip(){ $("tipLayer").style.display="none"; }
+function showChipTip(el){ if(_dragItem) return; const L=$("tipLayer");
+  const key=(el.dataset.name||"").split(" ")[0];
+  L.innerHTML=`<b>${el.dataset.name||""}</b>
+    <span class="it-desc">${STATUS_INFO[key]||""}</span>
+    ${STATUS_FLAVOR[key]?`<em class="it-flavor">${STATUS_FLAVOR[key]}</em>`:""}`;
+  L.style.display="block";
+  const r=el.getBoundingClientRect(); L.style.left=Math.min(window.innerWidth-330,Math.max(8,r.left))+"px";
+  let top=r.bottom+8; if(top+L.offsetHeight>window.innerHeight-8) top=r.top-L.offsetHeight-8; L.style.top=top+"px";
+}
+function allStatusHtml(id){
+  const t=STATE.tenants.find(x=>x.id===id); if(!t) return "";
+  const all=[...t.statuses.map(s=>chip(s[1],s[0],s[2])),
+    ...t.emotions.map(e=>chip(e[0],"i-emotion","")),
+    ...(t.mark?[chip(t.mark,"i-mark","")]:[])];
+  return `<b>${t.name} · 全部状态效果</b><div class="chips" style="max-height:none;margin-top:6px">${all.join("")}</div>`;
+}
+function showDiffTip(el){
+  const diffs=["回合末理智消耗 +1","搜索行为伤害 ×1.1","伪人起始概率 20% / 每回合步进 20%"];
+  const L=$("tipLayer");
+  L.innerHTML=`<b>难度 a3 · 高频来袭</b>`+diffs.map(x=>`<span class="tip-line">${x}</span>`).join("");
+  L.style.display="block"; const r=el.getBoundingClientRect();
+  L.style.left=Math.min(window.innerWidth-340,Math.max(8,r.left))+"px";
+  L.style.top=(r.bottom+8)+"px";
+}
+function showSave(){
+  openDialog("保存存档","SAVE",
+    `<div class="it-desc">保存路径：<span class="mono">saves/savegame.json</span></div>
+     <div class="it-desc">回合：12 / 32　·　难度：a3　·　种子：<span class="mono">7F3A-11C2</span>　·　伪人：无眠怪医-苯环</div>
+     <div class="it-desc">包含：世界状态、房客、搜索、装备逐件耐久、信息、命运牌堆、伪人进度、回合历史。</div>
+     <div class="dim mono" style="font-size:11px;margin-top:6px">存档版本 2.2.0（版本/内容包不一致将拒绝读取）</div>`,
+    false, ()=>{ alert("演示：已保存到 saves/savegame.json"); });
+}
+function showLoad(){
+  openDialog("读取存档","LOAD",
+    `<div class="acc open"><div class="acc-head">${ic("i-note")}<span class="acc-title">savegame.json</span><span class="badge true">第 12 回合</span></div>
+      <div class="acc-body"><div class="it-desc">难度 a3 · 种子 7F3A-11C2 · 无眠怪医-苯环 · 3 名房客</div>
+      <div class="dim mono" style="font-size:11px">修改于 09-12 05:14</div></div></div>
+     <div class="acc"><div class="acc-head">${ic("i-note")}<span class="acc-title">backup_t08.json</span><span class="badge pending">第 8 回合</span></div>
+      <div class="acc-body"><div class="it-desc">难度 a0 · 种子 aloof-owl · 深潜者祭司-洋葱 · 3 名房客</div></div></div>
+     <div class="note">点选一项并「确认」读取（演示）。</div>`,
+    false, ()=>{ alert("演示：已读取 saves/savegame.json"); });
+}
+function statusZoneOver(ev,id){
+  if(ev.target.closest(".chip")) return;
+  const L=$("tipLayer"); L.innerHTML=allStatusHtml(id); L.style.display="block";
+  const r=ev.currentTarget.getBoundingClientRect();
+  L.style.left=Math.min(window.innerWidth-340,Math.max(8,r.left))+"px";
+  let top=r.bottom+8; if(top+L.offsetHeight>window.innerHeight-8) top=r.top-L.offsetHeight-8; L.style.top=top+"px";
+}
+function chip(label,iconId,cls){
+  const key=(label||"").split(" ")[0]; const info=STATUS_INFO[key]||label||"";
+  return `<span class="chip ${cls||""}" data-name="${label}" data-tip="${info}" onmouseover="showChipTip(this)" onmouseout="hideTip()">${ic(iconId)}${label}</span>`;
+}
+function showDoor(){
+  openDialog("门口事件","THRESHOLD",
+    `<p>人类访客：<strong>苯环</strong>（多疑-稳重）。<em>“外面很冷，能让我进去吗？”</em></p>
+     <div class="pick-row" style="margin-top:10px">
+       <button class="btn p" onclick="doorDecision('接纳')">接纳</button>
+       <button class="btn" onclick="doorDecision('拒绝')">拒绝</button></div>`);
+}
+function doorDecision(kind){ closeDialog(); alert("演示：门口事件 → "+kind); }
+function showSearch(){
+  openDialog("指派搜索","SEARCH ASSIGNMENT",
+    `<div class="search-layout">
+       <div><span class="eyebrow">1. 选择地点</span>
+         <div class="loc sel" style="margin-top:8px"><span>${ic("i-cross")} 县级综合医院</span><span class="mono dim">混合</span></div>
+         <div class="loc"><span>${ic("i-pill")} 便利店</span><span class="mono dim">食物</span></div>
+         <div class="loc"><span>${ic("i-tool")} 大型工农商超市</span><span class="mono dim">工具</span></div></div>
+       <div><span class="eyebrow">2. 调整出发背包</span>
+         <div class="note">与主界面同一仓库；拖拽装备后需「核对指派」再「二次确认」。</div></div>
+     </div>`,true);
+}
+function card(tag,title,desc){return `<div class="card" onclick="closeDialog()">
+  <span class="cn">${tag}</span>${ic("i-person","lg")}<span>${title}</span>
+  <span class="dim" style="font-size:11.5px;text-align:center">${desc}</span></div>`;}
+function showDiscover(){
+  const opts=[["01","火龙","固执-急躁 · 携带 4"],["02","比格小星","开朗-多疑 · 携带 3"],["03","ED Tear","温和-开朗 · 携带 4"]];
+  openDialog("发现 · 三选一","DISCOVER(3)",
+    `<div class="cards">${opts.map(o=>`<div class="card" data-name="${o[1]}" onclick="pickCard(this)"><span class="cn">${o[0]}</span>${ic("i-person","lg")}<span>${o[1]}</span><span class="dim" style="font-size:11.5px;text-align:center">${o[2]}</span></div>`).join("")}</div>
+     <div class="note">点选一位候选入住者，再点右下「确认」。（旧 Web 端缺失的机制）</div>`,
+    false, ()=>{
+      const el=document.querySelector("#dBody .card.sel");
+      if(!el){ alert("请先选择一位候选。"); return; }
+      alert("演示：接纳「"+el.dataset.name+"」入住。");
+    });
+}
+function showFate(){
+  const cards=[["07 · 正","战车","本回合搜索遭遇伪人概率 ×50%"],["16 · 逆","高塔","全员下一次生命消耗 +200%"],["21 · 正","世界","伪人 5 回合不能行动"]];
+  openDialog("命运抽牌 · 抽三选一","EREBUS",
+    `<div class="cards">${cards.map(c=>`<div class="card" onclick="pickCard(this)"><span class="cn">${c[0]}</span>${ic("i-mark","lg")}<span>${c[1]}</span><span class="dim" style="font-size:11.5px;text-align:center">${c[2]}</span></div>`).join("")}</div>
+     <div class="note">可交出紫色及以上物资改定正逆位，亦可反悔。</div>`);
+}
+function toggleAcc(el){ el.parentNode.classList.toggle("open"); }
+function pickCard(el){ el.parentNode.querySelectorAll(".card").forEach(c=>c.classList.remove("sel")); el.classList.add("sel"); }
+function showItemUse(name){
+  const info=ITEM_INFO[name]||{};
+  if(_isEquip(name)){ alert("演示：装备「"+name+"」——直接放入背包，无需选人。"); return; }
+  const picks=STATE.tenants.map(t=>`<div class="pick-card" onclick="pickUnit(this)">${ic("i-person")}<b>${t.name}</b><span class="dim mono" style="font-size:10px">${t.hp} / ${t.san}</span></div>`).join("");
+  openDialog("使用 · "+name,"SUPPLY",
+    `<p class="it-desc">${info.desc||""}</p>${info.flavor?`<p><em class="it-flavor">${info.flavor}</em></p>`:""}
+     <div class="eyebrow" style="margin-top:6px">选择作用房客</div><div class="pick-row">${picks}</div>`,
+    false, ()=>{
+      const el=document.querySelector("#dBody .pick-card.sel");
+      if(!el){ alert("请先选择作用房客。"); return; }
+      alert("演示：对 "+el.querySelector("b").textContent+" 使用「"+name+"」");
+    });
+}
+function pickUnit(el){ el.parentNode.querySelectorAll(".pick-card").forEach(c=>c.classList.remove("sel")); el.classList.add("sel"); }
+function useAbility(name){
+  if(name==="命运抽牌"){ showFate(); return; }
+  const picks=STATE.tenants.map(t=>`<div class="pick-card" onclick="pickUnit(this)">${ic("i-person")}<b>${t.name}</b><span class="dim mono" style="font-size:10px">${t.hp} / ${t.san}</span></div>`).join("");
+  openDialog("使用能力 · "+name,"ABILITY",
+    `<div class="it-desc">对一名房客结算「${name}」。</div>
+     <div class="eyebrow" style="margin-top:6px">选择目标房客</div><div class="pick-row">${picks}</div>`,
+    false, ()=>{
+      const el=document.querySelector("#dBody .pick-card.sel");
+      if(!el){ alert("请先选择目标房客。"); return; }
+      alert("演示：对 "+el.querySelector("b").textContent+" 使用「"+name+"」");
+    });
+}
+
+renderBondStrip();renderTenants();renderWarehouse();renderBackpack();renderMissions();renderIntel();renderLog();renderPbar();
+</script>
+</body>
+</html>

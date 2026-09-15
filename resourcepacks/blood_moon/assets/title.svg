@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300">
+  <defs>
+    <linearGradient id="bloodLine1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff6b63"/>
+      <stop offset="45%" stop-color="#d9414a"/>
+      <stop offset="100%" stop-color="#701620"/>
+    </linearGradient>
+    <!-- 「伪人」两字：浅红 → 暗红（横向渐变） -->
+    <linearGradient id="bloodFake" x1="0" y1="0" x2="1" y2="0.35">
+      <stop offset="0" stop-color="#ff8f86"/>
+      <stop offset="45%" stop-color="#d9414a"/>
+      <stop offset="100%" stop-color="#5e0d16"/>
+    </linearGradient>
+    <linearGradient id="bloodLine2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8a80"/>
+      <stop offset="50%" stop-color="#e0454d"/>
+      <stop offset="100%" stop-color="#8c1a23"/>
+    </linearGradient>
+    <linearGradient id="washRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c0333a" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#5e0d16" stop-opacity=".28"/>
+    </linearGradient>
+    <filter id="inkGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="washSoft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <filter id="washMid" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+    <filter id="sealSoft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.1"/>
+    </filter>
+  </defs>
+
+  <!-- 墨韵／血污底：大块晕染（先铺一层，字压在上面） -->
+  <g filter="url(#washSoft)">
+    <path d="M120 96 q120-64 300-40 q180 24 250 96 q70 74-40 116 q-140 52-320 18 q-180-34-190-190z"
+          fill="url(#washRed)" opacity=".38"/>
+    <path d="M560 214 q160-40 300-6 q120 30 60 74 q-120 84-300 46 q-140-30-60-114z"
+          fill="#8e1f28" opacity=".26"/>
+  </g>
+  <!-- 墨韵：笔刷飞白（拉长的斜向擦痕） -->
+  <g filter="url(#washMid)" fill="#c0333a" opacity=".3">
+    <path d="M84 168 q210-34 420-22 q-200 34-420 22z"/>
+    <path d="M596 128 q180-26 340-8 q-170 30-340 8z"/>
+    <path d="M232 254 q200-24 380-10 q-190 30-380 10z"/>
+  </g>
+
+  <!-- 円相（一笔朱红圆） -->
+  <path d="M812 118 a132 132 0 1 0 -18 -186" fill="none" stroke="#c0333a" stroke-width="9"
+        stroke-linecap="round" opacity=".2" transform="rotate(8 500 118)"/>
+
+  <!-- 飞墨溅点 -->
+  <g fill="#8e1f28" opacity=".5">
+    <circle cx="132" cy="86" r="4.5"/><circle cx="158" cy="112" r="2.6"/>
+    <circle cx="96" cy="150" r="3.2"/><circle cx="186" cy="66" r="2"/>
+    <circle cx="866" cy="196" r="4"/><circle cx="892" cy="168" r="2.4"/>
+    <circle cx="836" cy="222" r="2.8"/><circle cx="912" cy="206" r="1.8"/>
+    <circle cx="70" cy="242" r="3.4"/><circle cx="944" cy="94" r="2.2"/>
+  </g>
+
+  <g font-family="STKaiti, KaiTi, Microsoft YaHei UI, SimHei, serif" font-weight="700"
+     text-anchor="middle" filter="url(#inkGlow)">
+    <!-- 第一行：整体略带透明（墨渗感） -->
+    <text x="500" y="126" font-size="86" fill="url(#bloodLine1)" stroke="#1b0507" stroke-width="6"
+          paint-order="stroke" letter-spacing="6" opacity=".93">完蛋，</text>
+    <!-- 第二行：「伪人」用浅红→暗红渐变；整行略透 -->
+    <text x="500" y="232" font-size="86" fill="url(#bloodLine2)" stroke="#1b0507" stroke-width="6"
+          paint-order="stroke" letter-spacing="4" opacity=".95">我被<tspan fill="url(#bloodFake)"
+          font-size="92">伪人</tspan>包围了？！</text>
+  </g>
+
+  <!-- 字面上的血污/墨渍（压在字上，做"溅上去"的感觉） -->
+  <g filter="url(#washMid)">
+    <path d="M352 118 q26-18 54-8 q22 8 8 24 q-22 24-52 16 q-24-8-10-32z" fill="#8e1f28" opacity=".34"/>
+    <path d="M646 206 q24-14 46-4 q16 8 4 20 q-20 20-44 12 q-18-8-6-28z" fill="#5e0d16" opacity=".30"/>
+  </g>
+
+  <!-- 血滴：从字脚往下淌 -->
+  <g fill="#8e1f28">
+    <path d="M286 240 q4 18 3 26 q-2 9-7 7 q-4-2-3-11 q1-11 7-22z"/>
+    <path d="M432 246 q3 13 2 20 q-1 7-5 6 q-3-2-2-9 q1-8 5-17z"/>
+    <path d="M604 242 q5 22 4 31 q-2 9-8 8 q-5-3-3-13 q2-13 7-26z"/>
+    <path d="M716 246 q3 11 2 17 q-1 6-4 5 q-3-2-3-8 q1-7 5-14z"/>
+    <path d="M524 250 q3 16 2 24 q-1 8-6 6 q-3-2-2-10 q1-10 6-20z"/>
+  </g>
+
+  <!-- 副标题：日语那一行（微微透明） -->
+  <g font-family="Yu Gothic, Meiryo, Microsoft YaHei UI, sans-serif" text-anchor="middle">
+    <text x="500" y="290" font-size="27" fill="#f0c9c4" letter-spacing="5" opacity=".88"
+          stroke="#40121a" stroke-width="2.4" paint-order="stroke"
+          filter="url(#inkGlow)">しまった、偽人に囲まれた？！</text>
+  </g>
+
+  <!-- 朱印「偽」 -->
+  <g transform="translate(918,26)">
+    <rect x="0" y="0" width="52" height="52" rx="4" fill="none" stroke="#c0333a"
+          stroke-width="4" opacity=".78" filter="url(#sealSoft)"/>
+    <text x="26" y="39" text-anchor="middle" font-size="34" font-weight="900"
+          font-family="STKaiti, KaiTi, Microsoft YaHei UI, serif"
+          fill="#c0333a" opacity=".85">偽</text>
+  </g>
+</svg>

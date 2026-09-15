@@ -1,0 +1,7 @@
+{
+  "name": "DLC Template",
+  "version": "0.0.1",
+  "min_game_version": "2.0.0",
+  "description": "Standard empty DLC template. Copy this folder and rename it.",
+  "authors": []
+}

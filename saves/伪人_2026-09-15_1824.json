@@ -1,0 +1,1527 @@
+{
+  "meta": {
+    "version": "2.1.0",
+    "seed": "c0fd5853d776",
+    "difficulty": "a-10",
+    "packs": [
+      "base"
+    ]
+  },
+  "flow": {
+    "turn": 1,
+    "phase": "action",
+    "max_turns": 32,
+    "game_over": false,
+    "victory": false,
+    "ending": ""
+  },
+  "round": {
+    "searched_this_turn": false,
+    "item_uses_this_turn": 0
+  },
+  "ids": {
+    "tenant": 4,
+    "item": 7,
+    "information": 2,
+    "search": 1,
+    "pseudo": 2,
+    "mark": 2
+  },
+  "world": {
+    "visitors": {
+      "visitor_pool": [
+        "dragonboat",
+        "fries",
+        "whitedragon",
+        "fiver",
+        "benzene",
+        "wrongwave",
+        "rose",
+        "looting",
+        "flowey",
+        "zero329",
+        "sunset",
+        "six71",
+        "erebus",
+        "chaos"
+      ],
+      "visitor_rejections": {},
+      "next_pseudo_turn": 6
+    },
+    "locations": {
+      "available_locations": [
+        "county_hospital",
+        "convenience_store",
+        "supermarket",
+        "courier_station",
+        "private_clinic",
+        "chinese_fast_food",
+        "hardware_store",
+        "community_center",
+        "food_cart",
+        "ranger_station"
+      ]
+    },
+    "events": {
+      "door_events": [
+        {
+          "kind": "human",
+          "title": "访客：久孤",
+          "description": "爱好忍术的中二青年，自称“影之继承者”。 性格：开朗-急躁；携带能力：3。",
+          "visitor_id": "jiugu",
+          "pseudo_id": null,
+          "metadata": {}
+        }
+      ],
+      "event_counters": {
+        "0:pseudo.calendar.1": 1,
+        "0:pseudo.calendar.2": 1,
+        "0:pseudo.calendar.3": 1,
+        "0:pseudo.calendar.4": 1,
+        "0:pseudo.calendar.5": 1,
+        "0:start.discover.0": 1,
+        "0:start.discover.1": 1,
+        "0:start.discover.2": 1,
+        "0:tear.arrival.2": 1,
+        "0:visitor.queue": 1,
+        "0:world.locations": 1,
+        "0:start.loot.draws": 1,
+        "0:start.loot.food": 1,
+        "0:start.loot.medical": 1,
+        "0:start.loot.tool": 1,
+        "0:start.loot.carrier": 1,
+        "0:information.type": 1,
+        "0:information.truth": 1,
+        "1:dragon.1": 1,
+        "1:dragon.visitor.1": 1,
+        "1:bigstar.star_overflow.3": 1
+      }
+    },
+    "global_events": {
+      "events": {}
+    },
+    "disabled_characters": [
+      "demit",
+      "peach",
+      "sandwhite",
+      "hkw"
+    ],
+    "missions": []
+  },
+  "house": {
+    "tenants": {
+      "1": {
+        "id": 1,
+        "character_id": "dragon",
+        "health": 120.0,
+        "sanity": 120.0,
+        "max_health": 120.0,
+        "max_sanity": 120.0,
+        "alive": true,
+        "at_home": true,
+        "temporarily_away": false,
+        "return_turn": 0,
+        "leave_count": 0,
+        "is_pseudo": false,
+        "pseudo_source": null,
+        "copied_from": null,
+        "conditions": {
+          "shock": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "high_health_immunity": {
+            "intensity": 10,
+            "layers": 99
+          },
+          "boredom": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "irritation": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "anxiety": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "melancholy": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "panic": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "satisfaction": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "focus": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trust": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "excitement": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "happiness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "madness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "reason": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "chaos_carry": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_lucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_unlucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "information_gathering_zero329": {
+            "intensity": 0,
+            "layers": 0
+          }
+        },
+        "personalities": {},
+        "inventory": {
+          "items": []
+        },
+        "abilities": [
+          {
+            "ability_id": "call_friends",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          },
+          {
+            "ability_id": "party_focus",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          }
+        ],
+        "marks": {
+          "items": []
+        },
+        "action_locks": {},
+        "turn_counters": {
+          "home_turns": 1
+        },
+        "depression": -100.0,
+        "search_bonus": 0.0,
+        "fortune_bonus": 0,
+        "abilities_disabled": false,
+        "passives_disabled": false,
+        "return_event_pending": false
+      },
+      "2": {
+        "id": 2,
+        "character_id": "tear",
+        "health": 120.0,
+        "sanity": 120.0,
+        "max_health": 120.0,
+        "max_sanity": 120.0,
+        "alive": true,
+        "at_home": true,
+        "temporarily_away": false,
+        "return_turn": 0,
+        "leave_count": 0,
+        "is_pseudo": false,
+        "pseudo_source": null,
+        "copied_from": null,
+        "conditions": {
+          "shock": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "high_health_immunity": {
+            "intensity": 10,
+            "layers": 99
+          },
+          "boredom": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "irritation": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "anxiety": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "melancholy": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "panic": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "satisfaction": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "focus": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trust": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "excitement": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "happiness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "madness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "reason": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "chaos_carry": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_lucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_unlucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "information_gathering_zero329": {
+            "intensity": 0,
+            "layers": 0
+          }
+        },
+        "personalities": {},
+        "inventory": {
+          "items": []
+        },
+        "abilities": [
+          {
+            "ability_id": "walmart_bag",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          },
+          {
+            "ability_id": "needs_bag",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          }
+        ],
+        "marks": {
+          "items": []
+        },
+        "action_locks": {},
+        "turn_counters": {
+          "home_turns": 1
+        },
+        "depression": -100.0,
+        "search_bonus": 0.0,
+        "fortune_bonus": 0,
+        "abilities_disabled": false,
+        "passives_disabled": false,
+        "return_event_pending": false
+      },
+      "3": {
+        "id": 3,
+        "character_id": "bigstar",
+        "health": 120.0,
+        "sanity": 120.0,
+        "max_health": 120.0,
+        "max_sanity": 120.0,
+        "alive": true,
+        "at_home": true,
+        "temporarily_away": false,
+        "return_turn": 0,
+        "leave_count": 0,
+        "is_pseudo": false,
+        "pseudo_source": null,
+        "copied_from": null,
+        "conditions": {
+          "shock": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "high_health_immunity": {
+            "intensity": 10,
+            "layers": 99
+          },
+          "boredom": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "irritation": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "anxiety": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "melancholy": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "panic": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "satisfaction": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "focus": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trust": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "excitement": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "happiness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "madness": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "disorder": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "analgesia_trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "trauma": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "reason": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "chaos_carry": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_lucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "persona_unlucky": {
+            "intensity": 0,
+            "layers": 0
+          },
+          "information_gathering_zero329": {
+            "intensity": 0,
+            "layers": 0
+          }
+        },
+        "personalities": {},
+        "inventory": {
+          "items": []
+        },
+        "abilities": [
+          {
+            "ability_id": "hell_gift",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          },
+          {
+            "ability_id": "everyone_star",
+            "acquisition": "original",
+            "source_character_id": null,
+            "cooldown_until": 0,
+            "used_this_turn": false,
+            "disabled": false
+          }
+        ],
+        "marks": {
+          "items": [
+            {
+              "mark_instance_id": 1,
+              "mark_id": "star",
+              "value": 1.0
+            }
+          ]
+        },
+        "action_locks": {},
+        "turn_counters": {
+          "home_turns": 1
+        },
+        "depression": -100.0,
+        "search_bonus": 0.0,
+        "fortune_bonus": 0,
+        "abilities_disabled": false,
+        "passives_disabled": false,
+        "return_event_pending": false
+      }
+    },
+    "inventory": {
+      "items": [
+        {
+          "item_instance_id": 1,
+          "item_id": "walmart_bag",
+          "count": 1,
+          "durability": 0,
+          "held_turns": 0,
+          "plot": 0
+        },
+        {
+          "item_instance_id": 2,
+          "item_id": "pancake",
+          "count": 1,
+          "durability": 3,
+          "held_turns": 0,
+          "plot": 1
+        },
+        {
+          "item_instance_id": 3,
+          "item_id": "common_food",
+          "count": 1,
+          "durability": 0,
+          "held_turns": 0,
+          "plot": 2
+        },
+        {
+          "item_instance_id": 4,
+          "item_id": "portable_medicine",
+          "count": 1,
+          "durability": 10,
+          "held_turns": 0,
+          "plot": 3
+        },
+        {
+          "item_instance_id": 5,
+          "item_id": "flashlight",
+          "count": 1,
+          "durability": 0,
+          "held_turns": 0,
+          "plot": 4
+        },
+        {
+          "item_instance_id": 6,
+          "item_id": "compass",
+          "count": 1,
+          "durability": 0,
+          "held_turns": 0,
+          "plot": 5
+        }
+      ]
+    },
+    "information": [
+      {
+        "info_instance_id": 1,
+        "title": "伪人来访预告",
+        "text": "《乡野日报》指出：深潜者祭司-洋葱可能在第6回合行动。",
+        "status": "pending",
+        "gained_turn": 0,
+        "expires_turn": 5,
+        "truth": true,
+        "kind": "visit",
+        "subtype": "pseudo_visit",
+        "source": "《乡野日报》",
+        "template_id": null,
+        "location_id": null,
+        "target_ids": [],
+        "data": {
+          "predicted_turn": 6,
+          "actual_turn": 6
+        },
+        "verified_turn": null,
+        "resolved": false
+      }
+    ],
+    "bonds": {
+      "activated_bonds": [
+        "cheerful:2"
+      ]
+    }
+  },
+  "pseudo_state": {
+    "pseudo_instance_id": 1,
+    "scenario_id": "pseudo_onion",
+    "name": "深潜者祭司-洋葱",
+    "common": {
+      "revealed": false,
+      "visit_count": 0,
+      "liberated": false
+    },
+    "states": {
+      "onion": {
+        "whisper_marks": 0,
+        "whisper_count": 0,
+        "safe_irritation_whispers": 0,
+        "safe_health_whispers": 0,
+        "resolving_skill": false
+      }
+    }
+  },
+  "log": {
+    "history": [
+      {
+        "meta": {
+          "version": "2.1.0",
+          "seed": "c0fd5853d776",
+          "difficulty": "a-10",
+          "packs": [
+            "base"
+          ]
+        },
+        "flow": {
+          "turn": 0,
+          "phase": "created",
+          "max_turns": 32,
+          "game_over": false,
+          "victory": false,
+          "ending": ""
+        },
+        "round": {
+          "searched_this_turn": false,
+          "item_uses_this_turn": 0
+        },
+        "ids": {
+          "tenant": 4,
+          "item": 7,
+          "information": 2,
+          "search": 1,
+          "pseudo": 2,
+          "mark": 1
+        },
+        "world": {
+          "visitors": {
+            "visitor_pool": [
+              "jiugu",
+              "dragonboat",
+              "fries",
+              "whitedragon",
+              "fiver",
+              "benzene",
+              "wrongwave",
+              "rose",
+              "looting",
+              "flowey",
+              "zero329",
+              "sunset",
+              "six71",
+              "erebus",
+              "chaos"
+            ],
+            "visitor_rejections": {},
+            "next_pseudo_turn": 6
+          },
+          "locations": {
+            "available_locations": [
+              "county_hospital",
+              "convenience_store",
+              "supermarket",
+              "courier_station",
+              "private_clinic",
+              "chinese_fast_food",
+              "hardware_store",
+              "community_center",
+              "food_cart",
+              "ranger_station"
+            ]
+          },
+          "events": {
+            "door_events": [],
+            "event_counters": {
+              "0:pseudo.calendar.1": 1,
+              "0:pseudo.calendar.2": 1,
+              "0:pseudo.calendar.3": 1,
+              "0:pseudo.calendar.4": 1,
+              "0:pseudo.calendar.5": 1,
+              "0:start.discover.0": 1,
+              "0:start.discover.1": 1,
+              "0:start.discover.2": 1,
+              "0:tear.arrival.2": 1,
+              "0:visitor.queue": 1,
+              "0:world.locations": 1,
+              "0:start.loot.draws": 1,
+              "0:start.loot.food": 1,
+              "0:start.loot.medical": 1,
+              "0:start.loot.tool": 1,
+              "0:start.loot.carrier": 1,
+              "0:information.type": 1,
+              "0:information.truth": 1
+            }
+          },
+          "global_events": {
+            "events": {}
+          },
+          "disabled_characters": [
+            "demit",
+            "peach",
+            "sandwhite",
+            "hkw"
+          ],
+          "missions": []
+        },
+        "house": {
+          "tenants": {
+            "1": {
+              "id": 1,
+              "character_id": "dragon",
+              "health": 120.0,
+              "sanity": 120.0,
+              "max_health": 120.0,
+              "max_sanity": 120.0,
+              "alive": true,
+              "at_home": true,
+              "temporarily_away": false,
+              "return_turn": 0,
+              "leave_count": 0,
+              "is_pseudo": false,
+              "pseudo_source": null,
+              "copied_from": null,
+              "conditions": {
+                "shock": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "high_health_immunity": {
+                  "intensity": 10,
+                  "layers": 99
+                }
+              },
+              "personalities": {},
+              "inventory": {
+                "items": []
+              },
+              "abilities": [
+                {
+                  "ability_id": "call_friends",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                },
+                {
+                  "ability_id": "party_focus",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                }
+              ],
+              "marks": {
+                "items": []
+              },
+              "action_locks": {},
+              "turn_counters": {},
+              "depression": -100.0,
+              "search_bonus": 0.0,
+              "fortune_bonus": 0,
+              "abilities_disabled": false,
+              "passives_disabled": false,
+              "return_event_pending": false
+            },
+            "2": {
+              "id": 2,
+              "character_id": "tear",
+              "health": 120.0,
+              "sanity": 120.0,
+              "max_health": 120.0,
+              "max_sanity": 120.0,
+              "alive": true,
+              "at_home": true,
+              "temporarily_away": false,
+              "return_turn": 0,
+              "leave_count": 0,
+              "is_pseudo": false,
+              "pseudo_source": null,
+              "copied_from": null,
+              "conditions": {
+                "shock": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "analgesia_disorder": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "disorder": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "analgesia_trauma": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "trauma": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "high_health_immunity": {
+                  "intensity": 10,
+                  "layers": 99
+                }
+              },
+              "personalities": {},
+              "inventory": {
+                "items": []
+              },
+              "abilities": [
+                {
+                  "ability_id": "walmart_bag",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                },
+                {
+                  "ability_id": "needs_bag",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                }
+              ],
+              "marks": {
+                "items": []
+              },
+              "action_locks": {},
+              "turn_counters": {},
+              "depression": -100.0,
+              "search_bonus": 0.0,
+              "fortune_bonus": 0,
+              "abilities_disabled": false,
+              "passives_disabled": false,
+              "return_event_pending": false
+            },
+            "3": {
+              "id": 3,
+              "character_id": "bigstar",
+              "health": 120.0,
+              "sanity": 120.0,
+              "max_health": 120.0,
+              "max_sanity": 120.0,
+              "alive": true,
+              "at_home": true,
+              "temporarily_away": false,
+              "return_turn": 0,
+              "leave_count": 0,
+              "is_pseudo": false,
+              "pseudo_source": null,
+              "copied_from": null,
+              "conditions": {
+                "shock": {
+                  "intensity": 0,
+                  "layers": 0
+                },
+                "high_health_immunity": {
+                  "intensity": 10,
+                  "layers": 99
+                }
+              },
+              "personalities": {},
+              "inventory": {
+                "items": []
+              },
+              "abilities": [
+                {
+                  "ability_id": "hell_gift",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                },
+                {
+                  "ability_id": "everyone_star",
+                  "acquisition": "original",
+                  "source_character_id": null,
+                  "cooldown_until": 0,
+                  "used_this_turn": false,
+                  "disabled": false
+                }
+              ],
+              "marks": {
+                "items": []
+              },
+              "action_locks": {},
+              "turn_counters": {},
+              "depression": -100.0,
+              "search_bonus": 0.0,
+              "fortune_bonus": 0,
+              "abilities_disabled": false,
+              "passives_disabled": false,
+              "return_event_pending": false
+            }
+          },
+          "inventory": {
+            "items": [
+              {
+                "item_instance_id": 1,
+                "item_id": "walmart_bag",
+                "count": 1,
+                "durability": 0,
+                "held_turns": 0,
+                "plot": 0
+              },
+              {
+                "item_instance_id": 2,
+                "item_id": "pancake",
+                "count": 1,
+                "durability": 3,
+                "held_turns": 0,
+                "plot": 1
+              },
+              {
+                "item_instance_id": 3,
+                "item_id": "common_food",
+                "count": 1,
+                "durability": 0,
+                "held_turns": 0,
+                "plot": 2
+              },
+              {
+                "item_instance_id": 4,
+                "item_id": "portable_medicine",
+                "count": 1,
+                "durability": 10,
+                "held_turns": 0,
+                "plot": 3
+              },
+              {
+                "item_instance_id": 5,
+                "item_id": "flashlight",
+                "count": 1,
+                "durability": 0,
+                "held_turns": 0,
+                "plot": 4
+              },
+              {
+                "item_instance_id": 6,
+                "item_id": "compass",
+                "count": 1,
+                "durability": 0,
+                "held_turns": 0,
+                "plot": 5
+              }
+            ]
+          },
+          "information": [
+            {
+              "info_instance_id": 1,
+              "title": "伪人来访预告",
+              "text": "《乡野日报》指出：深潜者祭司-洋葱可能在第6回合行动。",
+              "status": "pending",
+              "gained_turn": 0,
+              "expires_turn": 5,
+              "truth": true,
+              "kind": "visit",
+              "subtype": "pseudo_visit",
+              "source": "《乡野日报》",
+              "template_id": null,
+              "location_id": null,
+              "target_ids": [],
+              "data": {
+                "predicted_turn": 6,
+                "actual_turn": 6
+              },
+              "verified_turn": null,
+              "resolved": false
+            }
+          ],
+          "bonds": {
+            "activated_bonds": [
+              "cheerful:2"
+            ]
+          }
+        },
+        "pseudo_state": {
+          "pseudo_instance_id": 1,
+          "scenario_id": "pseudo_onion",
+          "name": "深潜者祭司-洋葱",
+          "common": {
+            "revealed": false,
+            "visit_count": 0,
+            "liberated": false
+          },
+          "states": {
+            "onion": {
+              "whisper_marks": 0,
+              "whisper_count": 0,
+              "safe_irritation_whispers": 0,
+              "safe_health_whispers": 0,
+              "resolving_skill": false
+            }
+          }
+        },
+        "log": {
+          "history": [],
+          "current_turn_actions": [],
+          "action_log": []
+        }
+      }
+    ],
+    "current_turn_actions": [],
+    "action_log": [],
+    "entries": [
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 开局选择 #1 randbelow(3)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|pseudo.calendar.1|0 #1 roll=0.920759"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|pseudo.calendar.1|0 #2 骰点=0.920759 < 0.1 → 不生效"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|pseudo.calendar.2|0 #1 roll=0.495711"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|pseudo.calendar.2|0 #2 骰点=0.495711 < 0.2 → 不生效"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|pseudo.calendar.3|0 #1 roll=0.515313"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|pseudo.calendar.3|0 #2 骰点=0.515313 < 0.3 → 不生效"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|pseudo.calendar.4|0 #1 roll=0.864908"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|pseudo.calendar.4|0 #2 骰点=0.864908 < 0.4 → 不生效"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|pseudo.calendar.5|0 #1 roll=0.306149"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|pseudo.calendar.5|0 #2 骰点=0.306149 < 0.5 → 生效"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #1 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #2 randbelow(17)=7"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #3 randbelow(16)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #4 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #5 randbelow(2)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.0|0 #6 randbelow(1)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[发现] 1202.0 从 [('dragon', 1.0)、('bigstar', 1.0)、('tear', 1.0)、('benzene', 1.0)、('wrongwave', 1.0)、('erebus', 1.0)、('six71', 1.0)、('jiugu', 1.0)、('fries', 1.0)、('zero329', 1.0)、('rose', 1.0)、('looting', 1.0)、('chaos', 1.0)、('whitedragon', 1.0)、('dragonboat', 1.0)、('sunset', 1.0)、('flowey', 1.0)、('fiver', 1.0)] 中选择了 [dragon、bigstar、fries]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #1 randbelow(2)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #2 randbelow(16)=14"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #3 randbelow(15)=13"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #4 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #5 randbelow(2)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.1|0 #6 randbelow(1)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[发现] 1202.1 从 [('bigstar', 1.0)、('tear', 1.0)、('benzene', 1.0)、('wrongwave', 1.0)、('erebus', 1.0)、('six71', 1.0)、('jiugu', 1.0)、('fries', 1.0)、('zero329', 1.0)、('rose', 1.0)、('looting', 1.0)、('chaos', 1.0)、('whitedragon', 1.0)、('dragonboat', 1.0)、('sunset', 1.0)、('flowey', 1.0)、('fiver', 1.0)] 中选择了 [tear、sunset、flowey]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #1 randbelow(1)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #2 randbelow(15)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #3 randbelow(14)=6"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #4 randbelow(3)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #5 randbelow(2)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.discover.2|0 #6 randbelow(1)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[发现] 1202.2 从 [('bigstar', 1.0)、('benzene', 1.0)、('wrongwave', 1.0)、('erebus', 1.0)、('six71', 1.0)、('jiugu', 1.0)、('fries', 1.0)、('zero329', 1.0)、('rose', 1.0)、('looting', 1.0)、('chaos', 1.0)、('whitedragon', 1.0)、('dragonboat', 1.0)、('sunset', 1.0)、('flowey', 1.0)、('fiver', 1.0)] 中选择了 [benzene、zero329、bigstar]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|tear.arrival.2|0 #1 roll=0.023304"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|tear.arrival.2|0 #2 骰点=0.023304 >= 0 → 生效"
+      },
+      {
+        "turn": 0,
+        "shown": true,
+        "text": "ED Tear带来了沃尔玛购物袋。"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #1 randbelow(15)=9"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #2 randbelow(14)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #3 randbelow(13)=3"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #4 randbelow(12)=3"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #5 randbelow(11)=6"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #6 randbelow(10)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #7 randbelow(9)=8"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #8 randbelow(8)=7"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #9 randbelow(7)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #10 randbelow(6)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #11 randbelow(5)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #12 randbelow(4)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #13 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|visitor.queue|0 #14 randbelow(2)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #1 randbelow(4)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #2 randbelow(4)=1"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #3 randbelow(4)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #4 roll=0.998229"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #5 randbelow(9)=6"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #6 roll=0.220414"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #7 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #8 roll=0.540495"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|world.locations|0 #9 randbelow(3)=0"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.draws|0 #1 randbelow(4)=2"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.food|0 #1 roll=0.767811"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.food|0 #2 roll=0.168962"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[抽取/开局补给] start.loot.food 从 [simple_food、common_food、tasty_food、garlic、water、pancake、luncheon_meat] 中抽到了 [pancake、common_food]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.medical|0 #1 roll=0.643105"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[抽取/开局补给] start.loot.medical 从 [home_first_aid、portable_medicine] 中抽到了 [portable_medicine]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.tool|0 #1 roll=0.181053"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.tool|0 #2 roll=0.473749"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[抽取/开局补给] start.loot.tool 从 [flashlight、compass、sports_shoes] 中抽到了 [flashlight、compass]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|start.loot.carrier|0 #1 roll=0.646588"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[抽取/开局补给] start.loot.carrier 从 [smartphone、newspaper、video_tape] 中抽到了 [newspaper]"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|information.type|0 #1 randbelow(10)=8"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[随机] 0|information.truth|0 #1 roll=0.278386"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "[判定] 0|information.truth|0 #2 骰点=0.278386 < 0.7 → 生效"
+      },
+      {
+        "turn": 0,
+        "shown": true,
+        "text": "《乡野日报》已自动兑换为信息。"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "本局种子：c0fd5853d776；难度：a-10（百毒不侵）。"
+      },
+      {
+        "turn": 0,
+        "shown": false,
+        "text": "本局伪人：深潜者祭司-洋葱。人类形态“葱头”不会自然出现。"
+      },
+      {
+        "turn": 0,
+        "shown": true,
+        "text": "天色已暗。火龙、ED Tear、比格小星已经在屋里，门外的道路一片漆黑。"
+      },
+      {
+        "turn": 0,
+        "shown": true,
+        "text": "目标：撑到第32回合结束，或先完成伪人的解放条件。"
+      },
+      {
+        "turn": 1,
+        "shown": true,
+        "text": "\n========== 第 1 回合：回合开始 =========="
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|dragon.1|0 #1 roll=0.501195"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|dragon.1|0 #2 骰点=0.501195 >= 0 → 生效"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|dragon.visitor.1|0 #1 roll=0.608814"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|dragon.visitor.1|0 #2 骰点=0.608814 < 0.15 → 不生效"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|bigstar.star_overflow.3|0 #1 roll=0.351643"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|bigstar.star_overflow.3|0 #2 骰点=0.351643 >= 0 → 生效"
+      },
+      {
+        "turn": 1,
+        "shown": true,
+        "text": "门外有 1 个事件等待处理，暂时不能结束回合。"
+      },
+      {
+        "turn": 1,
+        "shown": true,
+        "text": "进入游戏。"
+      },
+      {
+        "turn": 0,
+        "shown": true,
+        "text": "已回溯至第1回合开始前；相同操作会得到相同随机结果。"
+      },
+      {
+        "turn": 1,
+        "shown": true,
+        "text": "\n========== 第 1 回合：回合开始 =========="
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|dragon.1|0 #1 roll=0.501195"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|dragon.1|0 #2 骰点=0.501195 >= 0 → 生效"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|dragon.visitor.1|0 #1 roll=0.608814"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|dragon.visitor.1|0 #2 骰点=0.608814 < 0.15 → 不生效"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[随机] 1|bigstar.star_overflow.3|0 #1 roll=0.351643"
+      },
+      {
+        "turn": 1,
+        "shown": false,
+        "text": "[判定] 1|bigstar.star_overflow.3|0 #2 骰点=0.351643 >= 0 → 生效"
+      },
+      {
+        "turn": 1,
+        "shown": true,
+        "text": "门外有 1 个事件等待处理，暂时不能结束回合。"
+      }
+    ]
+  }
+}

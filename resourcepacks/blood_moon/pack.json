@@ -1,0 +1,8 @@
+{
+  "name": "blood_moon",
+  "label": "血月・和风恐怖",
+  "version": "1.0.0",
+  "min_game_version": "2.1.0",
+  "description": "只改外观（和风恐怖色调 + 血月强光）；含封面背景与和风标题，并把**全部头像配件**换成和风一套（12 形状 + 14 特征），全员改用零件组装（avatar_mode=parts）。可热切换、随时卸载，不影响存档。",
+  "avatar_mode": "parts"
+}
