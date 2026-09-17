@@ -1,11 +1,15 @@
 """日志文案自检：扫 `_log()` 里的字面量，只报**机械项**，不判内容好坏。
 
-规则见 `docs/STYLE.md` §11。它只做机器能确定的事：
+规则见 `docs/STYLE.md` §11。只做机器能确定的事：
   - error：没有以 `。！？` 收尾；出现了 `**`（日志不用加粗）
   - warn ：估长超过上限；出现含糊词（似乎 / 好像 / 也许 / 大概）；出现 `·` 或换行
 
+实现上只认可见播报 `_log(`（**不认 `_record_log(`**），并按 f-string 的**花括号深度**取字面量：
+只收顶层字面量（`{…}` 里的字符串是表达式，不算正文），所以 `f"甲{x}乙{y}丙。"` 会拼成 `甲乙丙。`。
+`====` / `----` 这类结构行豁免句号与换行。
+
 用法：``python tools/audit_text.py [--max-len 40] [--quiet]``
-退出码：有 error 时 1，否则 0（方便挂进"每次改完的固定动作"）。
+退出码：有 error 时 1，否则 0。
 """
 
 from __future__ import annotations
@@ -18,34 +22,122 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCAN_DIRS = (ROOT / "weiren_game", ROOT / "dlc")
 
-CALL = re.compile(r"_log\(\s*f?((?:\"[^\"]*\"|'[^']*')+)")
-LITERAL = re.compile(r"\"([^\"]*)\"|'([^']*)'")
-PLACEHOLDER = re.compile(r"\{[^}]*\}")
+# 可见播报：`_log(`，且前一个字符不是单词字符（这样 `_record_log(` 不会被命中）
+CALL = re.compile(r"(?<![\w])_log\(")
+STRUCT = re.compile(r"[=\-]{4,}")
 
-END_OK = ("\u3002", "\uff01", "\uff1f")          # 。！？
-HAZY = ("\u4f3c\u4e4e", "\u597d\u50cf", "\u4e5f\u8bb8", "\u5927\u6982")   # 似乎 / 好像 / 也许 / 大概
+END_OK = ("\u3002", "\uff01", "\uff1f")                                   # 。！？
+HAZY = ("\u4f3c\u4e4e", "\u597d\u50cf", "\u4e5f\u8bb8", "\u5927\u6982")   # 似乎/好像/也许/大概
+PLACEHOLDER_W = 3          # 估长时每个 `{…}` 按 3 字算
+
+
+def _argument(text: str, start: int) -> str:
+    """从 `(` 之后取到配对的 `)`；按深度扫描，字符串里的括号不算数。"""
+    depth = 1
+    quote = ""
+    buf: list[str] = []
+    i = start
+    while i < len(text):
+        ch = text[i]
+        if quote:
+            buf.append(ch)
+            if ch == "\\":
+                if i + 1 < len(text):
+                    buf.append(text[i + 1])
+                i += 2
+                continue
+            if ch == quote:
+                quote = ""
+            i += 1
+            continue
+        if ch in "\"'":
+            quote = ch
+            buf.append(ch)
+            i += 1
+            continue
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return "".join(buf)
+        buf.append(ch)
+        i += 1
+    return "".join(buf)
+
+
+OPEN = "([{"
+CLOSE = ")]}"
+
+
+def _parts(argument: str) -> tuple[str, int]:
+    """取**最外层**字面量拼成正文；返回 (正文, `{…}` 占位符个数)。
+
+    任何括号/方括号/花括号里的字符串都不算正文（`spec["log"]`、`"{0}".format(x)` 里的那段）。
+    """
+    sentence: list[str] = []
+    braces = 0
+    depth = 0
+    quote = ""
+    i = 0
+    while i < len(argument):
+        ch = argument[i]
+        if quote:
+            if ch == "\\":
+                if depth == 0:
+                    sentence.append(argument[i + 1] if i + 1 < len(argument) else "")
+                i += 2
+                continue
+            if ch == quote:
+                quote = ""
+                i += 1
+                continue
+            if depth == 0:
+                sentence.append(ch)
+            i += 1
+            continue
+        if ch in "\"'":
+            quote = ch
+            i += 1
+            continue
+        if ch in OPEN:
+            depth += 1
+            if ch == "{" and depth == 1:
+                braces += 1
+        elif ch in CLOSE:
+            depth = max(0, depth - 1)
+        # 字符串外的字符（f 前缀、换行、缩进、+ 号）都不是正文，不进句子
+        i += 1
+    return "".join(sentence).strip(), braces
+
+
+def _ends_with_literal(argument: str) -> bool:
+    """参数是否以**字面量**结尾：是才由这里负责句号（后面接变量/调用的，句号可能来自它）。"""
+    return argument.rstrip().rstrip(",").endswith(("\"", "'"))
 
 
 def scan(path: pathlib.Path) -> list[tuple[str, str, str]]:
     """返回 [(等级, 说明, 原文)]；等级 ∈ {"error", "warn"}。"""
     rows: list[tuple[str, str, str]] = []
     text = path.read_text(encoding="utf-8", errors="replace")
-    for chunk in CALL.findall(text):
-        literal = "".join(a or b for a, b in LITERAL.findall(chunk))
-        if not literal.strip():
-            continue                                  # 纯表达式（全是占位符），没有可审的文字
-        estimated = len(PLACEHOLDER.sub("\u5360\u4f4d\u5360", literal))   # 占位符按 3 字估长
-        if not literal.endswith(END_OK):
-            rows.append(("error", "\u672a\u6536\u5c3e\uff08\u7f3a\u53e5\u53f7\uff09", literal))
-        if "**" in literal:
-            rows.append(("error", "\u542b\u52a0\u7c97\u6807\u8bb0 **", literal))
-        if estimated > MAX_LEN:
-            rows.append(("warn", "\u4f30\u957f %d\uff08>%d\uff09" % (estimated, MAX_LEN), literal))
+    for match in CALL.finditer(text):
+        argument = _argument(text, match.end())
+        sentence, braces = _parts(argument)
+        if not sentence:
+            continue                                     # 全是占位符 / 表达式，没有可审的文字
+        if STRUCT.search(sentence):
+            continue                                     # 结构行（回合分隔）不按句子的规则要求
+        if _ends_with_literal(argument) and not sentence.endswith(END_OK):
+            rows.append(("error", "\u672a\u6536\u5c3e\uff08\u7f3a\u53e5\u53f7\uff09", sentence))
+        if "**" in sentence:
+            rows.append(("error", "\u542b\u52a0\u7c97\u6807\u8bb0 **", sentence))
+        if len(sentence) + braces * PLACEHOLDER_W > MAX_LEN:
+            rows.append(("warn", "\u4f30\u957f > %d" % MAX_LEN, sentence))
         for word in HAZY:
-            if word in literal:
-                rows.append(("warn", "\u542b\u6a21\u7cca\u8bcd " + word, literal))
-        if "\u00b7" in literal or "\\n" in literal:
-            rows.append(("warn", "\u542b\u00b7\u6216\u6362\u884c", literal))
+            if word in sentence:
+                rows.append(("warn", "\u542b\u6a21\u7cca\u8bcd " + word, sentence))
+        if "\u00b7" in sentence or "\n" in sentence:
+            rows.append(("warn", "\u542b\u00b7\u6216\u6362\u884c", sentence))
     return rows
 
 
@@ -61,14 +153,13 @@ def main() -> int:
     warns = 0
     for base in SCAN_DIRS:
         for path in sorted(base.rglob("*.py")):
-            for level, why, literal in scan(path):
+            for level, why, sentence in scan(path):
                 if level == "error":
                     errors += 1
                 else:
                     warns += 1
                 if not args.quiet:
-                    rel = path.relative_to(ROOT)
-                    print("[%s] %s:%s  %s" % (level, rel, why, literal))
+                    print("[%s] %s:%s  %s" % (level, path.relative_to(ROOT), why, sentence))
     print("\n\u65e5\u5fd7\u6587\u6848\u81ea\u68c0\uff1aerror %d\uff0cwarn %d" % (errors, warns))
     return 1 if errors else 0
 
