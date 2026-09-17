@@ -33,9 +33,6 @@ DEFAULT_PORT = 8730
 SAVES_DIR = saves_dir()
 SAVE_PATH = SAVES_DIR / "savegame.json"
 INDEX_PATH = SAVES_DIR / "index.json"
-# 外置美术资源目录（多模态模型只需放文件 + manifest.json，不改任何代码）。
-ASSETS_DIR = app_base() / "assets" / "art"
-ART_MANIFEST = ASSETS_DIR / "manifest.json"
 
 def avatar_of(character_id: str) -> str:
     """角色自声明的头像图标（模块属性 AVATAR），缺省用通用头像。"""
@@ -81,6 +78,30 @@ def _location_supply(location) -> str:
     for key, value in location.item_tag_modifiers:
         parts.append(f"{tag_label(key)}权重 ×{value:g}")
     return "；".join(parts)
+
+
+def _location_drop(location) -> list[dict]:
+    """掉落的**结构化**视图：``[{tags, weight}]``（界面分行显示，不再是一长句）。"""
+    from .data.labels import tag_label
+
+    return [
+        {"tags": [tag_label(tag) for tag in tags], "weight": weight}
+        for tags, weight in location.tag_distribution
+    ]
+
+
+def _location_mechanics(location) -> list[str]:
+    """地点特殊设定，逐条（界面用小列表渲染）。"""
+    mech = []
+    if location.fixed:
+        mech.append("必定可选（固定出现）")
+    if location.turn_delta:
+        mech.append(f"搜索回合数{location.turn_delta:+d}")
+    if location.behavior_delta:
+        mech.append(f"搜索行为次数{location.behavior_delta:+d}")
+    if location.encounter_bonus:
+        mech.append(f"遭遇伪人概率{location.encounter_bonus:+.0%}")
+    return mech
 
 
 def _item_icon(item) -> str:
@@ -157,6 +178,7 @@ def _item_entry(item, count: int, durability: int = 0) -> list:
     from .data.items.flavor import ITEM_FLAVOR
     from .data.items import item_is_directly_usable
     from .data.labels import tag_label
+    from .item_icons import item_icon_markup
 
     return [
         _item_icon(item), item.name, item.quality, count, item.stack_size > 1,
@@ -165,7 +187,8 @@ def _item_entry(item, count: int, durability: int = 0) -> list:
         item.description, ITEM_FLAVOR.get(item.item_id, ""),
         not item_is_directly_usable(item.item_id),       # 装备/携带 还是 直接使用
         int(durability or 0), int(item.max_durability),  # 当前 / 上限耐久
-        art_url("items", item.item_id),                  # 外置图（缺图时前端回退内置图标）
+        # 内容层图标（白底 + 品质色特征的内联标记）；没图时为空，前端回退内置 i-* 零件。
+        item_icon_markup(item),
     ]
 
 
@@ -346,6 +369,68 @@ def _detail_slot(engine: GameEngine, tenant, mark_rows: dict[str, dict]) -> list
     return _project_slot(items, mark_rows)
 
 
+def _panel_item_entry(raw: object) -> list | None:
+    """面板格子里的物品：内容只给 item_id / 数量 / 耐久，投影成与仓库同一种条目。"""
+    if not isinstance(raw, dict):
+        return None
+    definition = CONTENT.items().get(str(raw.get("item_id") or ""))
+    if definition is None:
+        return None
+    return _item_entry(
+        definition,
+        max(1, int(raw.get("count") or 1)),
+        max(0, int(raw.get("durability") or 0)),
+    )
+
+
+def _project_panel(engine: GameEngine, tenant, mark_rows: dict[str, dict]) -> dict | None:
+    """房客专属面板：内容声明 ``PANEL``，核心只把条目投影成前端能画的样子。
+
+    面板**不是**待处理交互（随时能开、看完能关），所以这里出错只丢面板、不拖垮状态下发
+    —— 与 ``DETAIL_SLOT`` 同一个态度。动作名、物品的取舍全由内容决定，核心只转发。
+    """
+    try:
+        view = engine.panel_view(tenant)
+    except Exception:  # noqa: BLE001 - 面板内容出错不应拖垮状态下发
+        return None
+    if not view:
+        return None
+    slots: list[dict] = []
+    for raw in view.get("slots") or ():
+        if not isinstance(raw, dict):
+            continue
+        slots.append({
+            "group": int(raw.get("group") or 0),
+            "role": str(raw.get("role") or ""),
+            "label": str(raw.get("label") or ""),
+            "locked": bool(raw.get("locked", True)),
+            "onDrop": str(raw.get("on_drop") or ""),
+            "onTake": str(raw.get("on_take") or ""),
+            "entry": _panel_item_entry(raw.get("item")),
+            "rows": _project_slot(raw.get("rows") or (), mark_rows),
+        })
+    actions: list[dict] = []
+    for raw in view.get("actions") or ():
+        if not isinstance(raw, dict):
+            continue
+        actions.append({
+            "id": str(raw.get("id") or ""),
+            "label": str(raw.get("label") or ""),
+            "icon": str(raw.get("icon") or ""),
+            "enabled": bool(raw.get("enabled", True)),
+            "hint": str(raw.get("hint") or ""),
+        })
+    return {
+        "title": str(view.get("title") or ""),
+        "prompt": str(view.get("prompt") or ""),
+        "slots": slots,
+        "rows": _project_slot(view.get("rows") or (), mark_rows),
+        "actions": actions,
+        # 底板：内容自带的 svg 内部标记（与 DETAIL_SLOT 的 glyph.svg 同一条路）。
+        "backdrop": str(view.get("backdrop") or ""),
+    }
+
+
 def resolve_pack_asset(pack: str, filename: str) -> Path | None:
     """按包名解析素材位文件：base（空包名）/ 独立资源包 / DLC 内嵌。
 
@@ -389,12 +474,30 @@ def avatar_art(character_id: str) -> dict:
     """角色头像视图：整张（``full``）或「形状 × 专属特征 × 点缀色」的组装。
 
     零件来自内容层文件（base / 资料包 / 资源包，见 ``weiren_game/avatars.py``）；
-    内容可声明 ``AVATAR`` / ``AVATAR_FEATURE`` / ``AVATAR_ACCENT`` / ``AVATAR_DECOR`` 覆盖。
+    内容可声明 ``AVATAR`` / ``AVATAR_FEATURE`` 覆盖。
     """
     from .avatars import avatar_view
     from .data import CHARACTER_MODULES
 
     return avatar_view(character_id, CHARACTER_MODULES.get(character_id))
+
+
+def pseudo_avatar_art(pseudo_id: str) -> dict:
+    """伪人**自己**的头像视图。
+
+    以前这里偷懒直接用了它模仿的那个人类的视图，于是伪人卡/图鉴详情里显示的是人类立绘 ——
+    那是错的。伪人有自己的 `art`（`data/icon/pseudos/<pseudo_id>`，就是"污染版"立绘）；
+    这里再给它一份**按伪人 id** 解析的组装视图，`full` 一般为空，于是前端优先用 `art`。
+    """
+    from .avatars import avatar_mode, avatar_view
+    from .data import PSEUDO_MODULES
+
+    view = avatar_view(pseudo_id, PSEUDO_MODULES.get(pseudo_id))
+    # `use_parts` 的本意是"**包**要求用零件"，但 `avatar_view` 在没有整张头像时也会置 True。
+    # 伪人默认要显示它自己的**污染版立绘**（上面的 `art`），所以这里按包的声明来定：
+    # 默认 art 模式 → False（立绘优先）；包声明 avatar_mode=parts → True（改用零件）。
+    view["use_parts"] = avatar_mode() == "parts"
+    return view
 
 
 def _global_event_rows(engine: GameEngine) -> list[dict]:
@@ -466,6 +569,8 @@ def build_state(engine: GameEngine) -> dict:
                     "learned": getattr(state, "acquisition", "original") == "learned",
                     "cooldown": max(0, int(getattr(state, "cooldown_until", 0) or 0)
                                      - engine.state.flow.turn),
+                    # True：这条"主动技能"只是打开专属面板（界面渲染成开/关，不走 use_ability）。
+                    "opens_panel": bool(getattr(ability, "opens_panel", False)),
                     # 目标选择的界面规格：由内容自描述，前端不写死任何内容文案。
                     "prompt": getattr(ability, "prompt", ""),
                     "options": [list(opt) for opt in getattr(ability, "options", ())],
@@ -532,7 +637,10 @@ def build_state(engine: GameEngine) -> dict:
             "tags": list(info.tags),
             # 运行时性格（随机切换/性格改写会实时反映；内容可经 PERSONA_LABEL 覆写）。
             "persona": persona_display(engine, tenant),
-            "persona_off": bool(tenant.passives_disabled),
+            # 性格/被动失效：**休克同样算**（`systems/personality_system.py` 与 `engine._has_character`
+            # 判的就是 `shock or passives_disabled`）。这里只报 passives_disabled 会与机制不符——
+            # 玩家看到"性格还在"，但引擎已经把它关掉了（PRINCIPLES §一.4 状态必须如实）。
+            "persona_off": bool(tenant.passives_disabled or tenant.shock),
             "hp": round(tenant.health),
             "san": round(tenant.sanity),
             "hp_max": round(tenant.max_health),
@@ -543,6 +651,8 @@ def build_state(engine: GameEngine) -> dict:
             "emotions": emotions,
             # 详情页头像右侧的公共小面板：内容声明放什么（印记/进度条/文本/标签）。
             "slot": _detail_slot(engine, tenant, mark_rows),
+            # 专属面板（自定义 UI）：内容声明 `PANEL`，没声明就是 None。
+            "panel": _project_panel(engine, tenant, mark_rows),
             "mark": "",
             "abilities": abilities,
             "inventory": _slot_entries(tenant.inventory.items, engine.tenant_carry_capacity(tenant)),
@@ -676,9 +786,12 @@ def build_state(engine: GameEngine) -> dict:
             item = CONTENT.items().get(value)
             if item is not None:
                 iid = str(value)
+                from .item_icons import item_icon_markup
+
                 return {
                     "kind": "item", "id": iid, "name": item.name,
-                    "icon": _item_icon(item), "art": art_url("items", iid),
+                    "icon": _item_icon(item), "icon_svg": item_icon_markup(item),
+                    "quality": item.quality,
                     "quality_label": QUALITY_NAMES[item.quality]
                     if 0 <= item.quality < len(QUALITY_NAMES) else str(item.quality),
                     "desc": item.description,
@@ -695,7 +808,7 @@ def build_state(engine: GameEngine) -> dict:
     if view is not None:
         pending["interaction"] = view
 
-    from .data.labels import tag_label as _tag_label
+    from .data.labels import group_label as _group_label, tag_label as _tag_label
 
     tag_index: dict = {}
     for _iid, _item in CONTENT.items().items():
@@ -724,6 +837,8 @@ def build_state(engine: GameEngine) -> dict:
 
     return {
         "turn": flow.turn, "max_turns": flow.max_turns, "phase": flow.phase,
+        # 屋子显示名（内容层标签；将来由所选"地图"覆盖）。前端不写死。
+        "home": {"name": _map_shelter(engine)},
         "game_over": flow.game_over, "difficulty": meta.difficulty, "seed": meta.seed,
         "difficulty_label": (difficulty_entry or {}).get("label", ""),
         "difficulty_effects": difficulty_effects,
@@ -759,6 +874,14 @@ def build_state(engine: GameEngine) -> dict:
                 "art": art_url("locations", key),
                 "desc": _pack.LOCATION_TEXT.get(key, CONTENT.locations()[key].description),
                 "supply": _location_supply(CONTENT.locations()[key]),
+                # 结构化字段：搜索选择界面要分行显示掉落/机制，而不是堆一长句。
+                "group_label": _group_label(CONTENT.locations()[key].group),
+                "tier": CONTENT.locations()[key].tier,
+                "fixed": CONTENT.locations()[key].fixed,
+                "tags": sorted({_tag_label(t) for tags, _ in CONTENT.locations()[key].tag_distribution
+                                for t in tags}),
+                "drop": _location_drop(CONTENT.locations()[key]),
+                "mechanics": _location_mechanics(CONTENT.locations()[key]),
             }
             for key in engine.state.world.locations.available_locations
         ],
@@ -772,6 +895,26 @@ def build_state(engine: GameEngine) -> dict:
         "searchBlocked": bool(engine.state.round.searched_this_turn),
         "pending": pending, "statusInfo": status_info,
     }
+
+
+def _map_shelter(engine) -> str:
+    """屋子显示名：**只认地图的 `shelter`**（base 地图恒在，所以不需要第二份兜底）。"""
+    from .data import BASE_MAP_ID, MAPS
+
+    map_def = MAPS.get(engine.state.meta.map_id) or MAPS.get(BASE_MAP_ID)
+    return map_def.shelter if map_def else ""
+
+
+def _map_menu() -> list[dict]:
+    """可选地图列表：默认地图（base）排最前。"""
+    from .data import BASE_MAP_ID, MAPS
+
+    order = ([BASE_MAP_ID] if BASE_MAP_ID in MAPS else []) + [
+        key for key in sorted(MAPS) if key != BASE_MAP_ID
+    ]
+    return [{"id": key, "name": MAPS[key].name, "shelter": MAPS[key].shelter,
+             "count": len(MAPS[key].locations), "default": key == BASE_MAP_ID}
+            for key in order]
 
 
 def menu_state() -> dict:
@@ -799,6 +942,8 @@ def menu_state() -> dict:
              "enabled": path.name in resourcepack_order}
             for path in available_resourcepacks()
         ],
+        # 可选地图（区域包）：创建对局页的"地图"下拉用它；第一项就是默认图。
+        "maps": _map_menu(),
         "difficulties": list(DIFFICULTIES),
         "difficulty_info": [dict(entry) for entry in DIFFICULTY_INFO],
         "pseudos": [{"id": key, "name": value.name} for key, value in CONTENT.pseudos().items()],
@@ -812,43 +957,21 @@ def menu_state() -> dict:
             "pack_order": list(CONFIG.pack_order) or ["base", *enabled],
             "resourcepack_order": resourcepack_order,
             "show_full_skills": CONFIG.show_full_skills,
+            "panel_draggable": bool(CONFIG.panel_draggable),
+            "panel_pos": dict(CONFIG.panel_pos or {}),
         },
     }
 
 
-_ART_CACHE: dict = {"mtime": object(), "data": {}}
-
-
-def _art_index() -> dict:
-    """读取 assets/art/manifest.json（{kind: {id: 相对路径}}）；按 mtime 热更新。"""
-    global _ART_CACHE
-    try:
-        stamp = ART_MANIFEST.stat().st_mtime if ART_MANIFEST.is_file() else None
-    except OSError:
-        stamp = None
-    if _ART_CACHE.get("mtime") == stamp:
-        return _ART_CACHE["data"]
-    data: dict = {}
-    if stamp is not None:
-        try:
-            raw = json.loads(ART_MANIFEST.read_text(encoding="utf-8"))
-            if isinstance(raw, dict):
-                data = raw
-        except (OSError, ValueError):
-            data = {}
-    _ART_CACHE = {"mtime": stamp, "data": data}
-    return data
-
-
 def art_url(kind: str, entity_id: str) -> str:
-    """返回外置美术资源的 URL；未提供或文件缺失时返回空串（前端回退内置图标）。"""
-    entry = (_art_index().get(kind) or {}).get(entity_id)
-    if not entry:
-        return ""
-    relative = str(entry)
-    if not (ASSETS_DIR / relative).is_file():
-        return ""
-    return "/assets/art/" + relative.replace("\\", "/")
+    """地点 / 信息 / 伪人图标的 URL（内容层文件，资料包/资源包可覆盖）。
+
+    找不到文件时返回空串，前端回退内置单线图标。按"当前配置 + 文件系统"现算，
+    所以换资源包 / 调位次立即生效（见 :mod:`weiren_game.icon_files`）。
+    """
+    from .icon_files import icon_url
+
+    return icon_url(kind, entity_id)
 
 
 def _now_iso() -> str:
@@ -937,6 +1060,7 @@ class Session:
                 raise RuleViolation(f"DLC「{name}」装载失败：{exc}")
         self.engine = GameEngine.new_game(
             seed=options.get("seed") or None,
+            map_id=str(options.get("map") or "") or None,
             difficulty=options.get("difficulty") or "a0",
             max_turns=int(options.get("max_turns") or 32),
             pseudo_id=options.get("pseudo") or None,
@@ -970,6 +1094,26 @@ class Session:
         _write_index(index)
         self.save_path = path
         self._pending_save = None
+
+    def abort_start(self) -> bool:
+        """开局「发现」还没选完就强行退出：丢掉这场**还没真正开始**的局。
+
+        `defer_start` 期间引擎一次都没落盘（`flush_pending_save` 遇到待选就跳过），
+        所以"回退到开始发现之前"= 直接丢掉引擎 —— 磁盘上仍是上一份存档（或没有存档），
+        启动器也不会再被那个待选卡住（前端 `hasPending()` 会随之清掉）。
+
+        返回是否真的丢了一局；已经开打的对局（没有开局待选）不动，返回 False。
+        """
+        engine = self.engine
+        if engine is None:
+            return False
+        pending = getattr(engine, "_pending_choice", None)
+        if not pending or pending.get("kind") != "start_choice":
+            return False
+        self.engine = None
+        self.save_path = None
+        self._pending_save = None
+        return True
 
     def load_save(self, filename: str) -> None:
         if not filename:
@@ -1067,6 +1211,15 @@ class Session:
                 container=str(payload.get("container") or "warehouse"),
                 from_slot=int(payload["from_slot"]), to_slot=int(payload["to_slot"]),
                 tenant_id=payload.get("tenant_id"),
+            )
+        elif action == "panel":
+            # 专属面板动作：核心不解其意，转发给内容声明的处理器（见 data/characters/<id>.py）。
+            self.engine.panel_action(
+                int(payload["tenant_id"]),
+                str(payload.get("panel_action") or ""),
+                slot=payload.get("slot"),
+                item_id=payload.get("item_id"),
+                source=payload.get("source"),
             )
         elif action == "rewind":
             self.engine.rewind_one_turn()
@@ -1190,9 +1343,11 @@ def codex_state() -> dict:
         })
 
     items = []
+    from .item_icons import item_icon_markup
+
     for iid, item in sorted(ITEMS.items(), key=lambda kv: (kv[1].category, kv[1].name)):
         items.append({
-            "id": iid, "icon": _item_icon(item), "art": art_url("items", iid), "name": item.name,
+            "id": iid, "icon": _item_icon(item), "icon_svg": item_icon_markup(item), "name": item.name,
             "category": item.category, "category_label": category_label(item.category),
             "quality": item.quality,
             "quality_label": QUALITY_NAMES[item.quality] if 0 <= item.quality < len(QUALITY_NAMES) else str(item.quality),
@@ -1231,27 +1386,16 @@ def codex_state() -> dict:
                 supply += f"；{tier}品质概率{delta:+.0f}%"
         for key, value in loc.item_tag_modifiers:
             supply += f"；{tag_label(key)}权重 ×{value:g}"
-        # 特殊设定（完整句式）。
-        mech = []
-        if loc.fixed:
-            mech.append("必定可选（固定出现）")
-        if loc.turn_delta:
-            mech.append(f"搜索回合数{loc.turn_delta:+d}")
-        if loc.behavior_delta:
-            mech.append(f"搜索行为次数{loc.behavior_delta:+d}")
-        if loc.encounter_bonus:
-            mech.append(f"遭遇伪人概率{loc.encounter_bonus:+.0%}")
         locations.append({
             "id": lid, "name": loc.name, "art": art_url("locations", lid),
             "desc": _pack.LOCATION_TEXT.get(lid, loc.description),
             "group": loc.group, "group_label": group_label(loc.group),
+            "tier": loc.tier,
             "icon": _pack.LOCATION_ICONS.get(lid, group_icon(loc.group)), "fixed": loc.fixed,
             "supply": supply,
-            "mechanics": mech,
-            "drop": [
-                {"tags": [tag_label(t) for t in tags], "weight": weight}
-                for tags, weight in loc.tag_distribution
-            ],
+            # 与对局状态共用同一套"结构化"字段（清单/机制分行显示）。
+            "mechanics": _location_mechanics(loc),
+            "drop": _location_drop(loc),
             "tags": sorted({tag_label(t) for tags, _ in loc.tag_distribution for t in tags}),
         })
     pseudos = []
@@ -1267,8 +1411,9 @@ def codex_state() -> dict:
             "desc": definition.description,
             "human": human.name if human else definition.human_character_id,
             "human_id": definition.human_character_id if human else "",
-            "avatar": avatar_of(definition.human_character_id) if human else "i-person",
-            "avatar_parts": avatar_art(definition.human_character_id) if human else {},
+            # 头像用**伪人自己**的：`art` 是污染版立绘，`avatar_parts` 按伪人 id 解析。
+            "avatar": getattr(PSEUDO_MODULES.get(pid), "AVATAR", "") or "i-person",
+            "avatar_parts": pseudo_avatar_art(pid),
             "mark_label": definition.mark_label, "enters_house": definition.enters_house,
             "breakthrough": definition.breakthrough, "liberation": definition.liberation,
             "skills": [list(skill) for skill in skills],
@@ -1313,11 +1458,12 @@ def codex_state() -> dict:
         "tagIndex": tag_index,
         "qualityNames": list(QUALITY_NAMES),
         "mechanics": [
-            {"title": sec["title"], "icon": sec["icon"],
+            {"title": sec["title"], "icon": sec["icon"], "tint": sec.get("tint", ""),
              "entries": [list(e) for e in sec["entries"]]}
             for sec in _pack.MECHANICS
         ] + [
             {"title": sec.get("title", ""), "icon": sec.get("icon", "i-info"),
+             "tint": sec.get("tint", ""),
              "entries": [list(e) for e in sec.get("entries", ())]}
             for sec in _pack.EXTRA_SECTIONS
         ],
@@ -1387,6 +1533,20 @@ def apply_settings(payload: dict) -> None:
         ]
     if "show_full_skills" in payload:
         CONFIG.show_full_skills = bool(payload["show_full_skills"])
+    if "panel_draggable" in payload:
+        CONFIG.panel_draggable = bool(payload["panel_draggable"])
+    if "panel_pos" in payload and isinstance(payload["panel_pos"], dict):
+        # 只收 [0..1, 0..1] 这样的视口比例，别的一律丢弃（玩家侧宽容）。
+        clean: dict = {}
+        for key, value in payload["panel_pos"].items():
+            if not isinstance(value, (list, tuple)) or len(value) != 2:
+                continue
+            try:
+                left, top = float(value[0]), float(value[1])
+            except (TypeError, ValueError):
+                continue
+            clean[str(key)] = [min(1.0, max(0.0, left)), min(1.0, max(0.0, top))]
+        CONFIG.panel_pos = clean
     save_config(CONFIG)
 
 
@@ -1468,6 +1628,20 @@ def make_handler(session: Session, *, quit_server=None):
                     return
                 self._send_file(target)
                 return
+            if path.startswith("/api/icon/"):
+                from urllib.parse import unquote
+
+                from .icon_files import resolve_icon
+
+                parts = path[len("/api/icon/"):].split("/", 1)
+                target = resolve_icon(
+                    unquote(parts[0]), unquote(parts[1])
+                ) if len(parts) == 2 else None
+                if target is None:
+                    self.send_error(404)
+                    return
+                self._send_file(target)
+                return
             if path == "/api/export":
                 from urllib.parse import parse_qs
 
@@ -1501,12 +1675,6 @@ def make_handler(session: Session, *, quit_server=None):
             if path == "/api/codex":
                 self._send_json({"ok": True, "codex": codex_state()})
                 return
-            if path.startswith("/assets/art/"):
-                self._send_file(ASSETS_DIR / path[len("/assets/art/"):])
-                return
-            if path.startswith("/assets/"):
-                self._send_file(app_base() / "assets" / path[len("/assets/"):])
-                return
             target = WEBUI_DIR / ("index.html" if path in {"/", ""} else path.lstrip("/"))
             self._send_file(target)
 
@@ -1523,6 +1691,14 @@ def make_handler(session: Session, *, quit_server=None):
                     session.delete_save(str(payload.get("file") or ""))
                 elif path == "/api/load_save":
                     session.load_save(str(payload.get("file") or ""))
+                elif path == "/api/abort_start":
+                    # 开局「发现」期间强退：把这场还没开始的局丢掉（等价于回退到发现之前）。
+                    aborted = session.abort_start()
+                    self._send_json({
+                        "ok": True, "aborted": aborted,
+                        "state": build_state(session.engine) if session.engine else {"started": False},
+                    })
+                    return
                 elif path == "/api/settings":
                     apply_settings(payload)
                 elif path == "/api/quit":

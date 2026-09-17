@@ -18,4 +18,5 @@ def my_hook(engine, **kwargs):
 # HOOKS = {"turn_start.bond_effects": my_hook}
 # 单值 hook：HEALTH_PROTECTION / END_SANITY_COST / BOND_END_HEALTH /
 #           AWAKENING_MULTIPLIER / EMOTION_CHANGE_MULTIPLIER
-# 增减益走修饰器：在模块导入时 register_modifier_provider(...)（见内置性格模块）
+# 增减益走修饰器：在模块导入时 register_modifier_provider(...)（见内置性格模块）。
+# 该表已纳入 base 快照：装载/卸载随包回滚、重复「应用」不累积，**不需要**自己写去重。

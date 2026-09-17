@@ -38,7 +38,7 @@ pyinstaller --noconfirm --clean --onefile --windowed --name "完蛋我被伪人�
 ## 运行期文件位置
 
 打包/便携运行下，可写目录取**可执行文件（或脚本）所在目录**（见 `weiren_game/paths.py` 的 `app_base()`）：
-- `saves/`：存档；`assets/art/`：外置美术；`game_config.json`：设置；`dlc/`：内容包；`logs/web_ui.log`：无窗口时的输出。
+- `saves/`：存档；`game_config.json`：设置；`dlc/`：内容包；`resourcepacks/`：资源包；`logs/web_ui.log`：无窗口时的输出。
 
 ## 其他
 - `runtime/` 是**运行时**，不是源码；不想随仓库携带可删除，需要分发时再 `prepare_portable`。

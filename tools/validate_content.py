@@ -53,6 +53,9 @@ def check_characters() -> None:
                 warnings.append(f"{cid}: {slot}性格 {key!r} 为特殊性格（非羁绊正式性格）")
         dispatch = getattr(module, "ACTIVE_DISPATCH", None) or {}
         for ability in definition.actives:
+            if getattr(ability, "opens_panel", False):
+                # 只负责打开专属面板的技能：本来就不该有结算处理函数。
+                continue
             if ability.id not in dispatch:
                 errors.append(f"{cid}: 主动技能 {ability.id!r} 没有 ACTIVE_DISPATCH 处理函数")
 

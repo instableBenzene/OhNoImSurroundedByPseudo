@@ -365,13 +365,15 @@ def use_ability(engine: GameEngine) -> None:
             maximum = engine._mark_count(owner, current.amount_mark) if current.amount_mark else 99
             raw = input(f"{current.amount_label or '数量'}（1~{maximum}） > ").strip()
             picked_amount = int(raw) if raw.isdigit() else 1
-            for value, label in current.options:
+            # 选项允许带第 3、4 项（图标/说明，只给图形界面用）：这里只取前两项。
+            for option in current.options:
+                value, label = option[0], option[1]
                 if _yes(f"{label}？[y/N] > "):
                     picked_option = value
                     break
         elif current.target in {"resource", "tenant_condition"} and current.options:
-            labels = "，".join(f"[{i}] {label}" for i, (_v, label) in enumerate(current.options, 1))
-            picked_option = _choose(labels + " > ", [v for v, _l in current.options])
+            labels = "，".join(f"[{i}] {option[1]}" for i, option in enumerate(current.options, 1))
+            picked_option = _choose(labels + " > ", [option[0] for option in current.options])
             if picked_option is None:
                 return None
         elif current.target == "information":

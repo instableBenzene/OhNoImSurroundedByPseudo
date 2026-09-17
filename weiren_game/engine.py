@@ -156,6 +156,7 @@ class GameEngine(
         random_pseudo: bool | None = None,    # 置 True 时按种子随机伪人，并按 20% 比例自动禁用角色。
         start_choices: Sequence[str] | None = None,  #开局两次 Discover(3) 的玩家选择；缺省时确定性自动补选。
         defer_start: bool = False,            # 置 True 时先不选房客，交出待选让前端分步选择。
+        map_id: str | None = None,            # 本局用哪张地图（区域包）；None = 默认地图。
     ) -> "GameEngine":
         """按种子与参数创建一局新游戏，完成初始房客、地点与补给生成后返回引擎。"""
         from weiren_game.config import CONFIG
@@ -204,6 +205,11 @@ class GameEngine(
                 raise RuleViolation("伪人的人类原型不能列入禁用角色。")
             if character_id not in disabled:
                 disabled.append(character_id)
+        from .data import BASE_MAP_ID, MAPS
+
+        resolved_map_id = str(map_id or BASE_MAP_ID)
+        if resolved_map_id not in MAPS:
+            resolved_map_id = BASE_MAP_ID
         ids = InstancePool()
         state = GameState(
             meta=SaveMetadata(
@@ -211,6 +217,7 @@ class GameEngine(
                 seed=resolved_seed,
                 difficulty=difficulty,
                 packs=CONTENT.manifest(),
+                map_id=resolved_map_id,
             ),
             flow=GameFlowState(max_turns=max_turns),
             ids=ids,
@@ -401,24 +408,36 @@ class GameEngine(
         mission.reports.append(str(text))
 
     def _generate_locations(self) -> list[str]:
-        """按地点分组与权重，从规则池中确定本局可用的 10 个地点。"""
-        result = [key for key in FIXED_LOCATIONS]
+        """按**本局地图**的名单 + 分组权重，确定本局可用的地点（默认 10 个）。
+
+        地图的 ``locations`` 是显式名单：没列进来的地点（含 DLC 后加的）本局不会出现。
+        """
+        from .data import BASE_MAP_ID, MAPS
+
+        map_def = MAPS.get(self.state.meta.map_id) or MAPS.get(BASE_MAP_ID)
+        pool = [key for key in (map_def.locations if map_def else ()) if key in LOCATIONS]
+        if not pool:                          # 地图缺失/名单为空：退回全部地点，别让开局挂掉
+            pool = list(LOCATIONS)
+        want = int(map_def.draw_count) if map_def else 10
+        result = [key for key in FIXED_LOCATIONS if key in pool]
         rng = self._rng(EVENT_IDS["world.locations"])
         for group in BASE_MAP_GROUPS:
-            choices = [key for key in LOCATION_GROUPS.get(group, ()) if key not in result]
+            choices = [key for key in LOCATION_GROUPS.get(group, ())
+                       if key in pool and key not in result]
             if choices:                       # 内容缺失/空分组一律容忍
                 result.append(rng.choice(choices))
         group_weights = MAP_DRAW_WEIGHTS
         attempts = 0
-        while len(result) < 10 and attempts < 200:
+        while len(result) < want and attempts < 200:
             attempts += 1
             group = self._weighted_choice(group_weights, rng=rng)
-            choices = [key for key in LOCATION_GROUPS.get(group, ()) if key not in result]
+            choices = [key for key in LOCATION_GROUPS.get(group, ())
+                       if key in pool and key not in result]
             if choices:
                 result.append(rng.choice(choices))
-        if len(result) < 10:
-            result.extend(key for key in LOCATIONS if key not in result)
-        return result[:10]
+        if len(result) < want:
+            result.extend(key for key in pool if key not in result)
+        return result[:want]
 
     @classmethod
     def load(cls, path: str | Path) -> "GameEngine":
@@ -541,6 +560,59 @@ class GameEngine(
         """返回正在外出搜索的存活房客列表。"""
         mission_ids = {mission.tenant_id for mission in self.state.world.missions}
         return [tenant for tenant in self.living_tenants() if tenant.id in mission_ids]
+
+    def container(self, tenant: TenantState, key: str) -> object | None:
+        """取该房客的专属容器（不存在就按内容声明的类型建一个）；没声明过则返回 None。
+
+        容器是**内容自有的状态**（核心只负责存取与序列化）：角色模块声明
+        ``CONTAINERS = {"<key>": <类>}``，类自己实现 ``to_dict`` / ``from_dict``。
+        """
+        from .tenant import CONTAINER_TYPES
+
+        existing = tenant.containers.get(key)
+        if existing is not None:
+            return existing
+        cls = CONTAINER_TYPES.get((tenant.character_id, key))
+        if cls is None:
+            return None
+        created = cls.from_dict({})
+        tenant.containers[key] = created
+        return created
+
+    def panel_view(self, tenant: TenantState) -> dict | None:
+        """返回该房客的专属面板视图（内容声明 ``PANEL``）；没声明则返回 None。
+
+        面板**不是**待处理交互：它随时能开、看完能关，"开着没有"由前端记，
+        所以这里只负责把内容算好的视图交出去，不参与回合流程。
+        """
+        from .data import CHARACTER_PANELS
+
+        entry = CHARACTER_PANELS.get(tenant.character_id)
+        if entry is None:
+            return None
+        return entry[0](self, tenant) or None
+
+    def panel_action(
+        self,
+        tenant_id: int,
+        action: str,
+        *,
+        slot: int | None = None,
+        item_id: str | None = None,
+        source: object = None,
+    ) -> None:
+        """把面板动作转交给内容声明的处理器（核心不解其意，只转发）。"""
+        from .data import CHARACTER_PANELS
+
+        tenant = self.state.house.tenants.get(int(tenant_id))
+        if tenant is None:
+            raise RuleViolation("该房客不在屋内。")
+        entry = CHARACTER_PANELS.get(tenant.character_id)
+        if entry is None:
+            raise RuleViolation("该房客没有可用的专属面板。")
+        entry[1](
+            self, tenant, str(action), slot=slot, item_id=item_id, source=source
+        )
 
     def tenant_name(self, tenant_id: int) -> str:
         """按房客 ID 返回其角色名称；查无此人时返回“未知房客”。"""

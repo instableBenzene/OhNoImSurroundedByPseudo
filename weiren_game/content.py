@@ -4,8 +4,9 @@
 读档启动配置不一致会拒绝）。本管理器封装现有 ``data`` 包的全部
 ``register_*`` 入口并追踪已启用包，DLC 装载器与内置 base 包都经由它登记；
 核心对主目录（角色/物品/地点/伪人）统一经 CONTENT 视图读取。支持运行期
-热切换包集合：``capture_base()`` 在 base 内容就绪后抓取快照，``restore_base()``
-将其回滚（配合 :func:`weiren_game.dlc.reload_dlc` 即可免重启装卸 DLC）。
+热切换包集合：``ensure_captured()`` 在**装载任何内容包之前**懒抓一次 base 快照
+（不能放在模块级 —— 效果内核的 provider 由 ``systems/*`` 导入时登记，早抓会漏），
+``restore_base()`` 将其回滚（配合 :func:`weiren_game.dlc.reload_dlc` 即可免重启装卸 DLC）。
 """
 
 from __future__ import annotations
@@ -32,6 +33,8 @@ class ContentManager:
         # 内容包装载完成后的"外观基线"：独立资源包以它为起点（低→高叠加）。
         self._resource_baseline: list[tuple[object, object]] | None = None
         self._global_events: dict = {}
+        # base 快照是否已抓取（**懒抓**：必须在任何内容包装载之前，见 ensure_captured）。
+        self._captured = False
 
     def ensure_base(self) -> None:
         """校验内置 base 内容包在位；缺失视为启动失败。"""
@@ -127,6 +130,12 @@ class ContentManager:
 
         _register(category, label)
 
+    def register_map_location(self, map_id: str, location_id: str) -> None:
+        """把某个地点加进已有地图的名单（DLC 想让自己的地点进"城郊小镇"时用）。"""
+        from .data.maps import register_map_location as _register
+
+        _register(str(map_id), str(location_id))
+
     def register_item_tag_icon(self, tag: str, icon: str, *, priority: int | None = None) -> None:
         """登记 tag 图标（可选优先序）。"""
         from .data.labels import register_item_tag_icon as _register
@@ -156,6 +165,16 @@ class ContentManager:
         _apply(tag, entries)
 
     # ------------------------------------------------------- hot reload (DLC)
+    def ensure_captured(self) -> None:
+        """确保 base 快照已抓取（幂等）；**必须在装载任何内容包之前调用**。
+
+        快照要涵盖"base 全部登记完毕"的那一刻。不能改成 ``content.py`` 的模块级：
+        效果内核的 provider 由 ``systems/*`` 在**导入时**登记，而 ``systems``
+        通常比 ``content`` 晚导入 —— 早抓就会漏掉它们，回滚时反而把 base 抹掉。
+        """
+        if not self._captured:
+            self.capture_base()
+
     def capture_base(self) -> None:
         """记录内置 base 的当前注册状态，供运行期装卸 DLC 时回滚。"""
         import importlib
@@ -175,6 +194,7 @@ class ContentManager:
         self._snapshot = snapshot
         self._resource_snapshot = resource_snapshot
         self._global_events = _clone(GLOBAL_EVENT_DEFINITIONS)
+        self._captured = True
 
     def restore_resourcepack_base(self) -> None:
         """只把**资源包容器**回滚到 base（外观包可独立于内容包热切换）。"""
@@ -219,6 +239,10 @@ class ContentManager:
 
     def restore_base(self) -> None:
         """把注册表恢复到 base 快照（撤销所有 DLC 登记）并重置包清单。"""
+        if not self._captured:
+            # 还没抓过快照就没有可回滚的东西。**不要**在这里补抓：
+            # 此刻的注册表可能已经含 DLC 内容，补抓会把它们当成 base。
+            return
         for container, saved in self._snapshot:
             if isinstance(container, dict):
                 container.clear()
@@ -363,7 +387,8 @@ def _clone(value: object) -> object:
 
 # 需要快照/回滚的注册表（模块全路径 -> 属性名）。
 # **新增注册表必须登记在这里**，否则卸载 DLC 后仍会残留（历史上漏过
-# ABILITY_TARGET_OPTIONS / CHARACTER_CODEX_EXTRA / 状态·情绪定义 / 图鉴静态表）。
+# ABILITY_TARGET_OPTIONS / CHARACTER_CODEX_EXTRA / 状态·情绪定义 / 图鉴静态表 /
+# 效果内核的修饰器·闸门表）。
 _BASE_CONTAINERS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("weiren_game.data.characters", (
         "CHARACTER_MODULES", "CHARACTERS", "ABILITY_DISPATCH", "ABILITY_INTERACTIONS",
@@ -373,7 +398,7 @@ _BASE_CONTAINERS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "HEALTH_CHANGED_HOOKS", "ABILITY_USED_HOOKS", "ABILITY_FAILED_HOOKS",
         "MARK_GAINED_HOOKS", "MARK_CONSUMED_HOOKS", "MARK_REACHED_HOOKS", "NODE_HOOKS",
         "CHARACTER_DEATH_HOOKS", "CHARACTER_MARKS", "CHARACTER_DETAIL_SLOTS",
-        "INFORMATION_CREATED_HOOKS",
+        "CHARACTER_CONTAINERS", "CHARACTER_PANELS", "INFORMATION_CREATED_HOOKS",
     )),
     ("weiren_game.data.items", (
         "CATEGORY_ITEMS", "ITEMS", "ITEM_HOOKS", "ITEM_EFFECTS",
@@ -381,6 +406,7 @@ _BASE_CONTAINERS: tuple[tuple[str, tuple[str, ...]], ...] = (
     )),
     ("weiren_game.data.locations", (
         "LOCATIONS", "LOCATION_GROUPS", "BASE_MAP_GROUPS", "MAP_DRAW_WEIGHTS",
+        "MAPS",
     )),
     ("weiren_game.data.information", (
         "INFORMATION_TEMPLATES", "LOCATION_INFORMATION_MODIFIERS", "INFORMATION_STATE_EFFECTS",
@@ -408,14 +434,24 @@ _BASE_CONTAINERS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "STATUS_DEFINITIONS", "EMOTION_DEFINITIONS",
         "ALL_EMOTIONS", "EROSION_EMOTIONS", "AWAKENING_EMOTIONS",
     )),
+    # 角色专属容器的**类型表**（内容角色模块的 `CONTAINERS` 声明驱动）：
+    # 它决定存档里的容器能不能被反序列化，所以同样随包装卸回滚。
+    ("weiren_game.tenant", ("CONTAINER_TYPES",)),
+    # 效果内核（通道 / 闸门）的登记表：静态修饰器、条件式 provider、闸门与 provider。
+    # 它们同样"由内容登记"，只是登记的是数值修正而不是定义对象；不纳入快照就会在
+    # 卸载后残留，而且是**静默地多算一次**（同一效果被结算 N 次）。
+    ("weiren_game.modifier_rules", (
+        "MODIFIER_REGISTRY", "MODIFIER_PROVIDERS", "GATE_REGISTRY", "GATE_PROVIDERS",
+    )),
     # 资源包：贴图零件（SVG）+ 主题（CSS 变量 / 追加样式）。
     (RESOURCE_MODULE, ("RESOURCE_SYMBOLS", "RESOURCE_THEME", "RESOURCE_ASSETS")),
     # data 包根的派生 label 表（由 condition 同步维护，回滚时一并还原）。
     ("weiren_game.data", ("EROSION_EMOTIONS", "AWAKENING_EMOTIONS", "RARE_EMOTIONS")),
 )
 
-# 在 base 内容完成登记后立刻抓一份快照（此后才会装载 DLC）。
-CONTENT.capture_base()
+# base 快照**不在这里抓**：效果内核的 provider 由 `systems/*` 在导入时登记，
+# 而它们通常比 `content` 晚导入 —— 早抓会漏掉它们，回滚时反而把 base 抹掉。
+# 改为在任何内容包装载之前懒抓一次（`dlc.py` 的 `CONTENT.ensure_captured()`）。
 
 
 __all__ = ["BASE_PACK", "CONTENT", "RESOURCE_MODULE", "ContentManager"]

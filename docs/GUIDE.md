@@ -173,6 +173,8 @@ MODIFIERS = (
 **挂载与入口**
 - 静态：内容模块声明 `MODIFIERS = (...)`（聚合层按 `effect_type` 收表）；
 - 条件式：`register_modifier_provider(channel, provider)`，`provider(context)` 返回 `Modifier`/可迭代/None；
+  静态项与 provider 都住在 `modifier_rules` 的四张表里，已纳入 base 快照（随包装卸回滚，
+  装载器每次「应用」先还原 base 再重装，所以重复装载不会累积）；
 - 调用点：`engine._apply_modifiers(channel, base, source, context)`；
   `engine._apply_chance(base, source, context)`（再收敛 5%~95%）。
 
@@ -360,7 +362,7 @@ MODIFIERS = (
 
 ## 12. 验证
 
-- 单元测试：`python -m unittest discover -s tests -p "test_*.py"`（当前 52 全绿，刻意精简）；
+- 单元测试：`python -m unittest discover -s tests -p "test_*.py"`（必须全绿，刻意精简；见 `AGENTS.md` §1）；
 - 冒烟：`python tools/smoke_simulation.py --seeds 3 --log-dir <dir>`（三伪人可跑通）。
 - 修改后先跑测试再冒烟；行为不变才继续。
 
@@ -414,7 +416,9 @@ dlc/<name>/        外部内容包（同 data 的结构）
 
 ### 5. 可插拔内容
 - 自动发现：`data/_discovery.py`；顺序（影响随机确定性）见 `AGENTS.md`。
-- 热切换：`content.py` 的 `capture_base()/restore_base()` + `dlc.reload_dlc()`；新增注册表须加入 `_BASE_CONTAINERS` 快照。
+- 热切换：`content.py` 的 `ensure_captured()/restore_base()` + `dlc.reload_dlc()`；新增注册表须加入 `_BASE_CONTAINERS` 快照。
+  base 快照是**懒抓**的（`dlc.py` 在装载任何包之前调用 `ensure_captured()`），不能挪回 `content` 模块级：
+  效果内核的 provider 由 `systems/*` 在导入时登记，早抓会漏掉它们，回滚时反而把 base 抹掉。
   内容包**有序**（`pack_order`，高→低，含 base）：`dlc.apply_pack_order()` 从最低优先级装载，
   轮到 base 时 `overlay_base()` 让内置内容赢过它下方的包；把包排在 base 之前即可替换内置同 id 内容。
 - DLC：`dlc/<name>/`（`dlc.json` + 各内容目录：`characters/ personalities/ items/ tags/ statuses/

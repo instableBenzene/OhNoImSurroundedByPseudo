@@ -8,6 +8,10 @@
 - `items/<名>.py`：`CATEGORY` + `ITEMS`
 - `tags/<tag>.json`：tag 条目合并；`tags/<tag>.py`：tag 行为模块
 - `statuses/<名>.py`：`STATUSES` / `EMOTIONS`
+- `avatars/<section>/<id>.svg`：头像零件 / 整张头像（`shapes` / `features` / `characters`）
+- `item/item/<物品id>.svg` / `item/tag/<tag>.svg`：自带物品的图标 / 按标签兜底
+- `icon/<section>/<id>.<ext>`：地点 / 信息 / 伪人图标（`locations` / `information` / `pseudos`）
+- `maps/<id>/map.py`：自带一张地图（`MAP = MapDefinition(...)`，地点是显式名单）
 - `locations/<名>.py`：`LOCATIONS`（可选 `MAP_GROUPS`）
 - `information/<名>.py`：`INFORMATION_TEMPLATES`
 - `pseudos/<id>.py`：`DEFINITION` + `State` + `HANDLERS`

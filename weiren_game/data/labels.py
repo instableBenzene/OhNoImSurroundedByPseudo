@@ -32,7 +32,21 @@ QUALITY_TIER_LABELS = {
     "gold_plus": "金色及以上", "red": "红色",
 }
 
+# 品质色（q0..q5）：与默认材质的 `--q0..--q5` 一致（有单测钉住）；
+# 它们是**锁定 token**（语义色，资源包改不动），所以物品图标里可以直接烧进具体值。
+QUALITY_COLORS = ("#c4c9c4", "#66b875", "#6b9fd1", "#a77ad1", "#d6aa45", "#d86459")
+
 LOCATION_GROUP_LABELS = {"medical": "医疗", "tool": "工具", "food": "食物", "mixed": "混合"}
+
+# 搜索地点的档位（1 低 / 2 中 / 3 高）：只用于展示（图标特征色 + 档位 chip）。
+LOCATION_TIER_LABELS = {1: "低级", 2: "中级", 3: "高级"}
+
+
+def location_tier_label(tier: object) -> str:
+    try:
+        return LOCATION_TIER_LABELS.get(int(tier), "")
+    except (TypeError, ValueError):
+        return ""
 LOCATION_GROUP_ICONS = {"medical": "i-cross", "tool": "i-tool", "food": "i-snack", "mixed": "i-gate"}
 
 
@@ -131,9 +145,10 @@ def group_icon(group: str) -> str:
 __all__ = [
     "ACTIVE_USES_CHIP",
     "BOND_TIER_NAMES",
-    "ITEM_CATEGORY_LABELS", "ITEM_TAG_LABELS", "QUALITY_TIER_LABELS",
-    "LOCATION_GROUP_LABELS", "LOCATION_GROUP_ICONS",
+    "ITEM_CATEGORY_LABELS", "ITEM_TAG_LABELS", "QUALITY_TIER_LABELS", "QUALITY_COLORS",
+    "LOCATION_GROUP_LABELS", "LOCATION_GROUP_ICONS", "LOCATION_TIER_LABELS",
     "category_label", "tag_label", "tier_label", "group_label", "group_icon",
+    "location_tier_label",
     "ITEM_TAG_ICONS", "ITEM_TAG_ICON_PRIORITY",
     "register_item_category_label", "register_item_tag_label", "register_item_tag_icon",
     "register_information_kind_label", "register_location_group",

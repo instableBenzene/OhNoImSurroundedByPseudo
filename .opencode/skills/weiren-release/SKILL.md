@@ -10,7 +10,7 @@ description: Use before shipping/releasing OhNoImSurroundedByPseudo — "投放 
 ## 1. 静态与单测
 ```
 python -m compileall -q weiren_game game.py game_ui.py tools
-python -m unittest discover -s tests -p "test_*.py"          # 当前 52 全绿（刻意精简）
+python -m unittest discover -s tests -p "test_*.py"          # 必须全绿（刻意精简）
 python tools/validate_content.py                             # 内容完整性
 python tools/audit_separation.py                             # ①系统/前端无内容泄漏 ②data 不依赖 systems
 python tools/smoke_simulation.py --seeds 3 --log-dir <tmp>   # 批量对局冒烟

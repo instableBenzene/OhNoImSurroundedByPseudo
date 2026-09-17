@@ -44,14 +44,18 @@ python tools/audit_separation.py
 4. 标签（展示用）
 5. 技能表：每个技能给「名称 + 主动/被动 + 触发时机 + 目标 + 效果 + 数值/概率 +
    是否每回合限次（`per_turn`）+ 冷却/解锁条件（写进 `chips`）」
-6. 是否需要玩家选择（目标/信息/资源/数量/提交物资）；提示语与选项名（属内容层）
+6. 是否需要玩家选择（目标/信息/资源/数量/提交物资）；提示语与选项名（属内容层）。
+   `options` 每项 `(value, label)` 可**再加两项** `(value, label, icon, desc)`：`icon` 是贴图零件 id、
+   `desc` 是一句说明 —— 选择页会渲染成带图标的卡片，不写就回退中性图标
 7. 是否需要**专属印记**（计数）：获得条件、上下限、需要在详情页画进度条时给出换档阈值
    （`MARKS` + `MarkDefinition(..., bar_tiers=...)`；档位可带标注/刻度配色做提示，
    无上限就写阈值当参照）
 8. 头像右侧那片**小面板**放什么（`DETAIL_SLOT(engine, tenant)` 返回 `mark`/`bar`/`text`/`tags`/`glyph` 条目；
    `glyph` 是装饰图形（可 `spin="random"/"cw"` 旋转、`hint` 悬停文案），适合彩蛋；
    不声明就默认列印记）；若某个状态不该出现在状态栏（如人设），给它 `chip_hidden=True`
-9. 头像（默认随机形状，或指定 `AVATAR`）；是否要外置立绘
+9. 头像（默认按 id 哈希派生的「形状 × 特征」，可用 `AVATAR`/`AVATAR_FEATURE` 指定；
+   点缀色/点缀环已废弃）；要**整张头像**就给 `data/avatars/characters/<角色id>.svg`
+   （或包内 `avatars/characters/`）——立绘已进内容层，不再往 `assets/art/` 放
 10. 约束：`available=True` 会进入访客池、**改变按种子的随机序列**；是否触碰平衡
 
 ## 5. 字段速查（写技能/被动最常用的三套）

@@ -52,22 +52,32 @@ python game_ui.py         # 直接在终端运行（可见日志）
 | `docs/GUIDE.md` | **唯一权威**架构文档（含 §14 分层、§15 原稿覆盖） |
 | `docs/STYLE.md` | 美术与 UI 风格 + §9 参数表 |
 | `docs/ADD_CONTENT.md` | 内容创作：类型全景 / 加房客 / 写 DLC |
+| `docs/COOKBOOK.md` | 创作样例集（给人读）：照着改就能用的最小样例 |
 | `docs/DECISIONS.md` | 决策与修正记录 |
+| `docs/BALANCE.md` | 平衡改动记录（各技能的增强/削弱账） |
 | `dlc/README.md`、`dlc/_template/` | 内容包 / 伪人编写规范与模板 |
+| `resourcepacks/README.md` | 资源包（外观/材质）编写规范 |
 | `../完蛋，我被伪人包围了？！/` | 设计原稿（在项目外）：docx、`md/` 转换稿、差异附录 |
 
 ## 内容可插拔
 
-- **自动发现**（`weiren_game/data/_discovery.py`）：`characters/`、`personalities/`、`pseudos/`、
-  `items/`、`tags/` 下的 `.py` **放入或删除即生效，无需登记**。
+- **自动发现**（`weiren_game/data/_discovery.py`）：`characters/`、`personalities/`、`pseudos/`、`items/`、
+  `tags/`、`locations/`（含 `MAP_GROUPS`）、`information/`、`statuses/`、`maps/<id>/map.py` 下的文件
+  **放入或删除即生效，无需登记**；外观类（`avatars/`、`item/`、`icon/`、`resourcepack/`）同样按文件名生效。
 - 核心不含具体内容 id；角色专属的状态 / 事件 / 搜索修正 / 图鉴 / 选牌 UI 都写在各自的模块里。
 - 外部内容包放 `dlc/<pack>/`，`base` 恒启用；启用集合写入存档并在读取时校验一致。
+- **地图（区域包）**：`data/maps/<id>/map.py` 声明**显式地点名单 + 屋子名**；内置那张是 `base`
+  （显示名「城郊小镇」，屋子叫「城郊小屋」）。对局创建页可选地图。
+- **外观与材质**：内置材质、资料包自带外观、独立资源包三层，同名覆盖、各自有序；
+  资源包能改配色/字体/贴图/头像零件/物品图标/封面与大标题。详见 `resourcepacks/README.md`。
 
 ## 验证
 
 ```powershell
-python -m unittest discover -s tests -p "test_*.py"    # 50 项确定性单元/回归测试（刻意精简）
+python -m unittest discover -s tests -p "test_*.py"    # 确定性单元 / 回归测试（必须全绿，刻意精简）
 python tools/smoke_simulation.py --seeds 200           # 三类伪人的批量完整对局（稳定性）
+python tools/audit_separation.py                       # 核心/内容分离度自检
+python tools/validate_content.py                       # 内容校验（编号/性格/引用完整性）
 ```
 
 自动玩家只用于稳定性验证，胜率不代表正式平衡结果。

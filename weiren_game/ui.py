@@ -11,7 +11,8 @@ def _pairs(options):
     """把 ``[value, ...]`` 或 ``[(value, label), ...]`` 规范成 ``[(value, label)]``。"""
     out = []
     for option in options:
-        if isinstance(option, tuple) and len(option) == 2:
+        # 允许 ``(value, label, icon, desc)`` —— 第 3、4 项只给界面用（图标/说明）。
+        if isinstance(option, tuple) and len(option) >= 2:
             out.append((option[0], str(option[1])))
         else:
             out.append((option, str(option)))

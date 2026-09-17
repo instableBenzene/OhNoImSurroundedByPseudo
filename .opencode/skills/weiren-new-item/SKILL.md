@@ -48,7 +48,10 @@ ITEMS = {
   （DLC 用 `register_item_tag_label` / `register_item_category_label` / `register_item_tag_icon`，
   或在 `__init__.register(ctx)` 里调用）。
 - 图鉴全文：`data/items/codex_text.py`；风味：`data/items/flavor.py`。
-- 贴图：`assets/art/` + `manifest.json`（有图即覆盖内置图标，**不改代码**）。
+- 图标：内容层 `data/item/item/<物品id>.svg`（专属）或 `data/item/tag/<tag>.svg`（按标签兜底）；
+  资料包放 `dlc/<包>/item/...`、资源包放 `resourcepacks/<包>/item/...` 即可覆盖（**不改代码**）。
+  两色规则：`#d7ddd2`/`currentColor` = 底色（主题近白），其余颜色 = 特征色（自动取**品质色**）。
+  不画也行 —— 没图标就回退内置 `i-*` 零件。详见 `resourcepacks/README.md`「物品图标」。
 
 ## 4. 需求描述清单（把这段给 AI / 作者）
 

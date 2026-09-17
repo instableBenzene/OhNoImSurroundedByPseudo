@@ -34,6 +34,9 @@ class GameConfig:
     resourcepack_order: list[str] = field(default_factory=lambda: ["base"])
     # 显示偏好：房客卡详情页是否直接展开完整技能文本（否则折叠成一行、悬浮查看）。
     show_full_skills: bool = True
+    # 专属面板能不能拖着走（默认开启）。位置按**视口比例**记住：面板 key（角色 id）→ [左, 上]。
+    panel_draggable: bool = True
+    panel_pos: dict = field(default_factory=dict)
 
 
 def load_config(path: str | Path = CONFIG_PATH) -> GameConfig:
@@ -62,6 +65,8 @@ def load_config(path: str | Path = CONFIG_PATH) -> GameConfig:
     config.resourcepack_order = [str(name) for name in config.resourcepack_order]
     if "base" not in config.resourcepack_order:
         config.resourcepack_order.append("base")
+    if not isinstance(config.panel_pos, dict):
+        config.panel_pos = {}
     return config
 
 
@@ -82,6 +87,8 @@ def save_config(config: GameConfig, path: str | Path = CONFIG_PATH) -> Path:
         "pack_order": list(config.pack_order),
         "resourcepack_order": list(config.resourcepack_order),
         "show_full_skills": config.show_full_skills,
+        "panel_draggable": bool(config.panel_draggable),
+        "panel_pos": dict(config.panel_pos or {}),
     }
     temporary = target.with_suffix(target.suffix + ".tmp")
     temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")

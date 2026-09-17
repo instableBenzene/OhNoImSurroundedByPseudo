@@ -32,6 +32,8 @@ from .characters import (
     CHARACTER_MODULES,
     CHARACTER_MARKS,
     CHARACTER_DETAIL_SLOTS,
+    CHARACTER_CONTAINERS,
+    CHARACTER_PANELS,
     CHARACTERS,
     CODEX_SECTIONS,
     CODEX_SUMMARY_HOOKS,
@@ -66,6 +68,7 @@ from .items import (
     items_of_category,
     register_item,
 )
+from .maps import BASE_MAP_ID, MAPS, MapDefinition, register_map, register_map_location
 from .locations import (
     ANY,
     BASE_MAP_GROUPS,

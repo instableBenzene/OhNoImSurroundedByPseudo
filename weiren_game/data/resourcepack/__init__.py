@@ -40,7 +40,6 @@ LOCKED_TOKENS: frozenset[str] = frozenset({
     "--diff-hard", "--diff-easy", "--diff-neutral",                 # 难度标签（更难/更易/基准）
     "--danger-ink",                                                 # 危险按钮/提示上的浅红文字
     "--q0", "--q1", "--q2", "--q3", "--q4", "--q5",
-    "--bronze", "--silver", "--gold", "--prism", "--prism-grad",
     "--slot", "--w",
 })
 
@@ -62,7 +61,8 @@ def register_theme(theme: object, *, allow_locked: bool = False) -> None:
     """登记/覆盖主题：token 逐个覆盖（换材质/换字体都改 token），``css`` 追加。
 
     ``allow_locked=False``（一般资源包/DLC）时忽略 :data:`LOCKED_TOKENS`
-    ——那些是语义色 / 品质色 / 羁绊位阶 / 尺寸，换了皮肤也不能改含义或布局。
+    ——那些是**语义提示色 / 品质色 / 尺寸**，换了皮肤也不能改含义或布局；
+    羁绊位阶（``--bronze/--silver/--gold/--prism``）**已解锁**——羁绊本就是内容可自定义的。
     base 资源包用 ``allow_locked=True`` 提供默认值。
     """
     theme = dict(theme or {})
@@ -72,7 +72,7 @@ def register_theme(theme: object, *, allow_locked: bool = False) -> None:
         for key, value in tokens.items():
             key = str(key)
             if not allow_locked and key in LOCKED_TOKENS:
-                print(f"资源包：忽略被锁定的 token {key}（语义/品质/羁绊/尺寸不随材质变）")
+                print(f"资源包：忽略被锁定的 token {key}（语义/品质/尺寸不随材质变）")
                 continue
             accepted[key] = str(value)
         RESOURCE_THEME["tokens"].update(accepted)

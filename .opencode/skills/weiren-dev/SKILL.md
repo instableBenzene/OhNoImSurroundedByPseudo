@@ -37,13 +37,13 @@ description: Use when working in the OhNoImSurroundedByPseudo repository ("完�
 - **DLC 伪人的图鉴技能**：`codex_pack.PSEUDO_SKILLS` 是内置静态表；DLC 伪人应由其模块声明 `CODEX_SKILLS`
   （`((名称, 文案), ...)`），图鉴页会自动回退读它。
 - 图鉴文案属于内容层：集中在 `data/` 下的图鉴包与 `*_text.py`（**以代码为准**），不在系统/前端写死。
-- **材质 / 字体 / 贴图零件也是内容**：`data/resourcepack/`（base 默认材质）→ 前端启动时
-  经 `/api/resourcepack` 注入 `<defs>` 与 `:root`；DLC 的 `resourcepack/` 同名覆盖。
+- **外观/材质也是内容**（三层：base → 资料包 → 独立资源包）。要动前端或材质，
+  先读 **`.opencode/skills/weiren-frontend/SKILL.md`**（token/零件/素材位/文件资产、渲染规则、验证手法、坑）。
 
 ## 3. 验证（每次改完必跑）
 ```
 python -m compileall -q weiren_game
-python -m unittest discover -s tests -p "test_*.py"        # 当前 52 全绿（刻意精简，勿堆冗余用例）
+python -m unittest discover -s tests -p "test_*.py"        # 当前 63 全绿（刻意精简，勿堆冗余用例）
 python tools/smoke_simulation.py --seeds 3 --log-dir <tmp>
 python tools/audit_separation.py                            # 分离度自检
 python tools/dump_effects.py                                # 效果注册表 dump（核对 docs/ARCH.md 的闸门/数值目录）
@@ -59,12 +59,14 @@ node tools/browser_playtest.mjs url=http://127.0.0.1:8775/ games=30 turns=12 bud
 - JS `>>` 按有符号 32 位溢出；哈希取模用 `>>>`。
 - 前端文本统一走 `mdText()`（`·`/换行→换行、`*斜体*`、`**加粗**`、对话 `“…”` 换行）与 `fmt()`（再叠加标签悬浮）；**只有 `【标签】` 才会被解析为 tag**。
 - 新增注册表必须纳入 `content.py` 的热切换快照（`_BASE_CONTAINERS`），否则 DLC 卸载回滚会漏。
+  快照是**懒抓**的（`dlc.py` 在装载任何包之前调 `CONTENT.ensure_captured()`）：抓取时机**不能**挪回
+  `content` 模块级 —— 效果内核的 provider 由 `systems/*` 导入时登记，早抓会把 base 自己抹掉。
 - 概率统一 5%~95%（**必定**用 `.certain(0/1)`）；**闸门与通道共用 `path/source`、分用聚合**
   （通道算术、闸门 `any`/`veto`），**闸门是纯查询**（不掷骰/不写状态，掷骰在结算点）；目标回合数下限 12。详见 `docs/ARCH.md`。
 - 测试基准由 `tests/_baseline.py` 钉住，勿依赖玩家 `game_config.json`。
 
 ## 5. 美术风格（详见 docs/STYLE.md）
-暗绿底 + 琥珀主色；启动器 Minecraft 风、哈希路由；标题"报纸剪字"拼贴；单线 SVG 图标、品质映射到颜色；头像 = 基础形状 × 专属特征 × 点缀色；吐司代替弹窗。改 UI 前先读 `docs/STYLE.md`。
+暗绿底 + 琥珀主色；启动器 Minecraft 风、哈希路由；标题"报纸剪字"拼贴；单线 SVG 图标、品质映射到颜色；头像 = 基础形状 × 专属特征；吐司代替弹窗。改 UI 前先读 `docs/STYLE.md`。
 
 ## 6. 品味与手法（摘要，全文见 `docs/PRINCIPLES.md`）
 - **交互靠常理**：拖进去的能拖回来；别为已有动作再加冗余按钮（如"取回"）。
@@ -79,5 +81,5 @@ node tools/browser_playtest.mjs url=http://127.0.0.1:8775/ games=30 turns=12 bud
 - **规则文档只写规则，不复制清单**：注册表、字段名、文件名、性格键、目录树这类清单一律指向唯一来源
   （代码 / `AGENTS.md` / `docs/*.md`），避免双维护漂移。
 - **测试保持精简**：合并同类断言、能用 `subTest` 就别开一堆方法；不写"镜像实现 / 重复基本行为"的用例。
-  当前套件刻意压在 **52 项以内**，不要为一次性改动再堆冗余测试。
+  当前 63 项，不要为一次性改动再堆冗余测试。
 - **术语与文案属于内容层**；只清自己产生的文件（`WEIREN_SAVES_DIR` 隔离）。

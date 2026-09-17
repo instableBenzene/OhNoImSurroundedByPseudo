@@ -9,6 +9,7 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 from weiren_game.marks import MarkInstance
 from weiren_game.global_event import GlobalEventDefinition, register_global_event
 from weiren_game.modifier_rules import register_modifier_provider
+from .erebus_fate_symbols import ORIENTATION_SYMBOLS, SYMBOLS as FATE_SYMBOLS
 
 from dataclasses import dataclass
 
@@ -214,6 +215,10 @@ FATE: dict[int, FateCard] = {
     20: FateCard(20, "审判", "初访后可抽；后续访客中加入伪人的人类对应形态。", "随机房客的主动与被动能力整局失效。"),
     21: FateCard(21, "世界", "伪人5回合不能行动，本局命运抽牌失效。", "伪人5回合不能行动，本局命运抽牌失效。"),
 }
+
+# 哪些牌需要玩家**指定一名房客**（正/逆位各自不同）：目前全副牌只有死神·正位读 `target_id`
+# （`_card_13:504`），逆位是随机房客、不需要输入。以后哪张牌开始读 target_id，就往这里加一条。
+NEEDS_TARGET: dict[int, tuple[str, ...]] = {13: ("upright",)}
 
 # ---------------------------------------------------------------- modifier
 def maybe_discern_pending(engine: EngineProtocol, info: object) -> bool:
@@ -854,6 +859,8 @@ def build_fate_view(engine) -> dict | None:
             "number": int(option["number"]),
             "name": "未知牌" if hidden else card.name,
             "display": "未知牌" if hidden else f"{int(option['number']):02d} {card.name}",
+            # 牌面符号：内容自带图形（见 erebus_fate_symbols.py），前端画在卡片的图标位上。
+            "svg": "" if hidden else FATE_SYMBOLS.get(int(option["number"]), ""),
             "upright": card.upright,
             "reversed": card.reversed,
             "hidden": bool(hidden),
@@ -862,6 +869,8 @@ def build_fate_view(engine) -> dict | None:
         })
     required = [i for i, option in enumerate(options) if option.get("requires_orientation")]
     choices = [["upright", "正位"], ["reversed", "逆位"]]
+    # 需要选人的牌 + 候选（只给 id 与名字；头像/生命/理智由 web_ui 投影成房客卡）。
+    needs = [int(option["number"]) for option in options if int(option["number"]) in NEEDS_TARGET]
     return {
         "prompt": "命运抽牌：选择一张结算",
         "options": views,
@@ -872,6 +881,8 @@ def build_fate_view(engine) -> dict | None:
         # 需要玩家指定正逆位的选项（如「命运之轮」）：方向选择独立于上交物资。
         "orientation": {
             "required": required, "choices": choices,
+            # 方向也要符号：前端那一步要和"选牌"同一套卡片，两张卡各配一个符号。
+            "symbols": dict(ORIENTATION_SYMBOLS),
             "prompt": "请选择这张牌的正位或逆位",
         },
         # 可选的"上交物资改定牌面"规格（内容自描述，前端通用渲染）。
@@ -881,8 +892,20 @@ def build_fate_view(engine) -> dict | None:
             "min_quality": 3,
             "choices": choices,
         },
-        "offer_prompt": "是否上交一件紫色及以上物资，改定所选牌的正逆位？",
-        "offer_yes": "上供", "offer_no": "不上供",
+        # 上供那一步的出口：**槽里放了东西就是上供，空着直接继续就是不上供**——
+        # 不再先问一句"是否上供"（那会把一件事拆成两个窗口）。
+        "proceed": "继续",
+        "proceed_hint": "把物资拖进上面的槽＝上供，可以改定正逆位；直接继续＝不上供。",
+        # 需要指定房客的牌：前端在"方向之后、揭晓之前"插一步，用现成的房客卡来选。
+        "target": {
+            "numbers": needs,
+            "required_by": {str(number): list(NEEDS_TARGET[number]) for number in needs},
+            "prompt": "选择一名房客",
+            "candidates": [
+                {"value": tenant.id, "label": engine.character(tenant).name}
+                for tenant in engine.home_tenants()
+            ],
+        },
         "upright_label": "正位", "reversed_label": "逆位",
     }
 
@@ -901,10 +924,12 @@ def resolve_fate_view(engine, value) -> None:
     index = value
     item_id = None
     orientation = None
+    target_id = None
     if isinstance(value, dict):
         index = value.get("index")
         item_id = value.get("item_id") or None
         orientation = value.get("orientation") or None
+        target_id = value.get("target_id") or None
     if index is None:
         raise RuleViolation("请选择一张命运牌。")
     option = options[int(index)]
@@ -918,7 +943,7 @@ def resolve_fate_view(engine, value) -> None:
         chosen = option["orientation"]
     resolve_fate(
         engine, actor.id, int(option["number"]),
-        orientation=chosen, target_id=None, sacrifice_item_id=item_id,
+        orientation=chosen, target_id=target_id, sacrifice_item_id=item_id,
     )
 
 
@@ -929,9 +954,19 @@ AVATAR = "i-av7"
 
 
 def CODEX_EXTRA() -> list:
-    """图鉴补充：厄瑞玻斯的命运牌（表格：正位/逆位同列）。"""
-    rows = [
-        [f"{card.number:02d} {card.name}", card.upright, card.reversed]
-        for card in sorted(FATE.values(), key=lambda c: c.number)
+    """图鉴补充：厄瑞玻斯的命运牌 —— 先是 22 张的**牌面符号**（缺的留空，方便核对），再是正/逆位表。"""
+    cards = sorted(FATE.values(), key=lambda c: c.number)
+    symbols = [
+        {"label": f"{card.number:02d} {card.name}", "svg": FATE_SYMBOLS.get(card.number, "")}
+        for card in cards
     ]
-    return [{"title": "命运牌", "table": {"columns": ["牌", "正位", "逆位"], "rows": rows}}]
+    # 顺手把两个方向符号也摆进同一面墙（同一套画法，便于一起核对）。
+    symbols += [
+        {"label": f"方向 {label}", "svg": ORIENTATION_SYMBOLS.get(key, "")}
+        for key, label in (("upright", "正位"), ("reversed", "逆位"))
+    ]
+    rows = [[f"{card.number:02d} {card.name}", card.upright, card.reversed] for card in cards]
+    return [
+        {"title": "牌面符号", "symbols": symbols},
+        {"title": "命运牌", "table": {"columns": ["牌", "正位", "逆位"], "rows": rows}},
+    ]

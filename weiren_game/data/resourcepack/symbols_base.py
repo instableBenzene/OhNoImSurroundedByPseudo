@@ -1,0 +1,72 @@
+"""默认贴图零件（base 材质）：通用图标 + 地点图标 + 性格（羁绊）图标。
+
+原本烘在前端 ``index.html`` 的 ``<defs>`` 里；搬到这里之后，
+**资料包 / 资源包都能用同名 id 覆盖或新增**（见 ``docs/ADD_CONTENT.md``「资源包」）。
+约定：``viewBox`` 统一 ``0 0 24 24``、线条走 ``currentColor``（跟着主题色走）；
+**性格（羁绊）8 个不烘任何颜色**：它们的颜色由**等级色**（铜/银/金/棱彩，见 `--bronze/--silver/--gold/--prism`）
+决定，这样"等级"永远读得出来。
+"""
+
+from __future__ import annotations
+
+SYMBOLS: dict[str, str] = {
+    "i-person": '<circle cx="12" cy="7" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+    "i-clock": '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.4 2.1"/>',
+    "i-gate": '<path d="M4.2 7h15.6M5.8 7v13.4M18.2 7v13.4M5.8 11.4h12.4"/>',
+    "i-search": '<circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6l4.6 4.6"/>',
+    "i-hand": '<path d="M8.2 12.4V6.6a1.5 1.5 0 0 1 3 0v4.8"/><path d="M11.2 11.4V5.4a1.5 1.5 0 0 1 3 0v6"/><path d="M14.2 11.4V7.4a1.5 1.5 0 0 1 3 0v8a5.6 5.6 0 0 1-5.6 5.6h-1A5.6 5.6 0 0 1 5 15.4v-2.8a1.5 1.5 0 0 1 3 0"/>',
+    "i-gear": '<circle cx="12" cy="12" r="3.1"/><path d="M12 2.4v3.2M12 18.4v3.2M2.4 12h3.2M18.4 12h3.2M5.2 5.2l2.3 2.3M16.5 16.5l2.3 2.3M18.8 5.2l-2.3 2.3M7.5 16.5l-2.3 2.3"/>',
+    "i-book": '<path d="M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2z"/><path d="M8 3v18"/>',
+    "i-cross": '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8v8M8 12h8"/>',
+    "i-tool": '<path d="M5 19.2 14.6 9.6"/><path d="M13.2 5.6l5.2 5.2-3.1 3.1-5.2-5.2z"/><path d="M4 20.4l2.6-2.6"/>',
+    "i-armor": '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 3v18"/>',
+    "i-pill": '<rect x="3.6" y="8" width="16.8" height="8" rx="4"/><path d="M12 8v8"/>',
+    "i-info": '<circle cx="12" cy="12" r="8.6"/><path d="M12 11.2V16.2"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/>',
+    "i-target": '<circle cx="12" cy="12" r="7.8"/><circle cx="12" cy="12" r="3.4"/><path d="M12 1.8v3.2M12 19v3.2M1.8 12h3.2M19 12h3.2"/>',
+    "i-trauma": '<path d="M12 3.6l2.4 5.2 5.6.7-4.2 3.9 1.1 5.6L12 16.3 7.1 19l1.1-5.6L4 9.5l5.6-.7z"/>',
+    "i-disorder": '<path d="M4 9.2c3.6-3.4 7.2 3.4 10.8 0"/><path d="M9.2 15c3.6-3.4 7.2 3.4 10.8 0"/>',
+    "i-shock": '<path d="M13.4 2.6 6.2 13.2h5.1l-.9 8.2 7.9-11h-5.2z"/>',
+    "i-emotion": '<path d="M4.6 12S7.8 6.6 12 6.6 19.4 12 19.4 12 16.2 17.4 12 17.4 4.6 12 4.6 12z"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/>',
+    "i-mark": '<path d="M12 3.4l2.5 5.4 5.8.7-4.3 4 1.2 5.7L12 16.4 6.8 19.2l1.2-5.7-4.3-4 5.8-.7z"/>',
+    "i-doll": '<circle cx="12" cy="7" r="3.2"/><circle cx="8.4" cy="4.6" r="1.3"/><circle cx="15.6" cy="4.6" r="1.3"/><path d="M8 13c-2 3-2 6 0 7h8c2-1 2-4 0-7z"/><path d="M12 8v5"/>',
+    "i-bag": '<path d="M5.4 8.4h13.2l-1 11.2H6.4z"/><path d="M9.2 8.4V6.6a2.8 2.8 0 0 1 5.6 0v1.8"/><path d="M9.8 12.4h4.4"/>',
+    "i-bullet": '<path d="M12 3c2.4 2.6 3.6 4.8 3.6 7.2 0 2-1.6 3.6-3.6 3.6s-3.6-1.6-3.6-3.6C8.4 7.8 9.6 5.6 12 3z"/><path d="M8.4 13.8h7.2v4.6a1.6 1.6 0 01-1.6 1.6h-4a1.6 1.6 0 01-1.6-1.6z"/><path d="M8.4 16.4h7.2"/>',
+    "i-loc-med-big": '<rect x="3" y="6" width="18" height="15" rx="1"/><path d="M3 6l9-3 9 3"/><path d="M12 11v6M9 14h6"/><path d="M6 21v-4h3v4M15 21v-4h3v4"/>',
+    "i-loc-med-small": '<rect x="5" y="7" width="14" height="12" rx="1"/><path d="M5 7l7-3 7 3"/><path d="M12 11v4M10 13h4"/>',
+    "i-loc-pharmacy": '<path d="M4 10h16v3a8 8 0 01-8 8 8 8 0 01-8-8z"/><path d="M12 10v11"/><path d="M6 6l3 4M18 6l-3 4"/><path d="M8 4h8"/>',
+    "i-loc-blood": '<path d="M12 3c4 5 6 7.5 6 10.5A6 6 0 016 13.5C6 10.5 8 8 12 3z"/><path d="M9 14h6M12 11v6"/>',
+    "i-loc-hardware": '<path d="M14.5 6.5a4 4 0 105 5L21 13l-8 8-2-2 8-8z"/><path d="M6 6l4 4M4 10l4-4"/>',
+    "i-loc-tree": '<path d="M12 3l6 9h-4l5 7H5l5-7H6z"/><path d="M12 19v3"/>',
+    "i-loc-shield": '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 8v5M10 10h4"/>',
+    "i-loc-fuel": '<rect x="4" y="4" width="9" height="17" rx="1"/><path d="M13 8h3a2 2 0 012 2v7a2 2 0 104 0v-8l-2-3"/><path d="M7 8h3"/>',
+    "i-loc-flagship": '<path d="M4 10h16v9H4z"/><path d="M3 10l2-3h14l2 3"/><path d="M12 3l1 3M12 6l-3 4h6z"/><path d="M8 19v-5h8v5"/>',
+    "i-loc-store": '<path d="M4 9h16v11H4z"/><path d="M3 9l2-4h14l2 4"/><path d="M9 20v-6h6v6"/>',
+    "i-loc-cart": '<path d="M3 5h2l2 10h11l2-7H6"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/>',
+    "i-loc-food": '<path d="M4 11h16a8 8 0 01-16 0z"/><path d="M4 11c0-4 3.6-6 8-6s8 2 8 6"/><path d="M4 16h16v2H4zM8 8h.01M12 7h.01M16 8h.01"/>',
+    "i-loc-crate": '<rect x="4" y="12" width="16" height="8"/><rect x="7" y="5" width="10" height="7"/><path d="M12 5v15M4 16h16"/>',
+    "i-loc-lantern": '<path d="M9 4h6v3H9z"/><path d="M8 7h8l1 10H7z"/><path d="M12 17v3"/><path d="M12 10v4"/>',
+    "i-loc-house": '<path d="M4 20V10l8-6 8 6v10z"/><path d="M10 20v-6h4v6"/>',
+    "i-loc-school": '<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c0 1 2 2 5 2s5-1 5-2v-5"/><path d="M21 9v6"/>',
+    "i-loc-package": '<path d="M3 8l9-4 9 4v8l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v8"/>',
+    "i-loc-bus": '<rect x="4" y="5" width="16" height="12" rx="1"/><path d="M4 12h16M7 17v2M17 17v2"/><circle cx="8" cy="17" r="1.2"/><circle cx="16" cy="17" r="1.2"/>',
+    "i-loc-people": '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.4 2.7-5 6-5s6 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 20c0-2.6 1.6-4 4-4"/>',
+    "i-loc-book": '<path d="M5 4h6v16H5z"/><path d="M11 4h8v16h-8z"/><path d="M8 8h.01M8 11h.01M15 8h.01"/>',
+    "i-loc-scales": '<path d="M12 3v18M6 21h12"/><path d="M4 7h16"/><path d="M4 7l-2 6h4zM20 7l-2 6h4z"/>',
+    "i-seal": '<path d="M12 3.4l6.8 3.9v5.2c0 3.8-2.9 5.8-6.8 7.7-3.9-1.9-6.8-3.9-6.8-7.7V7.3z"/><path d="M9.2 12.2l2 2 3.6-3.8"/>',
+    "i-craft": '<path d="M6 10l6-5 6 5v8H6z"/><path d="M9 18v-5h6v5"/>',
+    "i-drink": '<path d="M6 4h12l-1 15H7z"/><path d="M8 9h8"/>',
+    "i-ammo": '<rect x="9" y="7" width="6" height="12" rx="3"/><path d="M12 3v4"/>',
+    "i-snack": '<path d="M7 3h10l-1 18H8z"/><path d="M8 10h8M8 14h8"/>',
+    "i-key": '<circle cx="9" cy="9" r="4"/><path d="M11.6 11.6L20 20M17 17l2-2"/>',
+    "i-battery": '<rect x="3" y="8" width="15" height="8"/><path d="M20 10v4"/>',
+    "i-torch": '<path d="M12 3v5"/><path d="M8 8h8l-2 13h-4z"/>',
+    "i-note": '<path d="M6 3.4h9.2L19.8 8v12.6H6z"/><path d="M15.1 3.6V8h4.6"/><path d="M8.8 12.2h6.6M8.8 15.6h4.4"/>',
+    "i-b-cheerful": '<circle cx="12" cy="12" r="3.9"/><path d="M12 2.6v2.5M12 18.9v2.5M2.6 12h2.5M18.9 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"/>',
+    "i-b-loner": '<circle cx="9.5" cy="8" r="2.7"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M18 5.5v13"/>',
+    "i-b-keen": '<path d="M12 3.4l1.8 4.8 4.8 1.8-4.8 1.8-1.8 4.8-1.8-4.8L5.4 10l4.8-1.8z"/><path d="M3.2 7.4h2.4M2.4 11.2h2"/>',
+    "i-b-stubborn": '<rect x="5.5" y="10.4" width="13" height="9.6" rx="1.6"/><path d="M8.5 10.4V7.8a3.5 3.5 0 0 1 7 0v2.6"/><path d="M12 13.8v2.8"/>',
+    "i-b-steady": '<path d="M2.6 19l6-11.4 3.6 6.6L14.6 10l6.8 9z"/>',
+    "i-b-impatient": '<path d="M13.6 2.4L5.4 13.2h5.4l-1 8.4 8.2-10.8h-5.4z"/>',
+    "i-b-gentle": '<path d="M12 20.3C8.5 17.8 4 14.2 4 10.3 4 8 5.8 6.3 8 6.3c1.7 0 3.2 1 4 2.5.8-1.5 2.3-2.5 4-2.5 2.2 0 4 1.7 4 4 0 3.9-4.5 7.5-8 10z"/>',
+    "i-b-suspicious": '<path d="M3 12s3.6-6.3 9-6.3S21 12 21 12s-3.6 6.3-9 6.3S3 12 3 12z"/><circle cx="12" cy="12" r="2.4"/><path d="M4 20L20 4"/>',
+}

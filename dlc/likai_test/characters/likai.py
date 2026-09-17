@@ -42,6 +42,11 @@ CHARACTER = CharacterDefinition(
     source_note="测试 DLC：likai_test",
 )
 
+# 头像：从 12 个形状里挑一个（不声明会回退通用头像、`validate_content` 也会提醒）。
+# 更贴题的做法是给整张头像：`likai_test/avatars/characters/likai.svg`（或放内容层
+# `data/avatars/characters/likai.svg`）—— 那样连配件一起定死，不再受哈希派生影响。
+AVATAR = "i-av9"
+
 
 def initial_setup(engine: object, tenant: object) -> None:
     """老楷入住时按累计死亡次数提升最大生命值。"""

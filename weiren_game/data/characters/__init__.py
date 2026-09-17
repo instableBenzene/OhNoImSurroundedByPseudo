@@ -179,6 +179,31 @@ CHARACTER_DETAIL_SLOTS: dict[str, object] = {
     if getattr(module, "DETAIL_SLOT", None) is not None
 }
 
+# 角色专属容器：模块声明 `CONTAINERS = {"<key>": <类>}`（自定义 UI 的专属状态放这里）。
+# 声明表纳入 `_BASE_CONTAINERS` 快照；类型表（供存档反序列化）登记进 `weiren_game.tenant`。
+CHARACTER_CONTAINERS: dict[str, dict[str, type]] = {
+    character_id: dict(getattr(module, "CONTAINERS", {}))
+    for character_id, module in CHARACTER_MODULES.items()
+    if getattr(module, "CONTAINERS", None)
+}
+
+# 角色专属面板（自定义 UI）：模块声明 `PANEL = (build_view, resolve_action)`。
+#   build_view(engine, tenant) -> dict | None    视图（条目词表与 DETAIL_SLOT 同一套）
+#   resolve_action(engine, tenant, action, *, slot=None, item_id=None, source=None)
+# 面板"开着没有"是**纯展示状态**（前端记），后端只负责下发视图与转交动作；
+# 核心不认识面板里的任何具体概念（田 / 水 / 成熟都不在核心词表里）。
+CHARACTER_PANELS: dict[str, object] = {
+    character_id: getattr(module, "PANEL", None)
+    for character_id, module in CHARACTER_MODULES.items()
+    if getattr(module, "PANEL", None) is not None
+}
+
+from weiren_game.tenant import register_container_type as _register_container_type
+
+for _container_owner, _container_map in CHARACTER_CONTAINERS.items():
+    for _container_key, _container_cls in _container_map.items():
+        _register_container_type(_container_owner, _container_key, _container_cls)
+
 
 # 新待验证信息生成后的角色被动（如厄瑞玻斯太阳识破/占卜直觉）。
 INFORMATION_CREATED_HOOKS: list[object] = [
@@ -237,6 +262,14 @@ def register_character_module(character_id: str, module: object) -> None:
     slot = getattr(module, "DETAIL_SLOT", None)
     if slot is not None:
         CHARACTER_DETAIL_SLOTS[character_id] = slot
+    containers = getattr(module, "CONTAINERS", None)
+    if containers:
+        CHARACTER_CONTAINERS[character_id] = dict(containers)
+        for container_key, container_cls in dict(containers).items():
+            _register_container_type(character_id, container_key, container_cls)
+    panel = getattr(module, "PANEL", None)
+    if panel is not None:
+        CHARACTER_PANELS[character_id] = panel
     used_hook = getattr(module, "ON_ABILITY_USED", None)
     if used_hook is not None and used_hook not in ABILITY_USED_HOOKS:
         ABILITY_USED_HOOKS.append(used_hook)

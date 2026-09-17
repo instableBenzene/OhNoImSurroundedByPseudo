@@ -20,6 +20,10 @@ dlc/<dlc_name>/
   tags/<tag>.py               # 文件名即 tag 的行为模块（进 TAG_BEHAVIORS）
   statuses/any_name.py        # STATUSES / EMOTIONS（状态与情绪定义）
   resourcepack/any_name.py    # THEME（CSS 变量/字体/追加 css）/ SYMBOLS（贴图零件）
+  avatars/<section>/<id>.svg  # 头像零件/整张头像（shapes/features/characters，按位次覆盖 base）
+  item/item/<id>.svg          # 自带物品的图标；item/tag/<tag>.svg 按标签兜底
+  icon/<section>/<id>.<ext>   # 地点/信息/伪人图标（locations/information/pseudos）
+  maps/<id>/map.py            # 自带一张地图（显式地点名单 + 屋子名）
   locations/any_name.py       # LOCATIONS；可选 MAP_GROUPS 把新分组纳入开局抽取
   information/any_name.py     # INFORMATION_TEMPLATES（可选 LOCATION_INFORMATION_MODIFIERS）
   pseudos/<id>.py             # DEFINITION / State / HANDLERS（可选 NODE_HOOKS）

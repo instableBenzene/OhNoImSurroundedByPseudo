@@ -20,7 +20,7 @@ CHARACTER = CharacterDefinition(
          prompt="选择要消耗的警觉印记层数",
          amount_label="消耗警觉印记层数",
          amount_mark="alert",
-         options=(("discern","额外消耗30理智立即识破"),),
+         options=(("discern","额外消耗30理智立即识破","i-search","把这次拿到的信息直接变成已证实"),),
          branches=(
              B(
                  max_on_force=True,

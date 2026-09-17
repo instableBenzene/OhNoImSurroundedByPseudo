@@ -30,11 +30,17 @@
 ## 5. 图标与头像
 - 图标：单线 SVG（`stroke:currentColor`），线条简洁；地点图标体现**类型与规模差异**（大/小医疗点、餐车、货箱、夜市…）。
 - 头像：**基础形状（12）× 专属特征（14：帽/兜帽/眼镜/耳机/口罩/发饰…）× 点缀色（低饱和，环/点/弧）**；主色仍为琥珀，点缀色只作装饰、不喧宾夺主。
-- **外置美术**（`assets/art/` + `manifest.json`）：已有图时用 `<img class="art-img">` 覆盖内置图标，缺图回退。
+- **内容层资产**（`weiren_game/data/` 下，资料包/资源包可同 id 覆盖）：
+  - **物品图标** `data/item/{item,tag}/<id>.svg`：**两色** —— 底色（`#d7ddd2` / `currentColor`，前端给 `--ink`）
+    + 特征色（运行期换成该物品的**品质色**）。后端内联下发，尺寸走 `.art-inline`（槽 20px / 图鉴行 19px / 详章 72px）。
+  - **头像零件** `data/avatars/{shapes,features,characters}/`：形状吃 `--ink`（蒙版）、特征吃点缀色；见 `resourcepacks/README.md`。
+- **封面 / 大标题**：base 材质自带（封面 = `data/resourcepack/assets/background.svg` + base 的动画样式；
+  标题 = 剪字渲染器 + `--title-paper-*`/`--title-ink-*` token）。素材位 `background`/`title` 一给就整块替换。
+- **地点 / 信息 / 伪人图标**：内容层 `data/icon/<section>/<id>.<ext>`（资料包/资源包同 id 覆盖，经 `GET /api/icon/<section>/<id>` 提供）→ 有图用 `<img class="art-img">` 覆盖内置单线图标，缺图回退。
   - 尺寸：`.cd-av .art-img` 72px、`.td-left .av .art-img` 56px、`.av .art-img` 42px、`.cv .art-img` 19px（图鉴列表/信息行）、`.loc-name .art-img` 19px。
-  - 现状：24 房客 + 3 伪人 + 57 物资 + 25 地点 + 22 信息，共 131 张；**物资的品质色直接烧在 SVG 里**（`img` 不继承 `currentColor`）。
-  - 上色约定：物资=品质色；地点=功能色（医疗绿/食物琥珀/工具雾蓝/混合灰）；信息=类型色（物资线索琥珀/地点修正雾蓝/房客状态紫/伪人红）。
-  - 详见 `assets/art/README.md` 与 `docs/DECISIONS.md` 顶部条目。
+  - 现状：3 伪人 + 25 地点 + 22 信息，共 50 张（房客立绘 24、物品图标 57+21 已搬进内容层）。
+  - 上色约定：地点=功能色（医疗绿/食物琥珀/工具雾蓝/混合灰）；信息=类型色（物资线索琥珀/地点修正雾蓝/房客状态紫/伪人红）。
+  - 详见 `resourcepacks/README.md` 与 `docs/DECISIONS.md` 顶部条目。
 
 ## 6. 原则
 - 内容相关文案一律走内容层；系统/前端只渲染。
@@ -79,53 +85,60 @@
 - 满→绿（`--ok`）、≤55%→黄（`--warn`）、≤25%→红（`--danger`）；悬浮物品显示`耐久 当前/上限`。
 - 数据侧：物品条目第 10/11 项为当前/上限耐久；**耐久品按实例下发**（不按 item_id 聚合，避免耐久被合并丢失）。
 
-## 9. 参数表（从实现提取，改样式以这里为准）
+## 9. 参数表（改样式的入口；**具体色值不在这里复制**）
 
-> **颜色 token / 字体由资源包定义、前端保留默认材质兜底**：前端 `:root` 里那份是**默认材质**
-> （值与 base 资源包 `weiren_game/data/resourcepack/theme.py` 的 `THEME["tokens"]` **逐一相同**，
-> 由单测钉住）；资源包（内容层，DLC 的 `resourcepack/` 同名覆盖）只做**覆盖/追加**，
-> 启动时写回 `:root`。所以"资源包不可用"时界面**保持默认观感**。
-> **尺寸与结构**始终在前端 `<style>` 里。
+> **颜色的唯一来源**：`weiren_game/data/resourcepack/theme.py`（token / 字体栈 / 遮罩 / 阴影配方 / 标题纸墨 / 棱彩色标）。
+> 前端 `:root` 里有一份**同值的默认材质兜底**（单测钉住逐一相同）；启动时 `GET /api/resourcepack`
+> 把资源包的 token 写回 `:root`、把贴图零件注入 `<defs>`。**尺寸与结构**始终在前端 `<style>` 里。
+> 外观那摊的完整说明见 `.opencode/skills/weiren-frontend/SKILL.md`。
 >
-> **哪些 token 可以被材质包改**（其余一律锁定，见 `data/resourcepack/__init__.py` 的 `LOCKED_TOKENS`）：
-> - ✅ 色调/材质：`--bg/--panel/--panel2/--line/--line2/--ink/--ink2/--ink3`、`--amber/--amber-soft/--jade-deep`、
->   `--amber-rgb`（强调色的 rgb 分量，供 `rgba(var(--amber-rgb),α)` 的 hover/选中叠加用——**与 `--amber` 必须同步**）、
->   `--ink-hi/--ink-btn/--ink-head`、`--edge`、按钮面 `--btn-*/--pri-*/--surface-*`、
->   启动器背景 `--launcher-1/2/3`、字体栈（`--mono/--sans/--serif/--hei/--comic/--px-font`）
-> - ❌ 锁定（含义/尺寸）：语义 `--ok/--danger/--warn/--info`、危险红 `--danger-*` 与 `--danger-ink`、
->   难度标签 `--diff-hard/--diff-easy/--diff-neutral`、品质 `--q0..--q5`、
->   羁绊位阶 `--bronze/--silver/--gold/--prism/--prism-grad`、尺寸 `--slot/--w`
->
-> **只剩 5 处字面量**（刻意不收编）：报纸剪字标题的纸/墨色（`.mc-title` / `.title-bangs b`）
-> 与金牌徽记的金属渐变三色（`.tier-badge.t-gold`）。
+> - ✅ **资源包可改**：色调与字体栈、**遮罩/面板底**（`--scrim*`/`--mask*`/`--glass`/`--card-glass`/`--moss`）、
+>   **阴影配方**（`--shadow-*`，整套 UI 的斜面/投影都引用它们，写 `none` 就是扁平风）、
+>   **标题整套**（`--title-paper-*`/`--title-ink-*`/`--title-wash`）、
+>   **羁绊四档**（`--bronze/--silver/--gold/--gold-grad/--prism/--prism-grad`）、棱彩五色标（`--prism-1..5`）。
+> - ❌ **锁定**（含义/尺寸，见 `data/resourcepack/__init__.py::LOCKED_TOKENS`）：语义 `--ok/--danger/--warn/--info`
+>   与 `--danger-*`、难度 `--diff-*`、品质 `--q0..--q5`、尺寸 `--slot`/`--w`。
+> - **CSS 里不许出现裸色值**，只有三条合法姿势：`var(--x)`、`rgba(var(--x-rgb),α)`、
+>   `color-mix(in srgb, var(--edge|--ink-hi) N%, transparent)`（阴影/高光从主题色算出；需要 Chrome/Edge 111+）。
 
-### 颜色 token（`:root`）
-- 底 `--bg:#0b0f10`；面板 `--panel:#171e1e` / `--panel2:#1d2625`；线 `--line:#33403d` / `--line2:#27312f`
-- 文字 `--ink:#e6eadf` / `--ink2:#9aa79f` / `--ink3:#6f7d76`
-- 语义 `--ok:#68b998` / `--danger:#d46b63` / `--warn:#e2a84d` / `--info:#71a6c4`
-- 强调 `--amber:#e2a84d`、`--amber-soft:#6d4a21`、`--jade-deep:#274c3e`
-- 品质 `--q0..--q5 = #c4c9c4 / #66b875 / #6b9fd1 / #a77ad1 / #d6aa45 / #d86459`
-- 羁绊位阶 `--bronze:#b07a4a` / `--silver:#c3ccd0` / `--gold:#f3d24e` / `--prism:#e3a6ee`；
-  棱彩另有多色渐变 `--prism-grad`（档名渐变文字、图标描边 `#prismGrad`、徽记渐变底）
+### 颜色与阴影
+- 分组：底 / 面板 / 线 / 文字、琥珀强调（`--amber` + `--amber-rgb` 分量）、语义、品质六档、羁绊四档、
+  **遮罩 / 面板底**、**阴影配方**（`--shadow-*` 一族 —— 整套 UI 的斜面与投影都引用它们，
+  写 `none` 就是扁平风）。**token 名与值一律去 `theme.py` 看**（这里不复制清单，会漂）。
 
 ### 字体栈
-- 正文 `--sans:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif`
-- 标题/按钮 `--hei:"Microsoft YaHei UI","Microsoft YaHei","SimHei","PingFang SC","Noto Sans CJK SC",sans-serif`
-- 数字/代号 `--mono:Consolas,"Cascadia Mono","Courier New",monospace`
-- 楷体 `--serif:"STKaiti","KaiTi",serif`；另有 `--comic`（启动器偶用）
+- 正文 `--sans`、标题/按钮 `--hei`、数字/代号 `--mono`、楷体 `--serif`，另有 `--comic`/`--px-font`（值在 `theme.py`）。
 
 ### 按钮
-- 常规 `.btn`：`font 13px(--hei)`；底 `linear-gradient(#2c3b34,#1b2620)`；`border:2px solid #0c0c0c`；`radius:3px`；
-  `box-shadow:inset 1px 1px 0 rgba(255,255,255,.10), inset -1px -1px 0 rgba(0,0,0,.5)`；`padding:7px 14px`；`transition .14s`
-  - hover：`linear-gradient(#3c5247,#25352c)` + 琥珀边
-  - 主按钮 `.btn.p`：`linear-gradient(#3f6b4f,#274c3e)`，hover `#4f8663,#315e4c`
-- 启动器 `.mc-btn`：`font 17px(--sans) / padding:14px 22px`；双层内阴影 `inset ±2px` + `0 7px 16px rgba(0,0,0,.45)`；
-  `text-shadow:1px 1px 0 rgba(0,0,0,.6)`；按下 `translateY(2px)`；`.wide` 全宽 `20px/19px 26px`
+- 常规 `.btn`：`font 13px(--hei)`；面 `linear-gradient(var(--btn-1),var(--btn-2))`；`border:2px solid var(--edge)`；
+  `radius:3px`；`box-shadow:var(--shadow-bevel)`；`padding:7px 14px`；hover 换 `--btn-hi-*` + 琥珀边。
+- 主按钮 `.btn.p`：`linear-gradient(var(--pri-1),var(--pri-2))`，hover `--pri-hi-*`。
+- 启动器 `.mc-btn`：`font 17px(--sans)`；`box-shadow:var(--shadow-bevel-lg)`；`text-shadow:var(--text-shadow-bevel)`；
+  按下 `translateY(2px)`；`.wide` 全宽 `20px/19px 26px`。
 
 ### 弹窗
-- `.dialog`：`width:min(560px,92vw)`；底 `linear-gradient(180deg,#1b2622,#131b18)`；`border:2px solid #0c0c0c`；`radius:3px`；
-  `box-shadow:inset 0 0 0 2px rgba(226,168,77,.18), 0 18px 40px rgba(0,0,0,.6)`；`.dialog.wide = min(880px,94vw)`
-- 头 `.dhead` `padding:12px 16px`（底 `rgba(0,0,0,.22)`）；体 `.dbody` `padding:16px`；脚 `.dfoot` `padding:12px 16px`（底 `rgba(0,0,0,.18)`）
+- `.dialog`：`width:min(560px,92vw)`；底 `linear-gradient(180deg,var(--surface-1),var(--surface-2))`；
+  `border:2px solid var(--edge)`；`radius:3px`；`box-shadow:var(--shadow-panel)`；`.dialog.wide = min(880px,94vw)`。
+- **面板高度**：`.lpane-inner.tall`（创建对局 / 存档 / 资料包 / 资源包）`min-height:90vh`，其 `.mc-panel`
+  `min-height:68vh` + `max-height:86vh` + `overflow-y:auto`；列表 `.dlc-list`/`.save-list` 随列拉伸。
+- 头 `.dhead` `padding:12px 16px`（底 `color-mix(in srgb,var(--edge) 22%,transparent)`）；
+  体 `.dbody` `padding:16px`；脚 `.dfoot` `padding:12px 16px`（底同色 18%）。
+
+### 发现（无背景板的选择浮层）
+- `.mask.bare`：`rgba(5,7,9,.66)`、**无模糊** —— 只把外面的场面调暗；`.dialog.bare`：透明、无边框、无投影、隐藏 `.dhead`
+- 一行卡片 `.disc-opts`：**总宽固定** `min(1180px,94vw)`；`.disc-row` 的 `gap` = `--gap`（JS 给：`max(8, 48-6×张数)`，**张数越多越紧**，实测 3 张 30px / 5 张 18px / 2 张 36px）
+- 卡片 `.card`（bare）：`flex:1 1 0`、`max-width:240px`、`padding:18px 12px`、深底 `rgba(20,28,26,.88)`；头像 56px；选中/悬停用琥珀描边 + 底色加重
+- 翻页箭头 `.pg-arrow`：`44×72` 命中区（三角用 `::before`）；**只在一页以上时出现**，到端点置灰（`.off`）而不隐藏 —— 行宽不跳
+- 分页粒度 `PER_PAGE = 5`；页码状态 `PAGER={key,page}`（key 变了自动回第 1 页）
+
+### 选择类弹窗（技能目标 / 效果 / 数量 / 搜索房客与地点）
+- `.choice-grid`：`repeat(auto-fit,minmax(186px,1fr))`、`gap:12px`、`max-height:56vh` 可滚；
+  卡片沿用 `.card`（`.sel` 琥珀描边 + 加底、悬停同款），`.card.wide` 是"图标 + 文字"横条（读效果文本用）
+- 房客卡（`tenantChoiceCard`）：`.cn` 编号 + `.dc-av` 头像 40px + `.dc-name` + `.ch-vitals`（生命/理智两条 `.bar`）+ `.ch-persona`
+- 效果卡（`optChoiceCard`）：`.dc-av` 取内容声明的 `i-*`、`.dc-name` 标签、`.dc-desc` 说明（第 4 项）
+- 数量（`amountBox`）：`.amt-btn` 46×46 步进 + `.amt-num` 88×46 + `.amt-range` 滑杆 + `.amt-bar > i.on` 格数条；端点按钮 `disabled`
+- 搜索地点行：`.loc-ico` 26px（图标已是「白底 + 档位特征色」）+ `.loc-main > b` + `.loc-sub > .chip`（**档位** `#8fa6b8/#c9a86a/#b06a5c` / 分组 / 固定）
+- 搜索地点详情：`.cd-title` + `.chips` + `.cd-block` + `.loc-drop`（`标签 → 百分比`）+ `.loc-mech`（`▸` 逐条）+ `.loc-raw`（`<details>` 原始长句）
 
 ### chip / badge / 槽位
 - `.chip`：`inline-flex; gap:4px; border:1px solid var(--line); padding:1px 6px; font 11px(--mono)`；`danger/warn/info` 变色

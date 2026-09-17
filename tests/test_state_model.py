@@ -72,6 +72,44 @@ class StateModelTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             TenantState.from_dict(raw)
 
+    def test_tenant_container_roundtrip(self) -> None:
+        """角色专属容器（自定义 UI 的专属状态）：进存档→读回；没声明/坏数据一律丢弃。"""
+        from dataclasses import dataclass, field
+
+        from weiren_game.tenant import CONTAINER_TYPES, register_container_type
+
+        @dataclass
+        class ProbeBox:
+            """测试用容器：一格东西 + 一个台阶计数。"""
+
+            name: str = ""
+            step: int = 0
+            tags: list = field(default_factory=list)
+
+            def to_dict(self) -> dict:
+                return {"name": self.name, "step": self.step, "tags": list(self.tags)}
+
+            @classmethod
+            def from_dict(cls, raw: dict) -> "ProbeBox":
+                return cls(
+                    name=str(raw.get("name", "")),
+                    step=int(raw.get("step", 0)),
+                    tags=[str(x) for x in raw.get("tags", ())],
+                )
+
+        register_container_type("dragon", "probe_box", ProbeBox)
+        try:
+            tenant = TenantState(id="T1", character_id="dragon")
+            tenant.containers["probe_box"] = ProbeBox("sweet_food", 2, ["食物"])
+            raw = tenant.to_dict()
+            self.assertEqual(TenantState.from_dict(raw), tenant)
+            raw["containers"]["ghost_box"] = {"step": 1}      # 没声明过的 key → 丢弃
+            self.assertEqual(TenantState.from_dict(raw).containers, tenant.containers)
+            raw["containers"]["probe_box"] = "坏数据"          # 坏数据 → 丢弃，不炸
+            self.assertEqual(TenantState.from_dict(raw).containers, {})
+        finally:
+            CONTAINER_TYPES.pop(("dragon", "probe_box"), None)
+
     def test_game_state_layers_and_pseudo_facade(self) -> None:
         state = GameState(
             meta=SaveMetadata(version=GAME_VERSION, seed="s", difficulty="a0"),

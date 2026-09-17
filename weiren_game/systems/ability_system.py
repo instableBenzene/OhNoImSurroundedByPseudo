@@ -155,6 +155,9 @@ class AbilitySystemMixin:
         ability = next((value for value in definition.actives if value.id == ability_id), None)
         if ability is None:
             ability = definition.actives[0]
+        if getattr(ability, "opens_panel", False):
+            # 只负责打开专属面板的技能：不掷失败、不付代价、不记冷却，也不该走结算。
+            raise RuleViolation(f"“{ability.name}”在界面里打开，不走技能结算。")
         state = actor.ability_state(ability.id)
         cooldown = state.cooldown_until if state else 0
         if not _bypass_limits and self.state.flow.turn < cooldown:

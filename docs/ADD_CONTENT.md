@@ -30,25 +30,29 @@
 | **性格（羁绊）** | `data/personalities/<key>.py`；DLC `personalities/<key>.py` | `TIERS`（或 `TIER_AT`/`ACTIVE_TIERS`/`ROUND_UP`）、`HOOKS`、`BOND_*`、modifier providers；可选 `LABEL`（中文名） | ✅ | 文件名即性格键；DLC 的中文名由 `LABEL` 登记（缺省回退为键名） |
 | **物品** | `data/items/<file>.py` | `CATEGORY` + `ITEMS`（`I(...)`）；可选 `ITEM_HOOKS`、`ITEM_EFFECTS` | ✅（按 `CATEGORY_ORDER`） | 风味见 `items/flavor.py`；图鉴全文见 `items/codex_text.py` |
 | **物资标签** | `data/tags/<tag>.json`（条目）或 `data/tags/<tag>.py`（行为）；DLC 同名两路 | JSON 为 `item_id`/物品名列表；`.py` 暴露 `after_*` 等 → `TAG_BEHAVIORS` | ✅（与内置同名 tag 合并/覆盖） | 中文名/图标经 `data/labels.py` 的登记函数（或 `register(ctx)` 调用） |
-| **地点** | `data/locations.py`（内置）/ DLC `locations/<file>.py` | `LOCATIONS`（`L(...)`）；可选 `MAP_GROUPS`（新分组纳入开局抽取） | DLC ✅ | 图鉴图标/文案在 `data/codex_pack.py` 的 `LOCATION_ICONS`/`LOCATION_TEXT` |
+| **地点** | `data/locations.py`（内置）/ DLC `locations/<file>.py` | `LOCATIONS`（`L(...)`，可选 `tier=1/2/3` 标档位）；可选 `MAP_GROUPS`（新分组纳入开局抽取） | DLC ✅ | 图鉴图标/文案在 `data/codex_pack.py` 的 `LOCATION_ICONS`/`LOCATION_TEXT`；图标是「白底 + 档位特征色」，见 `data/icon/locations/` |
+| **地图（区域包）** | `data/maps/<地图id>/map.py`；DLC `maps/<地图id>/map.py` | 暴露 `MAP = MapDefinition(id, name, shelter, locations=(...), draw_count=10)` | ✅（文件夹即发现） | `locations` 是**显式名单**：地点要出现在这张图里就必须列进来。DLC 想让自己的地点进「城郊小镇」→ `ctx.register_map_location("base", "<地点id>")`。屋子显示名 = 所选地图的 `shelter` |
 | **信息模板** | `data/information.py` / DLC `information/<file>.py` | `INFORMATION_TEMPLATES`、`LOCATION_INFORMATION_MODIFIERS`、`INFORMATION_STATE_EFFECTS` | DLC ✅ | 图鉴全文见 `data/information_text.py` |
 | **伪人** | `data/pseudos/<id>.py` | 暴露 `DEFINITION` + `HANDLERS`（+ 可选 `State`、`NODE_HOOKS`） | ✅ | 建议提供 `HANDLERS["observed_skills"]`、`["progress_text"]`；人类原型须存在 |
-| **主动/被动能力** | 写在角色/伪人模块内 | `A(id, name, desc, target=..., prompt=..., options=..., amount_label/amount_mark, chips, nested_option, branches)` | 随模块 | 声明式；前端/CLI 通用渲染；处理函数进 `ACTIVE_DISPATCH` |
+| **主动/被动能力** | 写在角色/伪人模块内 | `A(id, name, desc, target=..., prompt=..., options=..., amount_label/amount_mark, chips, nested_option, branches)` | 随模块 | 声明式；前端/CLI 通用渲染；处理函数进 `ACTIVE_DISPATCH`。`options` 每项是 `(value, label)`，**可选第 3、4 项** `(value, label, icon, desc)`：`icon` 取贴图零件 id（`i-*`）、`desc` 是一句说明 —— 界面有就用、没有就回退中性图标，旧写法不受影响 |
 | **状态 / 情绪** | 内置写在 `weiren_game/condition.py`；DLC `statuses/<file>.py` | 暴露 `STATUSES` / `EMOTIONS`（`StatusDefinition` / `EmotionDefinition`）；`chip_hidden=True` 表示不进状态栏（改用小面板等展示） | DLC ✅ | 情绪会顺带登记「情绪显现」**全局事件**定义（`emotion.reveal.<情绪>`）并同步 data 层标签表 |
 | **印记** | 角色模块 | `MARKS = (MarkDefinition(...),)`；可选 `bar_tiers`（进度条换档；可写 `(at, 标注, 刻度配色)` 做提示，如 `(4, "可驱逐", "danger")`；无上限时当"满槽"参照） | ✅（随角色模块） | 获得/消耗走 `engine._gain_mark/_consume_mark/_mark_count`；伪人印记的对外称呼见 `PseudoDefinition.mark_label` |
 | **详情页小面板 / 袖珍卡面板** | 角色模块 `DETAIL_SLOT`、伪人模块 `CARD_SLOT` | 返回条目列表：`mark`（引用自己的印记）/ `bar`（自定义进度条，可带档位刻度）/ `text`（一段说明，如人设）/ `tags`（小标签）/ `glyph`（装饰图形，可 `spin` 旋转，悬停给文案） | ✅（随模块） | 头像右侧与门口伪人卡里的**公共区域**；不声明 `DETAIL_SLOT` 时回退为"列出自己的印记" |
 | **资源包（材质 / 字体 / 贴图零件）** | 内置 `data/resourcepack/*.py`；DLC `resourcepack/*.py` | 暴露 `THEME = {"tokens": {"--bg": …, "--btn-1": …, "--amber": …}, "css": "…"}` 与 `SYMBOLS = {"i-xxx": "<path …/>"}`（viewBox 统一 24×24） | ✅ | **覆盖/追加**语义：同名 token / 零件 id 由包优先级决定谁赢；**只能改色调/字体**——语义色、品质色、羁绊位阶、尺寸（`--slot`/`--w`）锁定；前端自带默认材质，资源包缺失时观感不变 |
 | **资源包（独立一层）** | `resourcepacks/<name>/`（`pack.json` + `theme.py` / `symbols*.py` / `assets/*`） | 同上的 `THEME` / `SYMBOLS`（零件 id 通用，内容引用即生效）；另有 **`ASSETS`**：`background`（启动器封面）、`title`（大标题**整块**，含副标题那行） | ✅ | 与资料包并列、**各自有序**（设置 → 资源包，可 ▲▼ 调位次）；高者覆盖低者；独立资源包总在资料包之后套用，故能盖过资料包自带的外观 |
-| **头像零件**（每件一个文件） | `data/avatars/shapes/<id>.svg`、`data/avatars/features/<id>.svg`、`data/avatars/characters/<角色id>.svg`；资料包/资源包可放同名 `avatars/...` 覆盖 | 角色 `.py` 可声明 `AVATAR`（形状 id）/`AVATAR_FEATURE`/`AVATAR_ACCENT`/`AVATAR_DECOR`/`AVATAR_COLORS`（零件色槽 a–e 填色） | ✅ | 优先级 base → 资料包（位次）→ 资源包（位次）；`characters/<id>.svg` 是"整张头像"，直接替换该角色（人/伪人通用）；`assets/art/characters/` 立绘为最低优先级，包的 `pack.json::avatar_mode="parts"` 可让它让位、全员改用零件。零件声明过颜色就内联（色槽可被创作者替换），只用 `currentColor` 的走蒙版+主题色。**纯显示，不进存档** |
+| **头像零件**（每件一个文件） | `data/avatars/shapes/<id>.svg`、`data/avatars/features/<id>.svg`、`data/avatars/characters/<角色id>.svg`（24 张兜底立绘就在这里，属 base 层）；资料包/资源包可放同名 `avatars/...` 覆盖 | 角色 `.py` 可声明 `AVATAR`（形状 id）/`AVATAR_FEATURE`/`AVATAR_COLORS`（零件色槽 a–e 填色；点缀色/点缀环已废弃） | ✅ | 优先级 base → 资料包（位次）→ 资源包（位次）；`characters/<id>.svg` 是"整张头像"，直接替换该角色（人/伪人通用）；包的 `pack.json::avatar_mode="parts"` 可让 base 层立绘让位、全员改用零件（包自己放的整图仍优先）。零件声明过颜色就内联（色槽可被创作者替换），只用 `currentColor` 的走蒙版+主题色。**纯显示，不进存档** |
+| **物品图标**（每件一个文件） | `data/item/item/<物品id>.svg`（专属）、`data/item/tag/<tag>.svg`（按标签兜底）；资料包/资源包可放同名 `item/...` 覆盖 | 纯 SVG 文件，无需登记：有专属图就用专属图，否则按物品标签顺序找 tag 图（`ITEM_TAG_ICON_PRIORITY`） | ✅（放文件即生效） | 优先级 base → 资料包（位次）→ 资源包（位次）。**两色规则**：`#d7ddd2`/`currentColor` = 底色（→ 主题 `--ink`），其余颜色 = 特征色（→ 该物品的**品质色**）；后端内联下发，尺寸走 `.art-inline`。没图标文件就回退内置 `i-*` 零件。**纯显示，不进存档** |
 | **全局事件** | 任意内容模块 | `weiren_game/global_event.py` 的 `register_global_event(...)`；定义带 `label` / `icon` / `description`（后者是游戏内「全局事件」页点开看到的内容） | ✖（需显式注册；无目录约定） | DLC 可在 `register(ctx)` 或模块导入时注册 |
 | **图鉴补充 / 机制 / 羁绊文案** | `data/codex_pack.py`、`data/labels.py` | `MECHANICS`、`PERSONALITY_*`、`PSEUDO_SKILLS`、`register_section(...)` | 内置；DLC 经 `codex/` | 见 `docs/STYLE.md` §7；改这些静态表卸载时会整体回滚 |
-| **外置美术资源** | `assets/art/**` + `manifest.json` | 图片文件 + 清单（**不改代码**） | ✅（按 mtime 热更新） | 见 `assets/art/README.md` |
+| **地点 / 信息 / 伪人图标**（每件一个文件） | `data/icon/locations/<location_id>.<ext>`、`data/icon/information/<template_id>.<ext>`、`data/icon/pseudos/<pseudo_id>.<ext>`；资料包/资源包可放同名 `icon/<section>/...` 覆盖 | 纯图片文件，**无需登记**（按 id 命名即可；`.svg/.png/.jpg/.jpeg/.webp`） | ✅（放文件即生效） | 优先级 base → 资料包（位次）→ 资源包（位次），经 `GET /api/icon/<section>/<id>` 提供。这些是**彩色插画**（不参与配色 token）；没图就回退内置单线图标。**纯显示，不进存档** |
 
 ### 快速上手
 
 - 加房客：`python tools/new_character.py <id> <名>` → 填内容 → `validate_content` → 单测。
 - 打包 DLC：复制 `dlc/_template/` → 按上表填各目录 → 界面"应用"热装卸。
-- 换美术：把图片放进 `assets/art/` 并更新 `manifest.json`（多模态模型即可独立完成）。
+- 换美术（**按 id 命名放文件即可，不用清单**）：地点/信息/伪人图标放 `data/icon/<section>/<id>.<ext>`；
+  某角色的**整张头像**放 `data/avatars/characters/<角色id>.svg`；物品图标放 `data/item/item/<id>.svg`；
+  要能"随包开关"就放包内同名路径（`dlc/<包>/...` 或 `resourcepacks/<包>/...`）。
 - **不知道怎么下手 → 抄样例**：`docs/COOKBOOK.md` 有"照着改就能用"的最小样例
   （物品+状态 / 主动技能 / 概率被动 / 伪人 / 信息 / 全局事件 / DLC 打包）。
 
@@ -72,7 +76,7 @@
 ### 已知限制（诚实说明）
 
 - **全局事件** 不是"放文件即生效"，需要在模块里调用注册函数（角色模块导入时执行，或用 DLC 的 `register(ctx)`）。
-- **新增注册表**必须登记进 `weiren_game/content.py` 的 `_BASE_CONTAINERS`，否则卸载 DLC 后仍会残留（历史踩坑：目标候选、图鉴补充、状态/情绪、图鉴静态表）。
+- **新增注册表**必须登记进 `weiren_game/content.py` 的 `_BASE_CONTAINERS`，否则卸载 DLC 后仍会残留（历史踩坑：目标候选、图鉴补充、状态/情绪、图鉴静态表、效果内核的修饰器·闸门表）。
 - 头像/图标默认是**程序化单线 SVG**；要高质感需按"外置美术资源"提供图片。
 
 ---
@@ -113,7 +117,7 @@ ACTIVE_DISPATCH = {"active_id": use_active}
 # 图鉴补充（可选）
 # def CODEX_EXTRA(): return [{"title": "...", "entries": [("名", "说明"), ...]}]
 
-# 头像（内容自声明；形状 1~12，可与专属特征/点缀色组合）
+# 头像（内容自声明；形状 1~12，可与专属特征组合）
 AVATAR = "i-av5"
 ```
 
@@ -153,6 +157,11 @@ dlc/<dlc_name>/
   tags/<tag>.py           # 文件名即 tag 的行为模块（进 TAG_BEHAVIORS）
   statuses/<name>.py      # 暴露 STATUSES / EMOTIONS（状态与情绪定义）
   resourcepack/<name>.py  # 暴露 THEME（CSS 变量/字体/追加 css）与 SYMBOLS（贴图零件）
+  avatars/<section>/<id>.svg  # 头像零件/整张头像（shapes/features/characters，按位次覆盖 base）
+  item/item/<物品id>.svg  # 自带物品的专属图标
+  item/tag/<tag>.svg      # 按标签兜底（没有专属图标的物品用）
+  icon/<section>/<id>.<ext>  # 地点/信息/伪人图标（section = locations/information/pseudos）
+  maps/<id>/map.py        # 自带一张地图（MAP = MapDefinition，含显式地点名单）
   locations/<name>.py     # 暴露 LOCATIONS
                           #   可选 MAP_GROUPS：把新分组纳入开局抽取
   information/<name>.py   # 暴露 INFORMATION_TEMPLATES（可选 LOCATION_INFORMATION_MODIFIERS）

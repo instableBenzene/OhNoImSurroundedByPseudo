@@ -103,6 +103,8 @@ class AbilityDefinition:
     unlock_home_turns: int = 0
     # 目标选择的界面提示与候选（由内容自描述，核心/前端不写死内容文案）。
     prompt: str = ""
+    # ``(value, label)``；可选第 3 项 = 图标 id（``i-*``）、第 4 项 = 一句说明 ——
+    # 界面有就用、没有就回退中性图标（所以旧的两元组照样能跑）。
     options: tuple[tuple[str, str], ...] = ()
     amount_label: str = ""
     amount_mark: str = ""
@@ -112,6 +114,9 @@ class AbilityDefinition:
     per_turn: bool = False
     # 触发"嵌套调用"的选项值（如模仿：选定后需再选一个被调用能力）。
     nested_option: str = ""
+    # True：这条"主动技能"不结算效果，只负责**打开本角色的专属面板**（`PANEL`）。
+    # 前端把它渲染成开/关；引擎侧不掷失败、不付代价、不记冷却。
+    opens_panel: bool = False
 
 
 @dataclass(frozen=True)
@@ -212,6 +217,25 @@ class ItemDefinition:
 
 
 @dataclass(frozen=True)
+class MapDefinition:
+    """一张**地图**（区域包）：一组搜索地点 + 屋子的名字。
+
+    内置的默认地图是 ``base``（显示名「城郊小镇」，屋子叫「城郊小屋」）。
+    ``locations`` 是**显式名单**：地点要出现在这张图上就必须列进来 ——
+    DLC 自带的地点默认不进任何地图，想加入城郊小镇得登记（``register_map_location``）
+    或者自带一张地图。
+    """
+
+    id: str
+    name: str
+    shelter: str
+    locations: tuple[str, ...] = ()
+    # 开局从本图里抽多少个地点（``fixed`` 的地点必定入选）。
+    draw_count: int = 10
+    description: str = ""
+
+
+@dataclass(frozen=True)
 class LocationDefinition:
     """一个搜索地点的静态定义。"""
 
@@ -220,6 +244,8 @@ class LocationDefinition:
     description: str
     group: str
     tag_distribution: tuple[tuple[tuple[str, ...], float], ...]
+    # 物资点的档位：1=低 / 2=中 / 3=高。只影响展示（图标特征色 + 档位 chip），不影响掉落。
+    tier: int = 2
     turn_delta: int = 0
     behavior_delta: int = 0
     encounter_bonus: float = 0.0
@@ -293,6 +319,7 @@ def A(
     chips: tuple[str, ...] = (),
     nested_option: str = "",
     per_turn: bool = False,
+    opens_panel: bool = False,
 ) -> AbilityDefinition:
     """构造 AbilityDefinition 的简写工厂函数。"""
     return AbilityDefinition(
@@ -309,6 +336,7 @@ def A(
         chips=chips,
         nested_option=nested_option,
         per_turn=per_turn,
+        opens_panel=opens_panel,
     )
 
 

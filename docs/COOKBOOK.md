@@ -425,13 +425,14 @@ SYMBOLS = {                                      # 新贴图零件（viewBox 统
 - **只能改"色调"**：语义提示色（好/危险/警告/信息）、品质色、羁绊位阶、以及尺寸
   （`--slot` 格子边长、`--w` 描边）都被**锁定**，资源包写了也会被忽略（服务端会打一行提示）。
   这样换皮肤不会改变颜色含义、也不会让布局跑版。
-- **头像零件可以组合**：角色可声明「形状 × 专属特征 × 点缀色」三件套
+- **头像零件可以组合**：角色可声明「形状 × 专属特征」（点缀色/点缀环已废弃）
   ```python
   AVATAR = "i-av9"              # 形状
   AVATAR_FEATURE = "i-ft-crown" # 专属特征（可由资源包提供新零件）
-  AVATAR_ACCENT = "#ffcc66"     # 点缀色
+  AVATAR_COLORS = {"a": "#ffcc66"}  # 可选：给零件的色槽 var(--a) 填色
   ```
-  不声明就按 id 哈希派生（保持既有观感）；有 `assets/art/` 立绘时整张立绘优先。
+  不声明就按 id 哈希派生（保持既有观感）；有整张头像（`data/avatars/characters/<角色id>.svg`
+  或包内 `avatars/characters/`）时整张优先，包声明 `avatar_mode="parts"` 可让 base 层立绘让位。
 - **装载/卸载即生效回滚**：界面 DLC 页「应用」即可；同名零件/token 由包优先级决定谁赢。
 - 内置材质清单见 `data/resourcepack/theme.py`（颜色 token 与字体栈都在那），参数速查见 `docs/STYLE.md` §9。
 

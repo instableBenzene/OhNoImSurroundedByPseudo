@@ -26,6 +26,30 @@ from .marks import MarkPool
 PRIMARY_PERSONALITY_WEIGHT = 1.5
 SHOCK_INTENSITY_MAX = 4
 
+# 角色专属容器的**类型表**：(character_id, container_key) -> 类型。
+# 内容（角色模块）用 `CONTAINERS = {"<key>": <类>}` 声明，`data/characters` 装载时登记进来；
+# 这里只负责"按 key 反序列化"，不关心容器里装的是什么。
+CONTAINER_TYPES: dict[tuple[str, str], type] = {}
+
+
+def register_container_type(character_id: str, key: str, cls: type) -> None:
+    """登记一个角色专属容器的类型（由内容侧的 `CONTAINERS` 声明驱动）。"""
+    CONTAINER_TYPES[(str(character_id), str(key))] = cls
+
+
+def _restore_containers(character_id: str, raw: object) -> dict[str, object]:
+    """按类型表反序列化专属容器；**没声明过的 key / 坏数据一律跳过**（玩家侧宽容）。"""
+    restored: dict[str, object] = {}
+    for key, payload in dict(raw or {}).items():
+        cls = CONTAINER_TYPES.get((character_id, str(key)))
+        if cls is None or not isinstance(payload, dict):
+            continue
+        try:
+            restored[str(key)] = cls.from_dict(payload)
+        except (TypeError, ValueError):
+            continue
+    return restored
+
 
 def status_caps(status_id: str) -> tuple[int, int]:
     """返回已知状态定义的上限（intensity_max, layers_max）。"""
@@ -63,6 +87,9 @@ class TenantState:
     inventory: Inventory = field(default_factory=Inventory)
     abilities: list[AbilityState] = field(default_factory=list)
     marks: MarkPool = field(default_factory=MarkPool)
+    # 角色专属容器（内容声明、核心只负责存取与序列化）：container_key -> 对象。
+    # 对象自己实现 to_dict / from_dict（契约同 PseudoRuntime）；类型表见 CONTAINER_TYPES。
+    containers: dict[str, object] = field(default_factory=dict)
     action_locks: dict[str, int] = field(default_factory=dict)
     turn_counters: dict[str, int] = field(default_factory=dict)
     # --- 通用隐藏数值（消沉值；回合计数已归 turn_counters） ----------------
@@ -258,6 +285,9 @@ class TenantState:
             for entry in list(data.get("abilities", []))
         ]
         data["marks"] = MarkPool.from_dict(data.get("marks", {}))
+        data["containers"] = _restore_containers(
+            str(data.get("character_id") or ""), data.get("containers", {})
+        )
         data["action_locks"] = {
             key: int(value)
             for key, value in dict(data.get("action_locks", {})).items()
@@ -293,6 +323,10 @@ class TenantState:
             "inventory": self.inventory.to_dict(),
             "abilities": [state.to_dict() for state in self.abilities],
             "marks": self.marks.to_dict(),
+            "containers": {
+                key: (value.to_dict() if hasattr(value, "to_dict") else value)
+                for key, value in self.containers.items()
+            },
             "action_locks": dict(self.action_locks),
             "turn_counters": dict(self.turn_counters),
             "depression": self.depression,

@@ -10,5 +10,12 @@
   "resourcepack_order": [
     "base"
   ],
-  "show_full_skills": false
+  "show_full_skills": false,
+  "panel_draggable": true,
+  "panel_pos": {
+    "flowey": [
+      0.2582456197698745,
+      0.11942906118143459
+    ]
+  }
 }

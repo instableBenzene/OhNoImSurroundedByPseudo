@@ -15,8 +15,12 @@
         tags/<tag>.py             # 文件名即 tag 的行为模块（进 TAG_BEHAVIORS）
         statuses/*.py             # 暴露 STATUSES / EMOTIONS（状态与情绪定义）
         resourcepack/*.py         # 暴露 SYMBOLS（贴图零件）/ THEME（CSS 变量 + css）
+        avatars/<section>/<id>.svg  # 头像零件/整张头像（shapes/features/characters，见 avatars.py）
+        item/item/<id>.svg        # 自带物品的图标；item/tag/<tag>.svg 按标签兜底
+        icon/<section>/<id>.<ext> # 地点/信息/伪人图标（locations/information/pseudos，见 icon_files.py）
         locations/*.py            # 暴露 LOCATIONS
                                   #   可选 MAP_GROUPS：新分组纳入开局抽取
+        maps/<id>/map.py          # 自带一张地图（MAP = MapDefinition）
         information/*.py          # 暴露 INFORMATION_TEMPLATES，
                                   #   可选 LOCATION_INFORMATION_MODIFIERS
         pseudos/<pseudo_id>.py    # 每文件一类伪人（DEFINITION + 可选 State/HANDLERS/NODE_HOOKS）
@@ -322,6 +326,21 @@ def load_locations_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = Fal
     return loaded
 
 
+def load_maps_dir(dlc_dir: Path) -> list[str]:
+    """装载资料包自带的 maps/<id>/map.py（一张地图一个文件夹）。
+
+    地图是**加**进来的（同 id 覆盖靠包优先级：高优先级后装载），
+    所以这里不参与 §3.11 的快照回滚，卸载时由 `_BASE_CONTAINERS` 里的 `MAPS` 整体还原。
+    """
+    from .data.maps import load_map_dirs
+
+    directory = dlc_dir / "maps"
+    if not directory.is_dir():
+        return []
+    load_map_dirs(directory)
+    return sorted(path.parent.name for path in directory.glob("*/map.py"))
+
+
 def load_information_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = False) -> list[str]:
     """装载 information/*.py。"""
     info_dir = dlc_dir / "information"
@@ -344,6 +363,8 @@ def load_single_dlc(
     """
     if name in _LOADED:
         return
+    # 首次装载任何包之前先抓 base 快照（幂等）；此后所有登记都能随包回滚。
+    CONTENT.ensure_captured()
     dlc_dir = dlc_root(root) / name
     if not dlc_dir.is_dir():
         raise FileNotFoundError(f"no such dlc: {name}")
@@ -374,6 +395,7 @@ def load_single_dlc(
     load_resourcepack_dir(dlc_dir, module_prefix)
     load_locations_dir(dlc_dir, module_prefix, replace=replace)
     load_information_dir(dlc_dir, module_prefix, replace=replace)
+    load_maps_dir(dlc_dir)
 
     pseudo_dir = dlc_dir / "pseudos"
     if pseudo_dir.is_dir():
@@ -411,6 +433,7 @@ def apply_pack_order(order: Sequence[str], root: str | Path | None = None) -> li
 
     available = {path.name for path in available_dlcs(root)}
     ordered = _normalize_order(order, available)
+    CONTENT.ensure_captured()
     CONTENT.restore_base()
     _LOADED.clear()
     # 从最低优先级装到最高优先级；base 处让内置内容重新赢过它下方的包。
@@ -471,6 +494,7 @@ def load_configured_dlc() -> list[str]:
     available = {path.name for path in available_dlcs()}
     # 已装载的包也算"可用"：自定义 root 装载（工具/测试）或目录被改动时，不因找不到而卸载。
     available |= set(_LOADED)
+    CONTENT.ensure_captured()
     order = _normalize_order(CONFIG.pack_order or [BASE_PACK, *CONFIG.enabled_dlc], available)
     # 已是目标集合（且都装载完毕）就不重建，避免每次新开局都无谓回滚重装。
     current = list(CONTENT.pack_order())

@@ -15,6 +15,10 @@ def pin() -> None:
     CONFIG.random_pseudo = False
     CONFIG.default_pseudo = None
     CONFIG.enabled_dlc = []
+    # 装载看的是 ``pack_order``（``load_configured_dlc``），所以只清 ``enabled_dlc`` 不够：
+    # 玩家在界面里启用的包仍会被 ``GameEngine.new_game()`` 装进来，后面的目录统计就偏了。
+    CONFIG.pack_order = ["base"]
+    CONFIG.resourcepack_order = ["base"]
 
 
 pin()

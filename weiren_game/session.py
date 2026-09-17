@@ -26,11 +26,13 @@ class SaveMetadata:
     # 对局启动时启用的内容包清单（含内置 base 包）。包集合在对局期间不可变，
     # 读档时若与当前启动集合不一致将拒绝载入。
     packs: tuple[str, ...] = ()
+    # 本局用的**地图**（区域包）id；老存档没这个字段 → 回落默认地图。
+    map_id: str = ""
 
     @classmethod
     def from_dict(cls, raw: dict[str, object]) -> "SaveMetadata":
         """从字典还原 SaveMetadata。"""
-        allowed = {"version", "seed", "difficulty", "packs"}
+        allowed = {"version", "seed", "difficulty", "packs", "map_id"}
         unknown = set(raw) - allowed
         if unknown:
             raise TypeError(f"unknown SaveMetadata field: {sorted(unknown)}")
@@ -39,6 +41,7 @@ class SaveMetadata:
             seed=str(raw["seed"]),
             difficulty=str(raw["difficulty"]),
             packs=tuple(raw.get("packs") or ()),
+            map_id=str(raw.get("map_id") or ""),
         )
 
     def to_dict(self) -> dict[str, str]:

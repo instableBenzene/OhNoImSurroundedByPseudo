@@ -8,6 +8,8 @@
     dlc/<包>/avatars/<section>/<id>.svg            # 资料包同样可带
     resourcepacks/<包>/avatars/<section>/<id>.svg  # 资源包可覆盖（同 id 高者赢）
 
+（没有第二个"外置美术目录"了：立绘与零件都住内容层。）
+
 优先级（低 → 高）：**base → 资料包（按位次）→ 资源包（按位次）**。
 头像只影响**显示**，不写进存档：移除资源包/资料包都不会影响存档可用性。
 """
@@ -28,21 +30,16 @@ FEATURE_ORDER: tuple[str, ...] = (
     "i-ft-ponytail", "i-ft-headphones", "i-ft-flower", "i-ft-crown", "i-ft-eyepatch",
     "i-ft-bandage", "i-ft-antenna", "i-ft-earring",
 )
-ACCENTS: tuple[str, ...] = (
-    "#6fb3a6", "#c98aa0", "#8fa0d8", "#c9a86a", "#8fb98a",
-    "#b58ad8", "#d89a8a", "#7fb0c9", "#a8c98a", "#c98ac9",
-)
-DECOR: tuple[str, ...] = ("ring", "dot", "arc")
 DEFAULT_SHAPE = "i-av4"
 
 # ---------------------------------------------------------------- 色槽（留给创作者）
 # 零件文件里可以写 ``fill="var(--a)"`` / ``stroke="var(--b)"`` 这样的**色槽**，
 # 由内容层给颜色（角色模块的 ``AVATAR_COLORS = {"a": "#c0333a", ...}``）。
-# 没给就用下面这套缺省：`a` = 该角色的点缀色（后端注入），其余退回主题 token，
-# 于是"零件有默认颜色，但创作者可以输入颜色替换"。
+# 没给就退回主题 token，于是"零件有默认颜色，但创作者可以输入颜色替换"。
 # base 与血月包**不使用**色槽 —— 它们只有默认单色，靠主题染色。
 SLOT_PATTERN = re.compile(r"var\(--([a-e])\)")
 SLOT_TOKEN_DEFAULTS: dict[str, str] = {
+    "a": "var(--ink)",
     "b": "var(--ink)",
     "c": "var(--ink2)",
     "d": "var(--ink3)",
@@ -72,20 +69,9 @@ def avatar_hash(identifier: str) -> int:
 def _pack_dirs(*, dlc_root: str | Path | None = None,
                 rp_root: str | Path | None = None) -> list[Path]:
     """按**低 → 高**优先级列出各内容包/资源包的根目录。"""
-    from .config import CONFIG
-    from .paths import app_base
+    from .asset_layers import layer_roots
 
-    base = app_base()
-    dlc_base = Path(dlc_root) if dlc_root else base / "dlc"
-    rp_base = Path(rp_root) if rp_root else base / "resourcepacks"
-    roots: list[Path] = []
-    # 资料包：位次低者先（pack_order 是高→低）。
-    for name in reversed([n for n in CONFIG.pack_order if n != "base"]):
-        roots.append(dlc_base / name)
-    # 资源包：位次低者先（`base` 是内置材质那一行，不是目录）。
-    for name in reversed([n for n in (CONFIG.resourcepack_order or ()) if n != "base"]):
-        roots.append(rp_base / name)
-    return roots
+    return layer_roots(dlc_root=dlc_root, rp_root=rp_root)
 
 
 def avatar_index(*, dlc_root: str | Path | None = None,
@@ -95,21 +81,10 @@ def avatar_index(*, dlc_root: str | Path | None = None,
     base 层提供的"整张头像"会被记进 ``BASE_PORTRAITS`` —— 那是兜底立绘；
     包声明 ``avatar_mode: parts`` 时它让位（改成零件组装），**包自己带的**仍优先。
     """
-    from .paths import app_base
-
     index: dict[str, dict[str, Path]] = {section: {} for section in SECTIONS}
     BASE_PORTRAITS.clear()
-    directories = [app_base() / "weiren_game" / "data" / "avatars", *_pack_dirs(dlc_root=dlc_root, rp_root=rp_root)]
-    # base 的实现在包内（weiren_game/data/avatars），单独给相对路径。
-    directories[0] = Path(__file__).parent / "data" / "avatars"
-    # 极低优先级：老的外置美术目录（`assets/art/characters/`）若还留着文件也认，
-    # 行为与 base 层立绘一致（会被 `avatar_mode: parts` 跳过）。立绘现已住在 data/avatars/characters/。
-    art_characters = app_base() / "assets" / "art" / "characters"
-    if art_characters.is_dir():
-        for path in sorted(art_characters.glob("*")):
-            if path.suffix.lower() in (".svg", ".png", ".jpg", ".jpeg", ".webp"):
-                index[SECTION_CHARACTERS][path.stem] = path
-                BASE_PORTRAITS.add(path.stem)
+    directories = [Path(__file__).parent / "data" / "avatars",
+                   *_pack_dirs(dlc_root=dlc_root, rp_root=rp_root)]
     for root in directories:
         # base 的 weiren_game/data/avatars 本身就是 avatars 目录；包内布局是 <包>/avatars/<section>。
         avatars_root = root if root.name == "avatars" else root / "avatars"
@@ -168,15 +143,16 @@ def avatar_part_url(section: str, part_id: str, *, dlc_root: str | Path | None =
     return f"/api/avatar/{section}/{part_id}"
 
 
-def part_markup(path: Path, *, colors: dict | None = None, accent: str = "") -> str:
+def part_markup(path: Path, *, colors: dict | None = None) -> str:
     """读零件文件；若它用了色槽，就把 ``var(--a/b/c…)`` 换成具体颜色后返回**内联标记**。
 
     没用色槽（只有默认单色）的零件返回空串 —— 前端改用"蒙版 + 主题色"渲染，
     这样 base 的零件依旧跟着主题走，而创作者自定颜色的零件保留自己的配色。
+
+    （**头像点缀色已废弃**：不再有"角色点缀色"这个默认值，色槽 a–e 没给就一律跟主题走。）
     """
     try:
-        key = (str(path), path.stat().st_mtime_ns, accent,
-               tuple(sorted((colors or {}).items())))
+        key = (str(path), path.stat().st_mtime_ns, tuple(sorted((colors or {}).items())))
     except OSError:
         return ""
     cached = _PART_CACHE.get(key)
@@ -196,8 +172,6 @@ def part_markup(path: Path, *, colors: dict | None = None, accent: str = "") -> 
         value = str(value).strip()
         if _COLOR_OK.match(value):
             resolved[str(name)] = value
-    if "a" not in resolved and accent:
-        resolved["a"] = accent if _COLOR_OK.match(accent) else ""
 
     def _sub(match: "re.Match[str]") -> str:
         name = match.group(1)
@@ -221,8 +195,8 @@ def avatar_view(character_id: str, module: object | None, *, dlc_root: str | Pat
                 rp_root: str | Path | None = None) -> dict:
     """某个角色的头像视图：整张 → 形状/特征/点缀色（组装）。
 
-    内容可声明 ``AVATAR``（形状 id）/``AVATAR_FEATURE``/``AVATAR_ACCENT``/``AVATAR_DECOR``；
-    缺省按 id 哈希派生（与旧实现一致，保证既有观感不变）。
+    内容可声明 ``AVATAR``（形状 id）/``AVATAR_FEATURE``；缺省按 id 哈希派生。
+    （``AVATAR_ACCENT``/``AVATAR_DECOR`` 与"点缀环"一起废弃了。）
     """
     index = avatar_index(dlc_root=dlc_root, rp_root=rp_root)
     full = index[SECTION_CHARACTERS].get(character_id)
@@ -248,7 +222,6 @@ def avatar_view(character_id: str, module: object | None, *, dlc_root: str | Pat
         f"/api/avatar/{SECTION_FEATURES}/{feature_id}"
         if feature_id in index[SECTION_FEATURES] else ""
     )
-    accent = str(get("AVATAR_ACCENT") or ACCENTS[hashed % len(ACCENTS)])
     shape_path = index[SECTION_SHAPES].get(shape_id)
     feature_path = index[SECTION_FEATURES].get(feature_id)
     return {
@@ -258,9 +231,6 @@ def avatar_view(character_id: str, module: object | None, *, dlc_root: str | Pat
         "shape": shape,
         "feature": feature,
         # 用了色槽的零件给内联标记（创作者自定颜色）；没有则留空，前端走"蒙版 + 主题色"。
-        "shape_svg": part_markup(shape_path, colors=colors, accent=accent) if shape_path else "",
-        "feature_svg": (part_markup(feature_path, colors=colors, accent=accent)
-                        if feature_path else ""),
-        "accent": accent,
-        "decor": str(get("AVATAR_DECOR") or DECOR[hashed % len(DECOR)]),
+        "shape_svg": part_markup(shape_path, colors=colors) if shape_path else "",
+        "feature_svg": part_markup(feature_path, colors=colors) if feature_path else "",
     }

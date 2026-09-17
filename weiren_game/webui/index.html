@@ -17,10 +17,57 @@
     --q0:#c4c9c4; --q1:#66b875; --q2:#6b9fd1;
     --q3:#a77ad1; --q4:#d6aa45; --q5:#d86459;
     --bronze:#b07a4a; --silver:#c3ccd0; --gold:#f3d24e;
-    --prism:#e3a6ee; --prism-grad:linear-gradient(135deg,#7be0a8,#6bb8ff 30%,#c79bff 58%,#ffd76b 82%,#ff9ecb); --mono:Consolas,"Cascadia Mono","Courier New",monospace;
+    --prism:#e3a6ee;
+    --prism-1:#7be0a8;
+    --prism-2:#6bb8ff;
+    --prism-3:#c79bff;
+    --prism-4:#ffd76b;
+    --prism-5:#ff9ecb;
+    --prism-grad:linear-gradient(135deg,var(--prism-1),var(--prism-2) 30%,var(--prism-3) 58%,var(--prism-4) 82%,var(--prism-5)); --mono:Consolas,"Cascadia Mono","Courier New",monospace;
     --sans:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; --serif:"STKaiti","KaiTi",serif; --px-font:"Zpix","Fusion Pixel 12px","Minecraft","SimSun","Microsoft YaHei UI",monospace;
     --hei:"Microsoft YaHei UI","Microsoft YaHei","SimHei","PingFang SC","Noto Sans CJK SC",sans-serif; --comic:"Ink Free","Segoe Print","Comic Sans MS","Bradley Hand","Comic Sans",cursive; --slot:60px;
     --w:1.5px;
+    --title-paper-1:#e9e3cf;
+    --title-paper-2:#e3dcc4;
+    --title-paper-3:#ded6bd;
+    --title-paper-4:#ece6d3;
+    --title-paper-5:#e6dfc8;
+    --title-ink-1:#241f18;
+    --title-ink-2:#2b2419;
+    --title-ink-3:#1d1913;
+    --title-ink-4:#332a1c;
+    --title-ink-accent-1:#6f2c25;
+    --title-ink-accent-2:#274a33;
+    --flavor-ink:#c8b48f;   /* 图鉴"风味描述"的斜体墨色 */
+    /* 遮罩 / 面板底：同一套暗色，数值不同只是为了层次。 */
+    --scrim-soft:rgba(6,10,10,.55);
+    --scrim:rgba(6,10,10,.72);
+    --scrim-deep:rgba(6,10,10,.88);
+    --glass:rgba(9,15,15,.82);
+    --card-glass:rgba(20,28,26,.90);
+    --moss:rgba(6,18,15,.55);
+    /* 阴影配方（颜色从 --edge/--ink-hi 算出来；整条配方可被材质包替换）。 */
+    --shadow-bevel:inset 1px 1px 0 color-mix(in srgb,var(--ink-hi) 10%,transparent),inset -1px -1px 0 color-mix(in srgb,var(--edge) 50%,transparent);
+    --shadow-bevel-lg:inset 2px 2px 0 color-mix(in srgb,var(--ink-hi) 10%,transparent),inset -2px -2px 0 color-mix(in srgb,var(--edge) 50%,transparent),0 7px 16px color-mix(in srgb,var(--edge) 45%,transparent);
+    --shadow-bevel-plus:inset 1px 1px 0 color-mix(in srgb,var(--ink-hi) 15%,transparent),0 8px 20px color-mix(in srgb,var(--edge) 50%,transparent);
+    --shadow-press:inset -1px -1px 0 color-mix(in srgb,var(--ink-hi) 5%,transparent),inset 2px 2px 3px color-mix(in srgb,var(--edge) 58%,transparent);
+    --shadow-inset:inset 0 2px 4px color-mix(in srgb,var(--edge) 55%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--ink-hi) 4.5%,transparent);
+    --shadow-inset-deep:inset 2px 2px 4px color-mix(in srgb,var(--edge) 65%,transparent),inset -1px -1px 0 color-mix(in srgb,var(--ink-hi) 3.5%,transparent);
+    --shadow-inset-hover:inset 0 2px 5px color-mix(in srgb,var(--edge) 65%,transparent);
+    --shadow-panel:inset 0 0 0 2px rgba(var(--amber-rgb),.17),0 15px 38px color-mix(in srgb,var(--edge) 57%,transparent);
+    --shadow-bar:0 8px 22px color-mix(in srgb,var(--edge) 35%,transparent);
+    --shadow-tip:0 15px 32px color-mix(in srgb,var(--edge) 57%,transparent);
+    --shadow-float-up:0 -12px 30px color-mix(in srgb,var(--edge) 53%,transparent);
+    --shadow-drawer:8px 0 26px color-mix(in srgb,var(--edge) 45%,transparent);
+    --shadow-chip:0 1px 3px color-mix(in srgb,var(--edge) 50%,transparent);
+    --shadow-title:0 2px 0 color-mix(in srgb,var(--edge) 45%,transparent),0 0 0 1px color-mix(in srgb,var(--edge) 32%,transparent),inset 0 0 7px var(--title-wash);
+    --shadow-title-tag:0 3px 0 color-mix(in srgb,var(--edge) 45%,transparent),0 0 0 1px color-mix(in srgb,var(--edge) 32%,transparent);
+    --text-shadow-bevel:1px 1px 0 color-mix(in srgb,var(--edge) 60%,transparent);
+    /* 羁绊「金」徽记的渐变（和 --prism-grad 同一路线）。 */
+    --gold-grad:linear-gradient(160deg,#fff0b8,#f0c53d 55%,#d9a52e);
+    --title-wash:rgba(120,100,60,.28);   /* 剪字标题纸条的内晕 */
+    --ok-rgb:104,185,152;   /* --ok 的分量，供透明叠加用 */
+    --danger-rgb:212,107,99;   /* --danger 的分量 */
     --edge:#0c0c0c;   /* 描边黑（按钮/弹窗硬边框） */
     --ink-hi:#fff;   /* 最亮文字（悬停/强调） */
     --ink-btn:#f2efe2;   /* 按钮文字 */
@@ -75,7 +122,7 @@
   .topbar{display:flex;align-items:stretch;border-bottom:1px solid var(--line);
     border-top:2px solid var(--amber-soft);
     background:linear-gradient(180deg,var(--panel2),var(--surface-2));
-    box-shadow:0 8px 22px rgba(0,0,0,.35)}
+    box-shadow:var(--shadow-bar)}
   .brand-block{padding:11px 18px;border-left:1px solid var(--line);min-width:220px;
     display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:5px;text-align:right}
   .brand-block .eyebrow{color:var(--amber)}
@@ -89,7 +136,7 @@
   .top-actions{display:flex;align-items:center;gap:8px;padding:8px 12px;border-right:1px solid var(--line)}
   .top-actions button{font-family:var(--hei);font-size:13px;color:var(--ink-btn);letter-spacing:.03em;
     background:linear-gradient(var(--btn-1),var(--btn-2));border:2px solid var(--edge);border-radius:3px;
-    box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -1px -1px 0 rgba(0,0,0,.5);
+    box-shadow:var(--shadow-bevel);
     padding:7px 14px;cursor:pointer;transition:.14s}
   .top-actions button:hover{background:linear-gradient(var(--btn-hi-1),var(--btn-hi-2));border-color:var(--amber);color:var(--ink-hi)}
   .top-actions button:active{transform:translateY(1px)}
@@ -101,10 +148,12 @@
     grid-template-rows:minmax(0,1fr);
     grid-template-areas:"log board detail";}
   /* 羁绊：顶部常驻细条，平时只列已激活性格与等级 */
-  /* 抬高整条羁绊栏：未激活 chip 的 opacity 会新建层叠上下文，导致其悬浮窗掉到可视日志之下。 */
+  /* z-index 只需要"高过页内普通内容"：抬高它本来是为了让未激活 chip（opacity 会新建层叠上下文）
+     自己的悬浮窗不掉到可视日志之下。**别给到覆盖层之上** —— 遮罩 20 / 专属面板 26 / ESC 40
+     都比它高，原来写 80 会把这三样全盖住。 */
   .bonds-strip{display:flex;align-items:center;gap:12px;padding:6px 14px;
     border-bottom:1px solid var(--line);background:var(--surface-2);flex-wrap:wrap;
-    position:relative;z-index:80}
+    position:relative;z-index:15}
   .bond-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
   .bond-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
     padding:3px 11px;font-family:var(--mono);font-size:14px;color:var(--ink2)}
@@ -115,11 +164,11 @@
 .bond-chip.dead{border-style:dashed;border-color:var(--danger-2);color:var(--danger);opacity:.72}
 .bond-chip.idle .lv,.bond-chip.dead .lv{color:inherit}
 .p-idle{color:var(--ink3)}
-.p-dead{color:var(--danger);text-decoration:line-through;text-decoration-color:rgba(192,80,63,.6)}
+.p-dead{color:var(--danger);text-decoration:line-through;text-decoration-color:rgba(var(--danger-rgb),.6)}
   .bond-chip{position:relative}
   .tip{position:absolute;left:0;top:calc(100% + 8px);width:300px;display:none;z-index:60;
     background:var(--surface-tip);border:1px solid var(--line);padding:10px 12px;
-    box-shadow:0 12px 28px rgba(0,0,0,.5);font-family:var(--sans);font-size:12.5px;
+    box-shadow:var(--shadow-tip);font-family:var(--sans);font-size:12.5px;
     line-height:1.6;color:var(--ink2);text-align:left;font-weight:400}
   .bond-chip:hover .tip{display:block}
   .tip .tip-eff{display:block;margin:6px 0;color:var(--ink)}
@@ -166,7 +215,7 @@
   /* 必须高于 .bonds-strip（80），否则缩略条会压在概况之上。 */
   .bond-drawer{position:fixed;left:0;top:0;height:100vh;width:340px;z-index:85;display:flex;flex-direction:column;
     background:linear-gradient(180deg,var(--panel),var(--panel2));border-right:1px solid var(--line);
-    transform:translateX(-100%);transition:transform .22s ease;box-shadow:8px 0 26px rgba(0,0,0,.45)}
+    transform:translateX(-100%);transition:transform .22s ease;box-shadow:var(--shadow-drawer)}
   .bond-drawer.open{transform:none}
   .bond-drawer .head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
   .bond-drawer .body{overflow:auto;padding:12px 14px}
@@ -184,7 +233,7 @@
     color:transparent;-webkit-text-fill-color:transparent}
   .t-prism svg.ic{stroke:url(#prismGrad)}
   .bond-chip.t-prism .tier-badge,.t-prism .tier-badge,.tier-badge.t-prism{background:var(--prism-grad)}
-  .tier-badge.t-gold{background:linear-gradient(160deg,#fff0b8,#f0c53d 55%,#d9a52e)}
+  .tier-badge.t-gold{background:var(--gold-grad)}
   /* 权重归零（休克 / 高消沉等）：性格变暗 */
   .p-off{color:var(--ink3)!important;opacity:.45}
   .tier-legend{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);
@@ -195,7 +244,7 @@
   /* 外出搜索：贴现有信息下方、紧贴屏幕底部的小悬浮窗；点右上角三角收起/展开。 */
   .mission-float{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;
     max-height:46%;overflow:hidden;background:linear-gradient(180deg,var(--panel),var(--panel2));
-    border:1px solid var(--line);box-shadow:0 -10px 26px rgba(0,0,0,.5);
+    border:1px solid var(--line);box-shadow:var(--shadow-float-up);
     transition:transform .24s ease}
   .mission-float.collapsed{transform:translateY(calc(100% - 40px))}
   .mission-float > .head{display:flex;align-items:center;gap:8px;padding:9px 12px;
@@ -227,7 +276,7 @@
   .bond .name{flex:1}
   .bond .seg{display:flex;gap:3px}
   .bond .seg i{width:7px;height:12px;border:1px solid var(--line2);display:block}
-  .bond .seg i.on{border-color:var(--ok);background:rgba(104,185,152,.24)}
+  .bond .seg i.on{border-color:var(--ok);background:rgba(var(--ok-rgb),.24)}
   .bond .lv{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px;text-align:right}
 
   /* ---------- board ---------- */
@@ -235,14 +284,14 @@
   .turn-controls{display:flex;gap:6px}
   .turn-controls button{font-family:var(--hei);font-size:13px;letter-spacing:.03em;color:var(--ink-btn);
     background:linear-gradient(var(--btn-1),var(--btn-2));border:2px solid var(--edge);border-radius:3px;
-    box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -1px -1px 0 rgba(0,0,0,.5);
+    box-shadow:var(--shadow-bevel);
     padding:7px 14px;cursor:pointer;transition:.14s}
   .turn-controls button:hover{background:linear-gradient(var(--btn-hi-1),var(--btn-hi-2));border-color:var(--amber);color:var(--ink-hi)}
   .turn-controls button.p{background:linear-gradient(var(--pri-1),var(--pri-2))}
   .turn-controls button.p:hover{background:linear-gradient(var(--pri-hi-1),var(--pri-hi-2));border-color:var(--amber)}
   /* 本回合已无法再指派搜索时：按钮呈“按下未回弹”的失效态。 */
   .turn-controls button.pressed{transform:translateY(2px);opacity:.6;cursor:not-allowed;
-    box-shadow:inset -1px -1px 0 rgba(255,255,255,.05),inset 2px 2px 3px rgba(0,0,0,.6)}
+    box-shadow:var(--shadow-press)}
   .turn-controls button.pressed:hover{background:linear-gradient(var(--btn-1),var(--btn-2));border-color:var(--edge);color:var(--ink-btn)}
 
   .door-zone{display:grid;grid-template-columns:minmax(180px,1fr) 152px minmax(180px,.85fr);gap:12px;
@@ -258,15 +307,39 @@
 
   .section-heading{display:flex;align-items:flex-end;justify-content:space-between;margin:4px 2px 8px}
   /* 席位与仓库改为左右并排：左半放席位（一排三张），右半放屋主仓库（六格宽）。 */
-  .board-split{display:flex;gap:12px;flex:1;min-height:0;align-items:stretch}
+  .board-split{position:relative;display:flex;gap:12px;flex:1;min-height:0;align-items:stretch}
   .roster-col{flex:1 1 auto;min-width:0;overflow:auto;padding-right:2px}
   .warehouse-col{flex:0 0 auto;display:flex;flex-direction:column;min-height:0;overflow:hidden;position:relative}
   .warehouse-col > .body{flex:1 1 auto;overflow:auto;min-height:0}
   .expanded-detail{margin-bottom:10px}
+  /* 专属面板：独立浮窗（比居中的弹窗略偏左），不遮席位也不挡右栏仓库，随时能开关。 */
+  .panel-float{position:fixed;left:6vw;top:9vh;z-index:26;width:min(700px,74vw);max-height:78vh;
+    display:flex;flex-direction:column;overflow:hidden;
+    background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line2);
+    box-shadow:var(--shadow-panel)}
+  .panel-float[hidden]{display:none}
+  .panel-float > .head{position:relative;display:flex;align-items:center;gap:8px;
+    padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow:hidden}
+  .panel-float > .head h3{white-space:nowrap}
+  .panel-float > .head .btn{margin-left:auto;flex:none}
+  .panel-float > .head .btn + .btn{margin-left:0}
+  .panel-float > .body{position:relative;flex:1 1 auto;min-height:0;overflow:auto;padding:10px 12px}
+  .pf-back{position:absolute;inset:0;pointer-events:none;color:var(--ink3)}
+  .pf-back svg{display:block;width:100%;height:100%}
+  .pf-prompt{position:relative;font-size:12px;color:var(--ink2);margin:0 0 10px}
+  .pf-grid{position:relative;display:flex;flex-direction:column;gap:10px}
+  /* 一块地一框：生长 / 湿润度这些信息，与两个格子都在同一个框里。 */
+  .pf-plot{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;
+    border:1px solid var(--line2);background:rgba(var(--amber-rgb),.04)}
+  .pf-plot .slot{flex:none}
+  .pf-info{flex:1 1 auto;min-width:120px}
+  .panel-float .slot.locked{cursor:not-allowed}
+  .panel-float > .head{cursor:move}
+  .panel-float.dragging{opacity:.92}
   /* 房客背包：与仓库同宽对齐的贴底悬浮窗（覆盖在仓库下方，不改变仓库布局），可折叠。 */
   .bp-float{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;
     background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
-    box-shadow:0 -12px 30px rgba(0,0,0,.55)}
+    box-shadow:var(--shadow-float-up)}
   .bp-float.collapsed > .body{display:none}
   .bp-float[hidden]{display:none}
   /* 三角按钮相对窗口固定：绝对定位在右侧，标题/名字/容量在剩余空间里省略。 */
@@ -294,7 +367,7 @@
   .tenant.searching .av{opacity:.6}
   .tag.search{border-color:var(--warn);color:var(--warn)}
   .tenant .av{position:relative;width:56px;height:74px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
-    background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 1px,transparent 1px 6px)}
+    background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ink-hi) 2%,transparent) 0 1px,transparent 1px 6px)}
   .tenant .tn{display:flex;align-items:baseline;gap:6px}
   .tenant .tn b{font-size:15.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .tenant .tn .tag,.tenant .tn .tag.search{flex:none}
@@ -302,7 +375,7 @@
   /* 屋主直接驱逐：达标后在头像右上角冒出小按钮 + 是/否确认弹窗 */
   .expel-btn{position:absolute;top:-1px;right:-1px;z-index:2;font-family:var(--hei);font-size:10.5px;
     line-height:1.5;letter-spacing:.04em;padding:0 5px;color:var(--danger-ink);cursor:pointer;
-    border:1px solid var(--danger);background:linear-gradient(var(--danger-1),var(--danger-2));box-shadow:0 1px 3px rgba(0,0,0,.5)}
+    border:1px solid var(--danger);background:linear-gradient(var(--danger-1),var(--danger-2));box-shadow:var(--shadow-chip)}
   .expel-btn:hover{border-color:var(--amber);color:var(--ink-hi);background:linear-gradient(var(--danger-hi-1),var(--danger-hi-2))}
   .expel-btn.inline{position:static;margin-left:8px;padding:2px 9px;font-size:12px}
   .expel-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
@@ -343,10 +416,10 @@
   /* 格子做出「凹陷下去」的实体感：内阴影 + 暗底。 */
   .slot{width:var(--slot);height:var(--slot);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:3px;position:relative;transition:.15s;border-left-width:2px;overflow:hidden;
-    background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.14));
-    box-shadow:inset 0 2px 4px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.045)}
-  .slot:hover{border-color:var(--line2);box-shadow:inset 0 2px 5px rgba(0,0,0,.65)}
-  .slot.empty{background:linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.12))}
+    background:linear-gradient(180deg,color-mix(in srgb,var(--edge) 34%,transparent),color-mix(in srgb,var(--edge) 14%,transparent));
+    box-shadow:var(--shadow-inset)}
+  .slot:hover{border-color:var(--line2);box-shadow:var(--shadow-inset-hover)}
+  .slot.empty{background:linear-gradient(180deg,color-mix(in srgb,var(--edge) 30%,transparent),color-mix(in srgb,var(--edge) 12%,transparent))}
   /* 品质：图标与名称直接上色 */
   .slot.q0{color:var(--q0);border-left-color:var(--q0)}
   .slot.q1{color:var(--q1);border-left-color:var(--q1)}
@@ -355,12 +428,12 @@
   .slot.q4{color:var(--q4);border-left-color:var(--q4)}
   .slot.q5{color:var(--q5);border-left-color:var(--q5)}
   .slot .n{font-family:var(--mono);font-size:8.5px;text-align:center;padding:0 2px;line-height:1.05;max-width:100%;word-break:break-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .slot .dur{position:absolute;left:5px;right:5px;bottom:3px;height:4px;background:rgba(0,0,0,.55);
+  .slot .dur{position:absolute;left:5px;right:5px;bottom:3px;height:4px;background:color-mix(in srgb,var(--edge) 55%,transparent);
     border:1px solid var(--line2);border-radius:2px;overflow:hidden}
   .slot .dur i{display:block;height:100%;background:var(--ok)}
   .slot .dur i.low{background:var(--warn)}
   .slot .dur i.crit{background:var(--danger)}
-  .slot .c{position:absolute;top:1px;right:3px;font-family:var(--mono);font-size:10.5px;color:var(--ink);background:rgba(0,0,0,.35);padding:0 3px;border-radius:2px}
+  .slot .c{position:absolute;top:1px;right:3px;font-family:var(--mono);font-size:10.5px;color:var(--ink);background:color-mix(in srgb,var(--edge) 35%,transparent);padding:0 3px;border-radius:2px}
   .slot svg.ic{width:22px;height:22px}
   .slot .art-img{width:22px;height:22px}
   .slot{padding:6px 4px}
@@ -377,15 +450,16 @@
 .td-avid .panel-slot{flex:1 1 auto;min-width:0}
 .panel-slot{display:flex;flex-direction:column;gap:5px;min-width:0;align-items:flex-start}
 /* 名称 chip 只包住自己的文字（别被列布局拉成和进度条一样长的"条条"），
-   并与下方的印记条留出呼吸位。 */
-.panel-slot .mk{display:flex;flex-direction:column;gap:7px;width:100%;min-width:0;align-items:flex-start}
-.panel-slot .mark-chip{display:inline-flex;align-self:flex-start;align-items:center;gap:5px;max-width:100%}
+   两端收紧一点、并与下方的印记条留出更大呼吸位。 */
+.panel-slot .mk{display:flex;flex-direction:column;gap:10px;width:100%;min-width:0;align-items:flex-start}
+.panel-slot .mark-chip{display:inline-flex;align-self:flex-start;align-items:center;gap:5px;
+  max-width:100%;padding:0 5px}
 .panel-slot .mark-chip svg.ic{width:13px;height:13px;flex:none;opacity:.85}
 .panel-slot .mk-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .panel-slot .mark-chip b{color:var(--ink);font-weight:600}
 .panel-slot .mark-chip .dim{color:var(--ink3)}
 /* 进度条：颜色随内容层声明的阈值换档（铜/银/金/棱彩，与羁绊同一套 token）。 */
-.panel-slot .mk-bar{display:block;width:100%;height:5px;background:rgba(6,10,10,.75);
+.panel-slot .mk-bar{display:block;width:100%;height:5px;background:var(--scrim-deep);
   border:1px solid var(--line);position:relative;overflow:hidden;color:var(--ink3)}
 .panel-slot .mk-bar > i{display:block;height:100%;background:currentColor;transition:width .18s ease}
 /* 档位刻度：内容层可给 css（danger=红线、warn=黄线…），悬停看该档说明。 */
@@ -414,7 +488,7 @@
 .td-body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;padding:12px}
   .ab-list{display:flex;flex-direction:column;gap:8px}
   .ability{display:flex;flex-direction:column;gap:5px;border:1px solid var(--line);padding:8px 10px;
-    background:rgba(255,255,255,.015)}
+    background:color-mix(in srgb,var(--ink-hi) 1.5%,transparent)}
   .ability.compact{padding:6px 10px}
   .ability .ab-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
   .ability .ab-head b{word-break:break-word}
@@ -423,20 +497,20 @@
   /* 主动技能栏本体即按钮：可用=抬起；本回合不可用=按下未回弹 */
   .ability.usable,.ability.locked{font-family:var(--hei);letter-spacing:.03em;border:2px solid var(--edge);
     border-radius:3px;background:linear-gradient(var(--btn-1),var(--btn-2));
-    box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -1px -1px 0 rgba(0,0,0,.5);transition:.14s}
+    box-shadow:var(--shadow-bevel);transition:.14s}
   .ability.usable{cursor:pointer}
   .ability.usable:hover{background:linear-gradient(var(--btn-hi-1),var(--btn-hi-2));border-color:var(--amber)}
   .ability.usable:hover b,.ability.usable:hover .ab-text{color:var(--ink-hi)}
   .ability.usable:active{transform:translateY(2px);
-    box-shadow:inset -1px -1px 0 rgba(255,255,255,.05),inset 2px 2px 3px rgba(0,0,0,.55)}
+    box-shadow:var(--shadow-press)}
   .ability.locked{transform:translateY(2px);opacity:.72;background:linear-gradient(var(--surface-3),var(--surface-2));
-    box-shadow:inset 2px 2px 4px rgba(0,0,0,.65),inset -1px -1px 0 rgba(255,255,255,.035)}
+    box-shadow:var(--shadow-inset-deep)}
   .ability.disabled{opacity:.5}
   .slot.empty{opacity:.3;border-style:dashed;border-left-color:var(--line)}
 
   .slot{overflow:visible}
   .item-tip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);width:300px;display:none;z-index:80;
-    background:var(--surface-tip);border:1px solid var(--line);padding:10px 12px;box-shadow:0 14px 30px rgba(0,0,0,.55);
+    background:var(--surface-tip);border:1px solid var(--line);padding:10px 12px;box-shadow:var(--shadow-tip);
     font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--ink2);text-align:left;font-weight:400}
   .slot:hover .item-tip{display:block}
   .item-tip b{display:flex;align-items:baseline;gap:6px;font-size:13.5px;color:var(--ink)}
@@ -448,7 +522,7 @@
   .item-tip .it-act{display:block;margin-top:8px;padding-top:6px;border-top:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px}
 
   .tip-layer{position:fixed;z-index:300;display:none;pointer-events:none;width:320px;background:var(--surface-tip);
-    border:1px solid var(--line);padding:10px 12px;box-shadow:0 16px 36px rgba(0,0,0,.6);
+    border:1px solid var(--line);padding:10px 12px;box-shadow:var(--shadow-tip);
     font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--ink2)}
   .chip.expire{font-size:10.5px;color:var(--ink3);border-color:var(--line)}
   .psk{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
@@ -470,7 +544,7 @@
   .tip-layer .tip-eff{display:block;color:var(--ink);margin:4px 0}
   .tip-layer .it-act{display:block;margin-top:8px;padding-top:6px;border-top:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px}
   .pick-row{display:flex;flex-wrap:wrap;gap:8px}
-  .pick-card{display:flex;align-items:center;gap:6px;border:1px solid var(--line);padding:8px 12px;cursor:pointer;background:rgba(255,255,255,.015)}
+  .pick-card{display:flex;align-items:center;gap:6px;border:1px solid var(--line);padding:8px 12px;cursor:pointer;background:color-mix(in srgb,var(--ink-hi) 1.5%,transparent)}
   .pick-card:hover{border-color:var(--line2)}
   .pick-card.sel{border-color:var(--amber);background:rgba(var(--amber-rgb),.1)}
   .slot[draggable="true"]{cursor:grab}
@@ -529,19 +603,30 @@
   .log-list strong{color:var(--ink)}
 
   /* ---------- dialogs ---------- */
-  .mask{position:fixed;inset:0;background:rgba(6,8,10,.72);backdrop-filter:blur(2px);display:none;
+  .mask{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(2px);display:none;
     align-items:center;justify-content:center;z-index:20}
   .mask.on{display:flex}
+  /* ---------- 游戏内 Esc 菜单：MC 风「桌面」（全屏覆盖） ---------- */
+  .pause{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
+    background:var(--scrim-deep);backdrop-filter:blur(3px)}
+  .pause.on{display:flex}
+  .pause-panel{width:min(520px,92vw);display:flex;flex-direction:column;gap:14px;
+    background:var(--glass);border:2px solid var(--edge);padding:26px 26px 22px;border-radius:3px;
+    box-shadow:var(--shadow-panel)}
+  .pause-panel .mc-h2{margin:0 0 4px;text-align:center}
+  /* 两个短按钮各占一半、缝隙与长条按钮一致 → 左右外缘和长条按钮对齐。 */
+  .pause-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .pause-row .mc-btn{min-width:0;padding:15px 8px;font-size:16px}
   .dialog{width:min(560px,92vw);background:linear-gradient(180deg,var(--surface-1),var(--surface-2));
     border:2px solid var(--edge);border-radius:3px;
-    box-shadow:inset 0 0 0 2px rgba(var(--amber-rgb),.18),0 18px 40px rgba(0,0,0,.6)}
+    box-shadow:var(--shadow-panel)}
   .dialog.wide{width:min(880px,94vw)}
   .dialog .dhead{display:flex;align-items:center;gap:10px;padding:12px 16px;
-    border-bottom:1px solid var(--line);background:rgba(0,0,0,.22)}
+    border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--edge) 22%,transparent)}
   .dialog .dhead b{font-family:var(--hei);font-size:16px;color:var(--ink-head)}
   .dialog .dbody{padding:16px}
   .dialog .dfoot{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;
-    border-top:1px solid var(--line);background:rgba(0,0,0,.18)}
+    border-top:1px solid var(--line);background:color-mix(in srgb,var(--edge) 18%,transparent)}
   .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .card{border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:.15s}
   .card:hover{border-color:var(--info);background:rgba(var(--amber-rgb),.08)}
@@ -557,7 +642,7 @@
 .card .dc-weight{font-size:11px;font-family:var(--mono)}
   .btn{font-family:var(--hei);font-size:13px;letter-spacing:.03em;color:var(--ink-btn);
     background:linear-gradient(var(--btn-1),var(--btn-2));border:2px solid var(--edge);border-radius:3px;
-    box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -1px -1px 0 rgba(0,0,0,.5);
+    box-shadow:var(--shadow-bevel);
     padding:7px 14px;cursor:pointer;transition:.14s;white-space:nowrap;flex:none}
   .btn:hover{background:linear-gradient(var(--btn-hi-1),var(--btn-hi-2));border-color:var(--amber);color:var(--ink-hi)}
   .btn.p{background:linear-gradient(var(--pri-1),var(--pri-2))}
@@ -586,16 +671,7 @@
 body.in-launcher .topbar,body.in-launcher .bonds-strip,body.in-launcher .shell,
 body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !important}
 
-.dusk-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-.dusk-bg svg{width:100%;height:100%;display:block}
-.dusk-bg .win{fill:var(--amber);animation:flicker 5s ease-in-out infinite}
-.dusk-bg .win.b{animation-delay:1.9s}
-.dusk-bg .win.c{animation-delay:3.3s}
-.dusk-bg .fog{animation:fogmove 30s ease-in-out infinite alternate}
-.dusk-bg .fog.slow{animation-duration:44s}
-.dusk-bg .eyes{animation:peer 11s ease-in-out infinite}
 /* 资源包素材位：封面背景（background）用整张图覆盖内置黄昏山景。 */
-.dusk-bg.has-art svg{display:none}
 .bg-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 /* 资源包素材位：大标题（title）用图替换"报纸剪字"，高度仍按固定占位，按钮不会漂。 */
 /* 标题块：高度固定 + 居中等宽缩放（两侧不遮挡）；title 素材替换整块（含副标题）。 */
@@ -606,13 +682,10 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .title-block .title-art{display:block;max-width:100%;height:100%;object-fit:contain}
 /* 退出游戏后的收尾画面（服务已关，页面不再可用）。 */
 .quit-screen{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:12px;background:#0b0f10;color:#e6eadf;
+  align-items:center;justify-content:center;gap:12px;background:var(--bg);color:var(--ink);
   font-family:"Microsoft YaHei UI","PingFang SC",sans-serif}
 .quit-screen b{font-size:22px;letter-spacing:.08em}
-.quit-screen span{font-size:13px;color:#9aa79f}
-@keyframes flicker{0%,100%{opacity:.92}45%{opacity:.5}52%{opacity:.85}}
-@keyframes fogmove{0%{transform:translateX(-4%)}100%{transform:translateX(5%)}}
-@keyframes peer{0%,90%,100%{opacity:0}93%,97%{opacity:.85}}
+.quit-screen span{font-size:13px;color:var(--ink2)}
 
 .lpane{position:relative;z-index:1;display:none;padding:60px 24px 72px}
 .lpane.on{display:block}
@@ -620,16 +693,16 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .mc-eyebrow{text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;
   letter-spacing:.42em;color:var(--amber);text-transform:uppercase;margin:0 0 14px;text-indent:.42em}
 .mc-title{display:flex;align-items:flex-end;justify-content:center;gap:16px;
-  margin:0;font-family:var(--hei);color:#241f18;position:relative}
+  margin:0;font-family:var(--hei);color:var(--title-ink-1);position:relative}
 .title-cn{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
 .title-line{display:block;white-space:nowrap}
 .title-ch{display:inline-block;font-family:var(--hei);font-weight:900;line-height:1.06;
   padding:.05em .12em;margin:0 .015em;border-radius:1px;
-  box-shadow:0 2px 0 rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.32),inset 0 0 7px rgba(120,100,60,.28)}
+  box-shadow:var(--shadow-title)}
 .title-bangs{display:flex;flex-direction:row;align-items:flex-end;gap:6px;margin-bottom:.12em}
-.title-bangs b{display:inline-block;font-family:var(--hei);font-weight:900;color:#1b1710;line-height:1;
+.title-bangs b{display:inline-block;font-family:var(--hei);font-weight:900;color:var(--title-ink-3);line-height:1;
   padding:.02em .1em;border-radius:1px;
-  box-shadow:0 3px 0 rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.32)}
+  box-shadow:var(--shadow-title-tag)}
 .bang-q{transform:rotate(-9deg)}
 .bang-e{transform:rotate(8deg)}
 .mc-sub-en{margin:18px 0 0;text-align:center;font-family:var(--comic);letter-spacing:.08em;
@@ -647,7 +720,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .set-menu .mc-btn{min-width:0}
 /* 显示设置项：整行可点，右侧是当前值（是 / 否）。 */
 .disp-row{display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:14px 16px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.02);
+  padding:14px 16px;cursor:pointer;border:1px solid var(--line);background:color-mix(in srgb,var(--ink-hi) 2%,transparent);
   font-family:var(--sans);font-size:15px;color:var(--ink);transition:.14s}
 .disp-row:hover{border-color:var(--amber);background:rgba(var(--amber-rgb),.06)}
 .disp-val{font-family:var(--mono);color:var(--amber);font-size:16px;flex:none}
@@ -660,7 +733,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
 .toast{pointer-events:auto;cursor:pointer;min-width:220px;max-width:min(600px,92vw);
   background:linear-gradient(180deg,var(--surface-1),var(--surface-2));border:2px solid var(--edge);border-left:4px solid var(--amber);
-  box-shadow:inset 0 0 0 2px rgba(var(--amber-rgb),.18),0 12px 28px rgba(0,0,0,.5);
+  box-shadow:var(--shadow-panel);
   color:var(--ink);padding:12px 18px;font-size:14.5px;line-height:1.5;
   animation:toastIn .18s ease-out}
 .toast.err{border-left-color:var(--danger);color:var(--danger-ink)}
@@ -668,24 +741,96 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .pending-btn{position:fixed;right:18px;bottom:18px;z-index:70;font-family:var(--hei);font-size:14px;color:var(--ink-hi);
   background:linear-gradient(var(--pri-1),var(--pri-2));border:2px solid var(--edge);border-left:4px solid var(--amber);border-radius:3px;
-  padding:10px 16px;cursor:pointer;box-shadow:inset 1px 1px 0 rgba(255,255,255,.15),0 8px 20px rgba(0,0,0,.5)}
+  padding:10px 16px;cursor:pointer;box-shadow:var(--shadow-bevel-plus)}
 .pending-btn:hover{border-color:var(--amber)}
   .peek-toggle{position:fixed;left:50%;transform:translateX(-50%);bottom:46px;z-index:71;
     font-family:var(--hei);font-size:16px;letter-spacing:.05em;color:var(--ink-btn);
     background:linear-gradient(var(--pri-1),var(--pri-2));border:2px solid var(--edge);border-radius:3px;
-    box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -1px -1px 0 rgba(0,0,0,.5);
+    box-shadow:var(--shadow-bevel);
     padding:12px 34px;cursor:pointer;transition:.14s}
   .peek-toggle:hover{background:linear-gradient(var(--pri-hi-1),var(--pri-hi-2));border-color:var(--amber);color:var(--ink-hi)}
   .disc-desc{text-align:center;color:var(--ink2);margin-bottom:14px;font-size:13px;line-height:1.7}
+  /* ---- 「发现」：**不要背景板** —— 只把外面的场面调暗，卡片直接浮在上面 ----
+     一行从左往右排开：**总宽固定**，间距（`--gap`，由 JS 按张数给）随选项增多而收紧。 */
+  .mask.bare{background:var(--scrim-soft);backdrop-filter:none}
+  .dialog.bare{width:min(1180px,94vw);background:none;border:0;box-shadow:none}
+  .dialog.bare .dhead{display:none}
+  .dialog.bare .dbody{padding:0}
+  .dialog.bare .dfoot{justify-content:center;background:none;border:0;padding:18px 0 0}
+  .dialog.bare .disc-desc{font-size:14px;margin-bottom:18px}
   .disc-opts{display:flex;align-items:center;justify-content:center;gap:14px}
-  .disc-row{display:flex;gap:10px;justify-content:center;align-items:stretch;flex:1 1 auto;flex-wrap:nowrap;min-width:0}
+  .dialog.bare .disc-opts{width:min(1180px,94vw)}
+  .disc-row{display:flex;gap:var(--gap,10px);justify-content:center;align-items:stretch;flex:1 1 auto;flex-wrap:nowrap;min-width:0}
   .disc-row .card{flex:1 1 0;min-width:0;max-width:190px}
-  .pg-arrow{flex:0 0 auto;width:0;height:0;padding:0;background:none;border:0;cursor:pointer;
-    border-top:14px solid transparent;border-bottom:14px solid transparent;opacity:.85}
-  .pg-arrow.l{border-right:24px solid var(--amber)}
-  .pg-arrow.r{border-left:24px solid var(--amber)}
+  .dialog.bare .disc-row .card{max-width:240px;padding:18px 12px;gap:12px;
+    background:var(--card-glass)}
+  .dialog.bare .card:hover{background:rgba(var(--amber-rgb),.14);border-color:var(--amber)}
+  .dialog.bare .card.sel{background:rgba(var(--amber-rgb),.2);border-color:var(--amber);
+    box-shadow:inset 0 0 0 1px rgba(var(--amber-rgb),.55)}
+  .dialog.bare .card .dc-name{font-size:15px}
+  .dialog.bare .card .dc-av svg.ic.lg,.dialog.bare .card .dc-av .art-img,
+  .dialog.bare .card .dc-av .art-inline,.dialog.bare .card .dc-persona svg.ic.lg{width:56px;height:56px}
+  .dialog.bare .card .dc-av .av-wrap{--av-size:56px}
+  /* 翻页箭头：只在多于一页时出现；端点置灰但**不消失**（行宽不跳）。 */
+  .pg-arrow{-webkit-appearance:none;appearance:none;flex:0 0 auto;width:44px;height:72px;padding:0;
+    background:none;border:0;cursor:pointer;position:relative;opacity:.9;transition:opacity .14s}
+  .pg-arrow::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:0;height:0;border-top:16px solid transparent;border-bottom:16px solid transparent}
+  .pg-arrow.l::before{border-right:26px solid var(--amber)}
+  .pg-arrow.r::before{border-left:26px solid var(--amber)}
   .pg-arrow:hover{opacity:1}
-  .pg-arrow.off{opacity:.16;cursor:default}
+  .pg-arrow.off{opacity:.2;cursor:default}
+  /* ---- 选择类弹窗（技能目标 / 效果 / 数量 / 搜索房客与地点）：统一的"卡片"语言 ---- */
+  .choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(186px,1fr));gap:12px;
+    max-height:56vh;overflow-y:auto;padding:2px;scrollbar-width:thin}
+  .choice-grid.roomy{grid-template-columns:repeat(auto-fit,minmax(236px,1fr))}
+  .choice-grid .card{background:linear-gradient(180deg,color-mix(in srgb,var(--ink-hi) 2.5%,transparent),color-mix(in srgb,var(--edge) 7%,transparent))}
+  .choice-grid .card:hover{background:rgba(var(--amber-rgb),.12)}
+  .choice-grid .card.sel{border-color:var(--amber);background:rgba(var(--amber-rgb),.16);
+    box-shadow:inset 0 0 0 1px rgba(var(--amber-rgb),.45)}
+  .choice-grid .card.busy{opacity:.5}
+  .choice-grid .card.wide{grid-column:1 / -1;flex-direction:row;justify-content:flex-start;gap:12px;text-align:left}
+  .choice-grid .card.wide .dc-av{flex:none}
+  .choice-grid .card.wide .dc-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .card .dc-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+  .card .dc-desc{font-size:11.5px;color:var(--ink2);line-height:1.5;text-align:center}
+  .card.wide .dc-desc{text-align:left}
+  .card .dc-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+  .card .ch-vitals{width:100%;display:flex;flex-direction:column;gap:3px}
+  .card .ch-vitals .vit{margin-top:0}
+  .card .ch-persona{font-size:11px;color:var(--ink3);text-align:center;line-height:1.45}
+  /* 数量：步进 + 滑杆 + 印记格 */
+  .amount-box{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 14px}
+  .amount-box .amt-btn{width:46px;height:46px;padding:0;font-size:22px;line-height:1;font-family:var(--sans);
+    color:var(--ink-btn);background:linear-gradient(var(--btn-1),var(--btn-2));border:2px solid var(--edge);
+    border-radius:3px;cursor:pointer;transition:.14s}
+  .amount-box .amt-btn:hover{border-color:var(--amber);color:var(--ink-hi)}
+  .amount-box .amt-btn:disabled{opacity:.35;cursor:default}
+  .amount-box .amt-num{width:88px;height:46px;text-align:center;font-family:var(--mono);font-size:21px;
+    color:var(--ink-hi);background:var(--surface-3);border:2px solid var(--edge);border-radius:3px}
+  .amt-range{width:100%;accent-color:var(--amber);margin-bottom:12px}
+  .amt-bar{height:9px;border:1px solid var(--line2);padding:1px;display:flex;gap:2px}
+  .amt-bar i{flex:1;background:var(--line)}
+  .amt-bar i.on{background:var(--amber)}
+  /* 搜索地点：行（图标 + 名称 + 小 chip）+ 右侧结构化详情 */
+  .loc-ico{width:26px;height:26px;flex:none;display:inline-flex;align-items:center;justify-content:center}
+  .loc-ico svg.ic{width:26px;height:26px}
+  .loc-ico .art-img,.loc-ico .art-inline{width:26px;height:26px}
+  .choice-grid .card .chips{justify-content:center}
+  .loc-main{flex:1 1 auto;min-width:0}
+  .loc-main b{display:block;color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .loc-sub{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+  .loc-current{font-size:11px;color:var(--amber);margin-left:6px}
+  .loc-drop{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+  .loc-drop li{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--ink2);
+    border-bottom:1px dashed var(--line2);padding-bottom:3px}
+  .loc-drop li b{color:var(--ink);font-family:var(--mono)}
+  .loc-mech{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+  .loc-mech li{font-size:12px;color:var(--ink2);display:flex;gap:6px;align-items:flex-start}
+  .loc-mech li::before{content:"▸";color:var(--amber);flex:none}
+  .loc-raw{margin-top:10px;font-size:11px;color:var(--ink3)}
+  .loc-raw summary{cursor:pointer;color:var(--ink3)}
+  .loc-raw div{margin-top:5px;line-height:1.6}
 
 /* ---------- 图鉴（左列表 + 右详情） ---------- */
 .codex-tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px}
@@ -698,6 +843,11 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .codex-row{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;
   border:2px solid transparent;font-size:14px;color:var(--ink2)}
 .codex-row:hover{background:rgba(var(--amber-rgb),.08)}
+/* 机制分节图标：一圈低饱和分节色当徽章（颜色由内容层的 tint 给）。 */
+/* 图鉴里的"风味描述"：斜体 + 专属墨色（token，材质包可改）。 */
+.flavor-line{color:var(--flavor-ink);font-style:italic}
+.cv-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border:1px solid currentColor;border-radius:6px;opacity:.95}
 .codex-row.sel{background:rgba(var(--amber-rgb),.14);border-color:var(--amber);color:var(--ink)}
 .codex-row .cv{color:var(--amber);display:inline-flex;flex:none}
 .codex-detail{overflow-y:auto;padding:20px}
@@ -730,6 +880,14 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .slot .art-mask,.submit-slot .ss-box .art-mask{width:20px;height:20px}
 .cv .art-mask{width:19px;height:19px}
 .cd-av .art-mask{width:72px;height:72px}
+/* ---- 物品图标：内容层下发的**内联标记**（大部分近白底色 + 少量品质色特征）----
+   颜色由后端烧好（底色 = 主题 --ink、特征 = 锁定的品质色），尺寸交给这里。 */
+.art-inline{display:inline-flex;align-items:center;justify-content:center}
+.art-inline svg{width:100%;height:100%;display:block}
+.slot .art-inline,.submit-slot .ss-box .art-inline{width:20px;height:20px}
+.cv .art-inline{width:19px;height:19px}
+.cd-av .art-inline{width:72px;height:72px}
+.card .dc-av .art-inline{width:40px;height:40px}
 /* 头像组装：形状（--ink）× 特征（点缀色）× 点缀环 */
 .av-wrap{--av-size:42px}
 .av-wrap .av-shape{width:var(--av-size);height:var(--av-size);color:var(--ink)}
@@ -745,6 +903,8 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .td-left .av .art-img{width:56px;height:56px}
 /* 外置美术：图鉴列表行的图标槽（内置 svg.ic 默认 19px，img 需显式给尺寸） */
 .cv .art-img{width:19px;height:19px}
+/* 图鉴列表行里的**组装头像**（房客）：尺寸压到与内置图标一致。 */
+.cv .av-wrap{--av-size:19px}
 .loc-name .art-img{width:19px;height:19px}
 .cd-book{background:rgba(var(--amber-rgb),.08);border:1px solid rgba(var(--amber-rgb),.35);border-radius:3px;padding:10px 12px}
 .cd-book h4{color:var(--amber)}
@@ -765,10 +925,6 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .av-ft{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.85;pointer-events:none}
 .av-ft svg{width:100%;height:100%}
 .av-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
-.av-accent{position:absolute;pointer-events:none}
-.av-accent.ring{inset:-4px;border-radius:50%;border:1.5px solid var(--ac);opacity:.5}
-.av-accent.dot{right:-2px;bottom:-2px;width:7px;height:7px;border-radius:50%;background:var(--ac);opacity:.75}
-.av-accent.arc{left:10%;right:10%;bottom:-3px;height:0;border-bottom:2px solid var(--ac);opacity:.6;border-radius:50%}
 /* 品质直接反映到图标颜色 */
 .cd-av.q0 svg,.slot.q0 svg{color:var(--q0)}
 .cd-av.q1 svg,.slot.q1 svg{color:var(--q1)}
@@ -776,7 +932,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .cd-av.q3 svg,.slot.q3 svg{color:var(--q3)}
 .cd-av.q4 svg,.slot.q4 svg{color:var(--q4)}
 .cd-av.q5 svg,.slot.q5 svg{color:var(--q5)}
-.cd-dossier{display:flex;gap:16px;align-items:center;border:2px solid var(--edge);background:rgba(6,10,10,.5);padding:14px}
+.cd-dossier{display:flex;gap:16px;align-items:center;border:2px solid var(--edge);background:var(--scrim-soft);padding:14px}
 .cd-av{color:var(--amber);display:inline-flex;flex:none}
 /* 图鉴羁绊页：档位循环预览的颜色覆盖（盖过 .cd-av 的默认琥珀色） */
 .cd-av.t-bronze{color:var(--bronze)}
@@ -792,6 +948,14 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .cd-section h4{margin:0 0 8px;font-size:13px;color:var(--amber);letter-spacing:.08em}
 .cd-entry{margin-top:8px;font-size:13.5px;color:var(--ink2);line-height:1.6}
 .cd-entry b{color:var(--ink)}
+/* 图鉴：符号墙（内容给"一张一个内联 svg"，缺的画一条杠） */
+.cd-syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.cd-sym{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:9px 4px;border:1px solid var(--line);background:var(--surface-2)}
+.cd-sym svg.ic{width:34px;height:34px;color:var(--ink2)}
+.cd-sym b{font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap}
+.cd-sym.none{opacity:.45}
+.cd-sym.none b{color:var(--ink3)}
 .cd-link{color:var(--amber);cursor:pointer;border-bottom:1px dashed rgba(var(--amber-rgb),.5)}
 .cd-link:hover{color:var(--ink-hi)}
 .cd-tier{display:flex;gap:10px;align-items:baseline;margin-top:8px}
@@ -802,13 +966,13 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 /* 上供槽：保留墨绿底的面板，中间只放一个小格子（不再是一大片黄框）。 */
 .submit-slot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;
   border:1px solid var(--line);border-radius:3px;cursor:pointer;
-  background:linear-gradient(180deg,rgba(9,26,21,.62),rgba(6,18,15,.5))}
+  background:linear-gradient(180deg,var(--moss),var(--moss))}
 .submit-slot.drop{border-color:var(--ok)}
 .submit-slot .ss-box{width:var(--slot);height:var(--slot);border:1px dashed var(--amber);border-radius:3px;
   display:flex;align-items:center;justify-content:center;transition:.15s;
-  background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.14));
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.55)}
-.submit-slot.filled .ss-box{border-style:solid;border-color:var(--line2);box-shadow:inset 0 2px 4px rgba(0,0,0,.55)}
+  background:linear-gradient(180deg,color-mix(in srgb,var(--edge) 34%,transparent),color-mix(in srgb,var(--edge) 14%,transparent));
+  box-shadow:var(--shadow-inset)}
+.submit-slot.filled .ss-box{border-style:solid;border-color:var(--line2);box-shadow:var(--shadow-inset)}
 .submit-slot .ss-box svg.ic{width:22px;height:22px}
 .submit-slot .ss-box .art-img{width:22px;height:22px}
 .submit-slot .ss-hint{font-size:11.5px;color:var(--ink3);text-align:center;line-height:1.5}
@@ -820,25 +984,29 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 /* 总物资栏：固定格宽、居中对齐，间隔均匀。 */
 .submit-pool{display:grid;grid-template-columns:repeat(auto-fill,var(--slot));gap:6px;justify-content:center;
   max-height:26vh;overflow:auto;border:1px solid var(--line);border-radius:3px;padding:10px;
-  background:rgba(6,18,15,.4)}
+  background:var(--moss)}
 .submit-pool .slot.off{opacity:.32;cursor:not-allowed}
 .submit-src{font-size:9.5px;color:var(--ink3);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-h2{font-family:var(--hei);font-size:30px;text-align:center;color:var(--ink-head);margin:0 0 20px;letter-spacing:.1em;
   text-shadow:0 2px 0 var(--amber-soft),0 4px 16px rgba(var(--amber-rgb),.4)}
-.mc-panel{background:rgba(9,15,15,.78);border:2px solid var(--edge);
-  box-shadow:inset 0 0 0 2px rgba(var(--amber-rgb),.16),0 12px 30px rgba(0,0,0,.5);padding:12px}
+.mc-panel{background:var(--glass);border:2px solid var(--edge);
+  box-shadow:var(--shadow-panel);padding:12px}
 .mc-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+/* 创建对局 / 存档 / 资料包 / 资源包：整页拉高，内容溢出就走纵向进度条。 */
+.lpane-inner.tall{min-height:90vh;display:flex;flex-direction:column}
+.lpane-inner.tall > .mc-panel{min-height:68vh;max-height:86vh;overflow-y:auto}
+.lpane-inner.tall > .mc-panel.flat{overflow:visible;min-height:0}
 .mc-btn{font-family:var(--sans);font-size:17px;color:var(--ink-btn);letter-spacing:.06em;
   background:linear-gradient(var(--btn-1),var(--btn-2));border:2px solid var(--edge);border-radius:3px;
-  box-shadow:inset 2px 2px 0 rgba(255,255,255,.10),inset -2px -2px 0 rgba(0,0,0,.5),0 7px 16px rgba(0,0,0,.45);
-  padding:14px 22px;cursor:pointer;text-shadow:1px 1px 0 rgba(0,0,0,.6);transition:.14s}
+  box-shadow:var(--shadow-bevel-lg);
+  padding:14px 22px;cursor:pointer;text-shadow:var(--text-shadow-bevel);transition:.14s}
 .mc-btn:hover{background:linear-gradient(var(--btn-hi-1),var(--btn-hi-2));border-color:var(--amber);color:var(--ink-hi)}
 .mc-btn:active{transform:translateY(2px)}
 .mc-btn.p{background:linear-gradient(var(--pri-1),var(--pri-2))}
 .mc-btn.p:hover{background:linear-gradient(var(--pri-hi-1),var(--pri-hi-2));border-color:var(--amber)}
 .mc-btn.wide{width:100%;font-size:20px;padding:19px 26px}
 .mc-row .mc-btn{min-width:150px}
-.save-list{min-height:360px;max-height:62vh;overflow-y:auto;overflow-x:hidden}
+.save-list{min-height:520px;max-height:82vh;overflow-y:auto;overflow-x:hidden}
 .save-row{display:flex;gap:16px;align-items:center;padding:16px 18px;cursor:pointer;border:2px solid transparent}
 .save-row:hover{background:rgba(var(--amber-rgb),.08)}
 .save-row.sel{background:rgba(var(--amber-rgb),.14);border-color:var(--amber)}
@@ -860,21 +1028,25 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 .mc-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;font-size:14px;color:var(--ink2)}
 .mc-field input,.mc-field select{font:inherit;font-family:var(--sans);padding:10px;border:2px solid var(--edge);background:var(--surface-3);color:var(--ink-hi);border-radius:3px}
 .mc-row .mc-field{margin-bottom:0}
-.dlc-cols{display:grid;grid-template-columns:1fr 64px 1fr;gap:12px;align-items:start}
+.dlc-cols{display:grid;grid-template-columns:1fr 64px 1fr;gap:12px;align-items:stretch;min-height:0}
 .dlc-col h3{text-align:center;font-size:15px;color:var(--ink2);margin:0 0 10px;font-weight:600;letter-spacing:.1em}
-.dlc-list{min-height:330px;max-height:58vh;overflow-y:auto;background:rgba(6,10,10,.6);border:2px solid var(--edge);padding:8px}
-.dlc-item{padding:13px 14px;border:2px solid transparent;cursor:pointer;font-size:15px}
+.dlc-col{display:flex;flex-direction:column;min-height:0;height:100%}
+.dlc-list{flex:1 1 auto;min-height:460px;overflow-y:auto;background:var(--scrim);border:2px solid var(--edge);padding:8px}
+.dlc-item{display:flex;align-items:center;gap:8px;min-height:46px;padding:8px 10px 8px 14px;
+  border:2px solid transparent;cursor:pointer;font-size:15px}
 .dlc-item:hover{background:rgba(var(--amber-rgb),.1);border-color:var(--amber)}
 .dlc-item.on{background:rgba(var(--amber-rgb),.16);border-color:var(--amber)}
+.dlc-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 选中的已启用行：行尾**竖向**一对 ▲▼（双击那一行才是快捷开关，箭头只调位次）。 */
+.dlc-move{display:flex;flex-direction:column;gap:2px;flex:none}
+.dlc-move .dlc-arrow{padding:0;min-width:0;width:24px;height:17px;line-height:15px;font-size:9px;border-width:1.5px}
 .dlc-mid{display:flex;flex-direction:column;gap:12px;justify-content:center;padding-top:40px}
 .dlc-mid .mc-btn{min-width:0;padding:12px 0;text-align:center}
-.dlc-order{display:flex;gap:10px;justify-content:center;padding-top:10px}
-.dlc-order .mc-btn{min-width:0;padding:8px 18px;text-align:center}
 .dlc-base-tag{margin-left:8px;font-size:11.5px;color:var(--ink3)}
-.lc-dialog{position:fixed;inset:0;z-index:80;display:none;background:rgba(0,0,0,.66);align-items:center;justify-content:center}
+.lc-dialog{position:fixed;inset:0;z-index:80;display:none;background:color-mix(in srgb,var(--edge) 66%,transparent);align-items:center;justify-content:center}
 .lc-dialog.on{display:flex}
 .lc-box{width:min(520px,92vw);background:var(--panel2);border:2px solid var(--edge);
-  box-shadow:inset 0 0 0 2px rgba(var(--amber-rgb),.16),0 18px 40px rgba(0,0,0,.6);padding:22px;font-family:var(--sans)}
+  box-shadow:var(--shadow-panel);padding:22px;font-family:var(--sans)}
 .lc-box h3{margin:0 0 14px;font-family:var(--hei);color:var(--ink-head);font-size:24px;letter-spacing:.06em}
 .lc-hint{text-align:center;font-size:12px;color:var(--ink3);margin-top:14px;letter-spacing:.04em}
   /* ---------- 响应式（防中间被挤没） ---------- */
@@ -913,75 +1085,16 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 <button id="pendingBtn" class="peek-toggle" style="display:none" onclick="togglePending()">待处理 ▸</button>
 
 <svg class="defs" aria-hidden="true">
-  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-  <symbol id="i-gate" viewBox="0 0 24 24"><path d="M5 21V6l7-3 7 3v15"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
-  <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8 12V6a1.6 1.6 0 013.2 0v5"/><path d="M11.2 11V5a1.6 1.6 0 013.2 0v6"/><path d="M14.4 11V7a1.6 1.6 0 013.2 0v8a6 6 0 01-6 6h-1a6 6 0 01-6-6v-3a1.6 1.6 0 013.2 0"/></symbol>
-  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></symbol>
-  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2z"/><path d="M8 3v18"/></symbol>
-  <symbol id="i-cross" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8v8M8 12h8"/></symbol>
-  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 105 5L21 13l-8 8-2-2 8-8z"/><path d="M6 6l4 4M4 10l4-4"/></symbol>
-  <symbol id="i-armor" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 3v18"/></symbol>
-  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="4"/><path d="M12 8v8"/></symbol>
-  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
-  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></symbol>
-  <symbol id="i-trauma" viewBox="0 0 24 24"><path d="M4 18L18 4"/><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/></symbol>
-  <symbol id="i-disorder" viewBox="0 0 24 24"><path d="M4 9c4-4 8 4 12 0M4 15c4-4 8 4 12 0"/></symbol>
-  <symbol id="i-shock" viewBox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 8-11h-6z"/></symbol>
-  <symbol id="i-emotion" viewBox="0 0 24 24"><path d="M5 12s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="12" cy="12" r="1.6"/></symbol>
-  <symbol id="i-mark" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 5.9L12 16.9 6.7 19.3l1.2-5.9L3.4 9.3l6-.7z"/></symbol>
-<symbol id="i-doll" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><circle cx="8.4" cy="4.6" r="1.3"/><circle cx="15.6" cy="4.6" r="1.3"/><path d="M8 13c-2 3-2 6 0 7h8c2-1 2-4 0-7z"/><path d="M12 8v5"/></symbol>
-  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 016 0v2"/><path d="M9 12h6"/></symbol>
-  <symbol id="i-bullet" viewBox="0 0 24 24"><path d="M12 3c2.4 2.6 3.6 4.8 3.6 7.2 0 2-1.6 3.6-3.6 3.6s-3.6-1.6-3.6-3.6C8.4 7.8 9.6 5.6 12 3z"/><path d="M8.4 13.8h7.2v4.6a1.6 1.6 0 01-1.6 1.6h-4a1.6 1.6 0 01-1.6-1.6z"/><path d="M8.4 16.4h7.2"/></symbol>
-  <symbol id="i-loc-med-big" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="1"/><path d="M3 6l9-3 9 3"/><path d="M12 11v6M9 14h6"/><path d="M6 21v-4h3v4M15 21v-4h3v4"/></symbol>
-  <symbol id="i-loc-med-small" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="12" rx="1"/><path d="M5 7l7-3 7 3"/><path d="M12 11v4M10 13h4"/></symbol>
-  <symbol id="i-loc-pharmacy" viewBox="0 0 24 24"><path d="M4 10h16v3a8 8 0 01-8 8 8 8 0 01-8-8z"/><path d="M12 10v11"/><path d="M6 6l3 4M18 6l-3 4"/><path d="M8 4h8"/></symbol>
-  <symbol id="i-loc-blood" viewBox="0 0 24 24"><path d="M12 3c4 5 6 7.5 6 10.5A6 6 0 016 13.5C6 10.5 8 8 12 3z"/><path d="M9 14h6M12 11v6"/></symbol>
-  <symbol id="i-loc-hardware" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 105 5L21 13l-8 8-2-2 8-8z"/><path d="M6 6l4 4M4 10l4-4"/></symbol>
-  <symbol id="i-loc-tree" viewBox="0 0 24 24"><path d="M12 3l6 9h-4l5 7H5l5-7H6z"/><path d="M12 19v3"/></symbol>
-  <symbol id="i-loc-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 8v5M10 10h4"/></symbol>
-  <symbol id="i-loc-fuel" viewBox="0 0 24 24"><rect x="4" y="4" width="9" height="17" rx="1"/><path d="M13 8h3a2 2 0 012 2v7a2 2 0 104 0v-8l-2-3"/><path d="M7 8h3"/></symbol>
-  <symbol id="i-loc-flagship" viewBox="0 0 24 24"><path d="M4 10h16v9H4z"/><path d="M3 10l2-3h14l2 3"/><path d="M12 3l1 3M12 6l-3 4h6z"/><path d="M8 19v-5h8v5"/></symbol>
-  <symbol id="i-loc-store" viewBox="0 0 24 24"><path d="M4 9h16v11H4z"/><path d="M3 9l2-4h14l2 4"/><path d="M9 20v-6h6v6"/></symbol>
-  <symbol id="i-loc-cart" viewBox="0 0 24 24"><path d="M3 5h2l2 10h11l2-7H6"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></symbol>
-  <symbol id="i-loc-food" viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 01-16 0z"/><path d="M4 11c0-4 3.6-6 8-6s8 2 8 6"/><path d="M4 16h16v2H4zM8 8h.01M12 7h.01M16 8h.01"/></symbol>
-  <symbol id="i-loc-crate" viewBox="0 0 24 24"><rect x="4" y="12" width="16" height="8"/><rect x="7" y="5" width="10" height="7"/><path d="M12 5v15M4 16h16"/></symbol>
-  <symbol id="i-loc-lantern" viewBox="0 0 24 24"><path d="M9 4h6v3H9z"/><path d="M8 7h8l1 10H7z"/><path d="M12 17v3"/><path d="M12 10v4"/></symbol>
-  <symbol id="i-loc-house" viewBox="0 0 24 24"><path d="M4 20V10l8-6 8 6v10z"/><path d="M10 20v-6h4v6"/></symbol>
-  <symbol id="i-loc-school" viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c0 1 2 2 5 2s5-1 5-2v-5"/><path d="M21 9v6"/></symbol>
-  <symbol id="i-loc-package" viewBox="0 0 24 24"><path d="M3 8l9-4 9 4v8l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v8"/></symbol>
-  <symbol id="i-loc-bus" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="12" rx="1"/><path d="M4 12h16M7 17v2M17 17v2"/><circle cx="8" cy="17" r="1.2"/><circle cx="16" cy="17" r="1.2"/></symbol>
-  <symbol id="i-loc-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.4 2.7-5 6-5s6 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 20c0-2.6 1.6-4 4-4"/></symbol>
-  <symbol id="i-loc-book" viewBox="0 0 24 24"><path d="M5 4h6v16H5z"/><path d="M11 4h8v16h-8z"/><path d="M8 8h.01M8 11h.01M15 8h.01"/></symbol>
-  <symbol id="i-loc-scales" viewBox="0 0 24 24"><path d="M12 3v18M6 21h12"/><path d="M4 7h16"/><path d="M4 7l-2 6h4zM20 7l-2 6h4z"/></symbol>
-<symbol id="i-seal" viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 4-3 6-7 8-4-2-7-4-7-8V7z"/><path d="M9 12l2 2 4-4"/></symbol>
-  <symbol id="i-craft" viewBox="0 0 24 24"><path d="M6 10l6-5 6 5v8H6z"/><path d="M9 18v-5h6v5"/></symbol>
-  <symbol id="i-drink" viewBox="0 0 24 24"><path d="M6 4h12l-1 15H7z"/><path d="M8 9h8"/></symbol>
-  <symbol id="i-ammo" viewBox="0 0 24 24"><rect x="9" y="7" width="6" height="12" rx="3"/><path d="M12 3v4"/></symbol>
-  <symbol id="i-snack" viewBox="0 0 24 24"><path d="M7 3h10l-1 18H8z"/><path d="M8 10h8M8 14h8"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="9" cy="9" r="4"/><path d="M11.6 11.6L20 20M17 17l2-2"/></symbol>
-  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="3" y="8" width="15" height="8"/><path d="M20 10v4"/></symbol>
-  <symbol id="i-torch" viewBox="0 0 24 24"><path d="M12 3v5"/><path d="M8 8h8l-2 13h-4z"/></symbol>
-  <symbol id="i-note" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
   <linearGradient id="prismGrad" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#7be0a8"/><stop offset=".3" stop-color="#6bb8ff"/>
-    <stop offset=".58" stop-color="#c79bff"/><stop offset=".82" stop-color="#ffd76b"/>
-    <stop offset="1" stop-color="#ff9ecb"/>
+    <stop offset="0" stop-color="var(--prism-1)"/><stop offset=".3" stop-color="var(--prism-2)"/>
+    <stop offset=".58" stop-color="var(--prism-3)"/><stop offset=".82" stop-color="var(--prism-4)"/>
+    <stop offset="1" stop-color="var(--prism-5)"/>
   </linearGradient>
-  <symbol id="i-b-cheerful" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.9"/><path d="M12 2.6v2.5M12 18.9v2.5M2.6 12h2.5M18.9 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"/></symbol>
-  <symbol id="i-b-loner" viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="2.7"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M18 5.5v13"/></symbol>
-  <symbol id="i-b-keen" viewBox="0 0 24 24"><path d="M12 3.4l1.8 4.8 4.8 1.8-4.8 1.8-1.8 4.8-1.8-4.8L5.4 10l4.8-1.8z"/><path d="M3.2 7.4h2.4M2.4 11.2h2"/></symbol>
-  <symbol id="i-b-stubborn" viewBox="0 0 24 24"><rect x="5.5" y="10.4" width="13" height="9.6" rx="1.6"/><path d="M8.5 10.4V7.8a3.5 3.5 0 0 1 7 0v2.6"/><path d="M12 13.8v2.8"/></symbol>
-  <symbol id="i-b-steady" viewBox="0 0 24 24"><path d="M2.6 19l6-11.4 3.6 6.6L14.6 10l6.8 9z"/></symbol>
-  <symbol id="i-b-impatient" viewBox="0 0 24 24"><path d="M13.6 2.4L5.4 13.2h5.4l-1 8.4 8.2-10.8h-5.4z"/></symbol>
-  <symbol id="i-b-gentle" viewBox="0 0 24 24"><path d="M12 20.3C8.5 17.8 4 14.2 4 10.3 4 8 5.8 6.3 8 6.3c1.7 0 3.2 1 4 2.5.8-1.5 2.3-2.5 4-2.5 2.2 0 4 1.7 4 4 0 3.9-4.5 7.5-8 10z"/></symbol>
-  <symbol id="i-b-suspicious" viewBox="0 0 24 24"><path d="M3 12s3.6-6.3 9-6.3S21 12 21 12s-3.6 6.3-9 6.3S3 12 3 12z"/><circle cx="12" cy="12" r="2.4"/><path d="M4 20L20 4"/></symbol>
 </svg>
 
 <header class="topbar">
   <nav class="top-actions">
-    <button onclick="openExitDialog()">Esc 退出</button>
+    <button id="menuBtn" onclick="openPause()">菜单 ESC</button>
     <button onclick="doSave()">保存</button>
     <button onclick="doRewind()">回溯</button>
   </nav>
@@ -999,73 +1112,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 </header>
 
 <div class="launcher" id="launcher">
-  <div class="dusk-bg" aria-hidden="true">
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#060b12"/>
-          <stop offset="0.40" stop-color="#101f26"/>
-          <stop offset="0.64" stop-color="#2f3430"/>
-          <stop offset="0.80" stop-color="#7a4f27"/>
-          <stop offset="0.90" stop-color="#c9863a"/>
-        </linearGradient>
-        <radialGradient id="glow" cx="0.5" cy="0.85" r="0.6">
-          <stop offset="0" stop-color="#ffcf7a" stop-opacity=".85"/>
-          <stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#d9b27a" stop-opacity="0"/>
-          <stop offset="1" stop-color="#d9b27a" stop-opacity=".26"/>
-        </linearGradient>
-        <g id="hh1"><path d="M-6 34 L34 4 L74 34 Z"/><rect x="2" y="34" width="64" height="56"/><rect class="win" x="14" y="46" width="11" height="14"/><rect class="win b" x="42" y="46" width="11" height="14"/></g>
-        <g id="hh2"><path d="M-6 26 L30 0 L66 26 Z"/><rect x="4" y="26" width="52" height="46"/><rect class="win c" x="14" y="38" width="10" height="12"/><rect x="40" y="-16" width="8" height="18"/></g>
-        <g id="hh3"><path d="M-8 40 L34 6 L76 40 Z"/><rect x="0" y="40" width="68" height="62"/><rect class="win" x="12" y="54" width="11" height="15"/><rect class="win b" x="44" y="54" width="11" height="15"/><rect x="52" y="0" width="9" height="22"/></g>
-      </defs>
-      <rect width="1440" height="900" fill="url(#sky)"/>
-      <circle cx="760" cy="720" r="470" fill="url(#glow)"/>
-      <circle cx="1010" cy="668" r="86" fill="#ffd18c" opacity=".12"/>
-      <circle cx="1010" cy="668" r="58" fill="#ffd18c" opacity=".85"/>
-      <g fill="#0a1216" opacity=".5">
-        <ellipse cx="330" cy="270" rx="300" ry="24"/>
-        <ellipse cx="940" cy="205" rx="360" ry="20"/>
-        <ellipse cx="1240" cy="320" rx="260" ry="18"/>
-      </g>
-      <path d="M0 630 Q 220 560 470 616 T 940 606 T 1440 636 L1440 900 L0 900Z" fill="#0d1a1c"/>
-      <path d="M0 700 Q 300 656 640 690 T 1120 676 T 1440 702 L1440 900 L0 900Z" fill="#091313"/>
-      <g fill="#060d0e">
-        <use href="#hh2" x="150" y="686"/>
-        <use href="#hh1" x="250" y="690"/>
-        <use href="#hh3" x="360" y="682"/>
-        <use href="#hh1" x="470" y="692"/>
-        <g transform="translate(560,600)">
-          <path d="M-16 44 L22 12 L60 44 Z"/>
-          <rect x="-10" y="44" width="64" height="104"/>
-          <rect x="34" y="24" width="6" height="20"/>
-          <circle class="win c" cx="22" cy="78" r="11"/>
-        </g>
-        <use href="#hh3" x="680" y="684"/>
-        <use href="#hh2" x="800" y="690"/>
-        <use href="#hh1" x="900" y="688"/>
-        <use href="#hh2" x="1010" y="692"/>
-        <use href="#hh1" x="1120" y="686"/>
-        <use href="#hh3" x="1230" y="690"/>
-        <use href="#hh2" x="1330" y="688"/>
-      </g>
-      <g class="eyes" fill="#ffb454"><circle cx="1264" cy="744" r="3.4"/><circle cx="1277" cy="744" r="3.4"/></g>
-      <g fill="#08110f">
-        <path d="M60 700 l-34 -70 l-16 70 z"/>
-        <path d="M-10 700 l-30 -58 l-14 58 z"/>
-        <path d="M1390 698 l30 -64 l15 64 z"/>
-        <path d="M1440 700 l28 -54 l13 54 z"/>
-        <path d="M100 738 l-26 -50 l-12 50 z"/>
-        <path d="M1340 740 l26 -52 l12 52 z"/>
-      </g>
-      <ellipse class="fog" cx="720" cy="796" rx="760" ry="70" fill="#c9a877" opacity=".10"/>
-      <ellipse class="fog slow" cx="1180" cy="826" rx="520" ry="46" fill="#c9a877" opacity=".08"/>
-      <rect x="0" y="690" width="1440" height="210" fill="url(#fog)"/>
-      <rect x="0" y="840" width="1440" height="60" fill="#050a0a" opacity=".85"/>
-    </svg>
-  </div>
+  <div class="dusk-bg" aria-hidden="true"></div>
   <section class="lpane on" id="lpaneMain">
     <div class="lpane-inner">
       <p class="mc-eyebrow">Local Shelter · Night Watch</p>
@@ -1091,7 +1138,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   </section>
 
   <section class="lpane" id="lpaneSaves">
-    <div class="lpane-inner" style="max-width:1080px">
+    <div class="lpane-inner tall" style="max-width:1080px">
       <h2 class="mc-h2">选择存档</h2>
       <div class="mc-panel"><div class="save-list" id="saveList">加载中…</div></div>
       <div class="mc-row">
@@ -1128,7 +1175,6 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <div class="mc-row" style="margin-top:0">
           <label class="mc-field">日出回合<input id="setTurns" type="number" min="12" value="32" style="width:96px"></label>
           <label class="mc-field">伪人<select id="setPseudo"></select></label>
-          <label class="mc-field" style="flex-direction:row;align-items:center;gap:6px">随机伪人<input id="setRandom" type="checkbox"></label>
         </div>
       </div>
       <div class="mc-row">
@@ -1158,7 +1204,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   </section>
 
   <section class="lpane" id="lpaneDlc">
-    <div class="lpane-inner" style="max-width:1180px">
+    <div class="lpane-inner tall" style="max-width:1180px">
       <h2 class="mc-h2">资料包</h2>
       <div class="dlc-cols">
         <div class="dlc-col"><h3>可用内容包</h3><div class="dlc-list" id="dlcLeft"></div></div>
@@ -1166,19 +1212,18 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <div class="dlc-col">
           <h3>已启用（上 = 优先级高）</h3>
           <div class="dlc-list" id="dlcRight"></div>
-          <div class="dlc-order"><button class="mc-btn" onclick="dlcMove('up')" title="上移（提高优先级）">&#9650;</button><button class="mc-btn" onclick="dlcMove('down')" title="下移（降低优先级）">&#9660;</button></div>
         </div>
       </div>
       <div class="mc-row">
         <button class="mc-btn p" onclick="applyDlc()">应用</button>
         <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
       </div>
-      <p class="lc-hint" id="dlcHint">左→右＝启用，右→左＝卸载；在右侧选中后用 ▲▼ 调整优先级：越靠上越优先，同 id 内容由高位包覆盖。把包移到 base 之上即可替换内置内容（例如替换某位房客）。</p>
+      <p class="lc-hint" id="dlcHint">左→右＝启用，右→左＝卸载（**双击**任意一行即可快速切换，快捷键）；在右侧点选一行后，行尾出现 ▲▼ 调优先级：越靠上越优先，同 id 内容由高位包覆盖。把包移到 base 之上即可替换内置内容（例如替换某位房客）。</p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneResourcepack">
-    <div class="lpane-inner" style="max-width:1180px">
+    <div class="lpane-inner tall" style="max-width:1180px">
       <h2 class="mc-h2">资源包</h2>
       <div class="dlc-cols">
         <div class="dlc-col"><h3>可用资源包</h3><div class="dlc-list" id="rpLeft"></div></div>
@@ -1186,7 +1231,6 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <div class="dlc-col">
           <h3>已启用（上 = 优先级高）</h3>
           <div class="dlc-list" id="rpRight"></div>
-          <div class="dlc-order"><button class="mc-btn" onclick="rpMove('up')" title="上移（提高优先级）">&#9650;</button><button class="mc-btn" onclick="rpMove('down')" title="下移（降低优先级）">&#9660;</button></div>
         </div>
       </div>
       <div class="mc-row">
@@ -1194,13 +1238,13 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <button class="mc-btn" onclick="lpane('settings')">返回设置</button>
         <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
       </div>
-      <p class="lc-hint" id="rpHint">资源包只改外观（配色 / 字体 / 贴图 / 头像零件 / 封面背景与大标题）；越靠上越优先，低者被高者覆盖。`base` 就是内置材质本身，恒在清单里、不可卸载，但**位次可调**：排在 base 下方的资源包改不动内置材质。资源包总在资料包之后套用，所以能盖过资料包自带的外观。</p>
+      <p class="lc-hint" id="rpHint">资源包只改外观（配色 / 字体 / 贴图 / 头像零件 / 物品图标 / 封面背景与大标题）；**双击**任意一行可在"可用 / 已启用"之间快速切换；点选已启用的一行后，行尾出现 ▲▼ 调位次。越靠上越优先，低者被高者覆盖。`base` 就是内置材质本身，恒在清单里、不可卸载，但**位次可调**：排在 base 下方的资源包改不动内置材质。资源包总在资料包之后套用，所以能盖过资料包自带的外观。</p>
       <p class="lc-hint dim mono" id="rpPath" style="font-size:11px"></p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneCreate">
-    <div class="lpane-inner" style="max-width:780px">
+    <div class="lpane-inner tall" style="max-width:780px">
       <h2 class="mc-h2">创建新对局</h2>
       <div class="mc-panel">
         <label class="mc-field">存档名称<input id="cName" maxlength="40" placeholder="例如：第一次尝试"></label>
@@ -1209,7 +1253,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <div class="mc-row" style="margin-top:6px">
           <label class="mc-field">日出回合<input id="cTurns" type="number" min="12" value="32" style="width:110px"></label>
           <label class="mc-field">伪人<select id="cPseudo"></select></label>
-          <label class="mc-field" style="flex-direction:row;align-items:center;gap:6px">随机伪人<input id="cRandom" type="checkbox"></label>
+          <label class="mc-field">地图<select id="cMap"></select></label>
         </div>
         <div class="mc-row">
           <button class="mc-btn p" onclick="confirmCreate()">创建并开始</button>
@@ -1264,7 +1308,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   <!-- 避难所 -->
   <section class="board">
     <div class="board-topline">
-      <div><span class="eyebrow">SAFEHOUSE FLOOR</span><h2>避难所</h2></div>
+      <div><span class="eyebrow">SAFEHOUSE FLOOR</span><h2 id="homeName">城郊小屋</h2></div>
       <div class="turn-controls">
         <button onclick="showDoor()">处理门口</button>
         <button id="searchBtn" onclick="showSearch()">指派搜索</button>
@@ -1356,6 +1400,9 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 
 <div class="tip-layer" id="tipLayer"></div>
 
+<!-- 专属面板（内容声明 PANEL 的房客才有）：独立浮窗，比居中的弹窗略偏左；无遮罩，仓库照常可拖 -->
+<div class="panel-float" id="panelFloat" hidden></div>
+
 <div class="mask" id="mask">
   <div class="dialog" id="dialog">
     <div class="dhead"><svg class="ic"><use href="#i-info"/></svg><b class="mono" id="dTitle">事件</b>
@@ -1365,6 +1412,19 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
       <button class="btn p" onclick="confirmDialog()">确认</button></div>
   </div>
 </div>
+
+<!-- 游戏内 Esc：MC 风「桌面」。长条=退出游戏；短的两个并排（左右外缘与长条齐平）；返回游戏。 -->
+<section class="pause" id="pauseMenu">
+  <div class="pause-panel">
+    <h2 class="mc-h2">游戏菜单</h2>
+    <button class="mc-btn wide" onclick="exitToMenu()">退出游戏</button>
+    <div class="pause-row">
+      <button class="mc-btn" onclick="pausePane('settings')">设置</button>
+      <button class="mc-btn" onclick="pausePane('codex')">图鉴</button>
+    </div>
+    <button class="mc-btn wide p" onclick="closePause()">返回游戏</button>
+  </div>
+</section>
 
 <script>
 /* UI 只认识这份假 state；真实实现里它来自 /api/state */
@@ -1547,15 +1607,18 @@ function tenantDetailHtml(id){
   const markLines=slotHtml(t.slot||[]);
   const abil=(t.abilities||[]).map(a=>{
     const chips=(a.chips||[]).map(c=>`<span class="badge chip-note">${esc(c)}</span>`).join("");
-    const usable = a.kind==="主动" && !a.disabled && !a.used && !(a.cooldown>0);
-    const state = a.disabled?`<span class="badge seal">已封印</span>`
+    /* 只负责打开专属面板的技能：渲染成开 / 关，点击**不走** use_ability（引擎也不结算它）。 */
+    const panelSkill = !!a.opens_panel;
+    const usable = panelSkill || (a.kind==="主动" && !a.disabled && !a.used && !(a.cooldown>0));
+    const state = panelSkill?`<span class="badge">${PANEL_OPEN===t.id?"已打开":"打开界面"}</span>`
+      :(a.disabled?`<span class="badge seal">已封印</span>`
       :(a.cooldown>0?`<span class="badge">冷却 ${a.cooldown}</span>`
-      :(a.used?`<span class="badge">本回合已用</span>`:""));
+      :(a.used?`<span class="badge">本回合已用</span>`:"")));
     /* 技能栏本体即按钮：可用=抬起可点；本回合不可用=按下未回弹；被动=普通条目。 */
     const cls = a.disabled ? " disabled locked" : (usable ? " usable" : (a.kind==="主动" ? " locked" : ""));
     /* 整条技能栏都是按钮：可用才真正发动；不可用（冷却/已用/封印/被动）也只**吞掉点击**，
        不再冒泡到详情页的「点空白返回缩略」——否则点技能会莫名退回席位。 */
-    const click = ` onclick="event.stopPropagation();${usable?`useAbility(${t.id},'${a.id}')`:""}"`;
+    const click = ` onclick="event.stopPropagation();${panelSkill?`togglePanel(${t.id})`:(usable?`useAbility(${t.id},'${a.id}')`:"")}"`;
     /* 显示设置关掉「完整技能」时：只留一行（名称+chip），悬浮 1 秒看效果。 */
     if(!SETTINGS.show_full_skills){
       return `<div class="ability compact${cls}"${click} onmouseenter="abilityHoverStart(event,${t.id},'${a.id}')" onmouseleave="abilityHoverEnd()">
@@ -1626,17 +1689,23 @@ function tenantCardHtml(t){
     </div>
     <div class="chips" onmouseover="statusZoneOver(event,${t.id})" onmouseout="hideTip()">${chips}</div></div>`;
 }
+/* 格子里画什么：图标 + 名字 + 数量 + 耐久条。仓库/背包/专属面板共用这一份。 */
+function slotInner(item){
+  const [i,n,q,c,stack]=item;
+  const dur=item[10]||0, dmax=item[11]||0;
+  const pct=dmax>0?Math.max(0,Math.min(100,Math.round(dur/dmax*100))):0;
+  const dcls=pct<=25?"crit":(pct<=55?"low":"");
+  const durBar=dmax>0?`<span class="dur" title="耐久 ${dur}/${dmax}"><i class="${dcls}" style="width:${pct}%"></i></span>`:"";
+  return itemIcon(item[12],i,"q"+q)+'<span class="n">'+n+'</span>'+((stack&&c>1)?'<span class="c">×'+c+'</span>':'')+durBar;
+}
 function slotCell(item,index,kind){
   const drop = kind ? ' ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="'+(kind==="wh"?("dropOnWarehouse(event,"+index+")"):("dropOnBackpack(event,"+index+")"))+'"' : "";
   if(!item) return '<div class="slot empty"'+drop+'></div>';
   const [i,n,q,c,stack,itemId]=item;
   const dur=item[10]||0, dmax=item[11]||0;
-  const pct=dmax>0?Math.max(0,Math.min(100,Math.round(dur/dmax*100))):0;
-  const dcls=pct<=25?"crit":(pct<=55?"low":"");
-  const durBar=dmax>0?`<span class="dur" title="耐久 ${dur}/${dmax}"><i class="${dcls}" style="width:${pct}%"></i></span>`:"";
   const drag = (kind && !(kind==="bp"&&BP_LOCKED)) ? ' draggable="true" ondragstart="onDragStart(event,\''+esc(itemId)+'\',\''+esc(n)+'\',\''+kind+'\','+index+')" ondragend="onDragEnd()"' : "";
   return '<div class="slot q'+q+'"'+drag+drop+' onmouseenter="showItemTip(this,\''+esc(n)+'\','+q+','+dur+','+dmax+')" onmouseleave="hideTip()" onclick="showItemUse(\''+esc(itemId)+'\',\''+kind+'\','+index+')">'
-    + itemIcon(item[12],i,"q"+q)+'<span class="n">'+n+'</span>'+((stack&&c>1)?'<span class="c">×'+c+'</span>':'')+durBar+'</div>';
+    + slotInner(item)+'</div>';
 }
 function renderWarehouse(){
   const used=STATE.warehouse.filter(x=>x).length;
@@ -1665,6 +1734,116 @@ function setBpCollapsed(collapsed){
   if(b) b.textContent=collapsed?"▴":"▾";
 }
 function toggleBp(){ const f=$("bpFloat"); if(f) setBpCollapsed(!f.classList.contains("collapsed")); }
+/* ---- 专属面板（内容声明 PANEL）：随时能开、看完能关；动作名由内容定，前端只负责转发 ---- */
+let PANEL_OPEN=null;
+function panelTenant(){ return (STATE.tenants||[]).find(t=>t.id===PANEL_OPEN)||null; }
+function togglePanel(id){ PANEL_OPEN=(PANEL_OPEN===id)?null:id; renderPanel(); renderTenants(); }
+function closePanel(){ if(PANEL_OPEN===null) return; PANEL_OPEN=null; renderPanel(); renderTenants(); }
+function postPanelAction(tid,action,extra){
+  postAction(Object.assign({type:"panel",tenant_id:tid,panel_action:action},extra||{}));
+}
+function panelSlotHtml(tid,s){
+  if(!s) return '<div class="slot empty"></div>';
+  const drop=s.onDrop?` ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="dropOnPanel(event,${s.group},'${s.role}')"`:"";
+  const drag=s.onTake?` draggable="true" ondragstart="onPanelDragStart(event,${tid},${s.group},'${s.onTake}')" ondragend="onDragEnd()"`:"";
+  const e=s.entry, tip=e?` onmouseenter="showItemTip(this,'${esc(e[1])}',${e[2]},${e[10]||0},${e[11]||0})" onmouseleave="hideTip()"`:"";
+  return `<div class="slot${e?" q"+e[2]:""}${s.locked?" locked":""}"${drag}${drop}${tip} title="${esc(s.label||"")}">`
+    +(e?slotInner(e):'<span class="dim">空</span>')+'</div>';
+}
+/* 一块地一框：地格 + 信息（生长 / 湿润度 / 状态）+ 产物格，都框在里面。 */
+function panelGridHtml(tid,p){
+  const groups=[...new Set((p.slots||[]).map(s=>s.group))].sort((a,b)=>a-b);
+  return groups.map(g=>{
+    const pick=r=>(p.slots||[]).find(s=>s.group===g&&s.role===r);
+    const seed=pick("seed"), prod=pick("product");
+    const info=seed?slotHtml(seed.rows||[]):"";
+    return `<div class="pf-plot">${panelSlotHtml(tid,seed)}`
+      +`<div class="panel-slot pf-info">${info}</div>${panelSlotHtml(tid,prod)}</div>`;
+  }).join("");
+}
+function renderPanel(){
+  const box=$("panelFloat"); if(!box) return;
+  const t=panelTenant(), p=t&&t.panel;
+  if(!p){ PANEL_OPEN=null; box.hidden=true; box.innerHTML=""; return; }
+  box.hidden=false;
+  const back=p.backdrop?`<div class="pf-back"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${p.backdrop}</svg></div>`:"";
+  const acts=(p.actions||[]).map(a=>`<button class="btn${a.enabled?"":" locked"}" title="${esc(a.hint||"")}"`
+    +(a.enabled?` onclick="postPanelAction(${t.id},'${esc(a.id)}',{})"`:"")+`>${esc(a.label)}</button>`).join("");
+  box.innerHTML=`<div class="head"><span class="eyebrow">FIELD</span><h3>${esc(p.title||"")}</h3>${acts}`
+    +`<button class="btn" onclick="closePanel()">关闭</button></div>`
+    +`<div class="body">${back}`
+    +(p.prompt?`<div class="pf-prompt">${fmt(p.prompt)}</div>`:"")
+    +((p.rows||[]).length?`<div class="panel-slot">${slotHtml(p.rows)}</div>`:"")
+    +`<div class="pf-grid">${panelGridHtml(t.id,p)}</div></div>`;
+  box.onclick=panelBlankClick;
+  /* 位置：按视口比例记住（角色 id 为 key）；没记过就用 CSS 的默认位。 */
+  const saved=(SETTINGS.panel_pos||{})[t.character_id];
+  box.style.left=Array.isArray(saved)?(saved[0]*100).toFixed(2)+"vw":"";
+  box.style.top=Array.isArray(saved)?(saved[1]*100).toFixed(2)+"vh":"";
+  const head=box.querySelector(".head");
+  if(head) head.onmousedown=panelDragStart;
+}
+/* 按住标题栏拖动浮窗；松开时把位置记进对局外设置（视口比例）。 */
+let PANEL_DRAG=null, PANEL_DRAG_TS=0;
+function panelDragStart(ev){
+  if(!SETTINGS.panel_draggable) return;
+  if(ev.target.closest(".btn")) return;
+  const box=$("panelFloat"); if(!box) return;
+  const r=box.getBoundingClientRect();
+  PANEL_DRAG={dx:ev.clientX-r.left,dy:ev.clientY-r.top,
+    sx:ev.clientX,sy:ev.clientY,moved:false,at:Date.now()};
+  box.classList.add("dragging");
+  ev.preventDefault();
+}
+function panelDragMove(ev){
+  if(!PANEL_DRAG) return;
+  const box=$("panelFloat"); if(!box) return;
+  if(Math.abs(ev.clientX-PANEL_DRAG.sx)+Math.abs(ev.clientY-PANEL_DRAG.sy)>3) PANEL_DRAG.moved=true;
+  const left=Math.min(Math.max(0,ev.clientX-PANEL_DRAG.dx),Math.max(0,innerWidth-box.offsetWidth));
+  const top=Math.min(Math.max(0,ev.clientY-PANEL_DRAG.dy),Math.max(0,innerHeight-box.offsetHeight));
+  box.style.left=left+"px"; box.style.top=top+"px";
+}
+function panelDragEnd(){
+  if(!PANEL_DRAG) return;
+  const moved=PANEL_DRAG.moved||(Date.now()-PANEL_DRAG.at>300);
+  PANEL_DRAG=null;
+  const box=$("panelFloat"); if(!box) return;
+  box.classList.remove("dragging");
+  if(!moved) return;                 // 没拖动也没长按 = 真·点击，交给留白处理器去关
+  PANEL_DRAG_TS=Date.now();
+  const t=panelTenant(); if(!t) return;
+  const r=box.getBoundingClientRect();
+  SETTINGS.panel_pos=Object.assign({},SETTINGS.panel_pos,{[t.character_id]:[r.left/innerWidth,r.top/innerHeight]});
+  api("/api/settings",{panel_pos:SETTINGS.panel_pos}).catch(()=>{});
+}
+document.addEventListener("mousemove",panelDragMove);
+document.addEventListener("mouseup",panelDragEnd);
+/* 点面板留白关掉；**拖拽中不生效** —— 免得往里拖东西时手一滑把界面关了。 */
+function panelBlankClick(ev){
+  if(_dragItem) return;
+  const t=ev.target;
+  /* 标题栏是"抓手"：点它不关。拖完松开时浏览器会补一个 click，
+     这一条把"长按/拖动后松开"和"点一下留白"分开。 */
+  if(t.closest(".head")||t.closest(".slot")||t.closest(".panel-slot")||t.closest(".btn")) return;
+  if(PANEL_DRAG||(PANEL_DRAG_TS&&Date.now()-PANEL_DRAG_TS<300)) return;
+  closePanel();
+}
+function onPanelDragStart(ev,tid,group,action){
+  hideTip();
+  _dragItem="panel";
+  _dragSrc={kind:"panel",tenant:tid,slot:group,itemId:"",action:action};
+  if(ev.dataTransfer){ ev.dataTransfer.setData("text/plain",""); ev.dataTransfer.effectAllowed="move"; }
+}
+function dropOnPanel(ev,group,role){
+  ev.preventDefault(); ev.currentTarget.classList.remove("drop");
+  const src=_dragSrc; onDragEnd();
+  const t=panelTenant(); if(!t||!t.panel) return;
+  const slot=(t.panel.slots||[]).find(s=>s.group===group&&s.role===role);
+  if(!slot||!slot.onDrop) return;
+  if(!src||!src.itemId){ toast("从仓库或背包里拖一件物资过来。","err"); return; }
+  postPanelAction(t.id,slot.onDrop,{slot:group,item_id:src.itemId,
+    source:{kind:src.kind,tenant:src.tenant,slot:src.slot}});
+}
 /* 外出搜索：贴底悬浮窗；右上角三角切换展开/收起（无人工干预时有任务就自动冒上来）。 */
 let MISSIONS_MANUAL=null;
 function setMissions(open){
@@ -1715,7 +1894,7 @@ function renderIntel(){
         <span class="chip mono">${esc(x.remain||"")}</span>
         <span class="chev">▾</span></div>
       <div class="acc-body"><div class="it-desc">${x.desc?fmt(x.desc):'<span class="dim">（暂无说明）</span>'}</div></div></div>`).join("")
-      :'<div class="dim" style="padding:10px;color:#8f7f63">（当前没有全局事件）</div>';
+      :'<div class="dim" style="padding:10px;color:var(--ink3)">（当前没有全局事件）</div>';
     return;
   }
   const label={pending:"待验证",true:"已证实",false:"已证伪",expired:"已失效"};
@@ -1733,9 +1912,11 @@ function renderIntel(){
 }
 const D={mask:null,dialog:null};
 let _confirmCb=null;
-function openDialog(title,sub,html,wide,cb,hideFoot){
+/* `bare`：**不要背景板**（「发现」用）—— 只把外面的场面调暗，内容直接浮在上面。 */
+function openDialog(title,sub,html,wide,cb,hideFoot,bare){
   $("dTitle").textContent=title; $("dSub").textContent=sub||""; $("dBody").innerHTML=html;
-  $("dialog").className="dialog"+(wide?" wide":""); _confirmCb=cb||null;
+  $("dialog").className="dialog"+(wide?" wide":"")+(bare?" bare":""); _confirmCb=cb||null;
+  $("mask").classList.toggle("bare", !!bare);
   const foot=document.querySelector("#dialog .dfoot"); if(foot) foot.style.display=hideFoot?"none":"flex";
   $("mask").classList.add("on");
   // 一切"发现/待处理"类弹窗都可先收起看场面（浮动按钮可重新打开）。
@@ -1743,7 +1924,8 @@ function openDialog(title,sub,html,wide,cb,hideFoot){
   const cancelBtn=$("dCancel"); if(cancelBtn) cancelBtn.style.display=pend?"none":"";
   syncPeek();
 }
-function closeDialog(){ $("mask").classList.remove("on"); _confirmCb=null; syncPeek(); }
+function closeDialog(){ $("mask").classList.remove("on"); $("mask").classList.remove("bare");
+  _confirmCb=null; syncPeek(); }
 function confirmDialog(){ const cb=_confirmCb; _confirmCb=null; $("mask").classList.remove("on"); if(cb) cb(); }
 
 /* ---- 屋主直接驱逐：系统只下发「可否驱逐 + 风险」，按钮与弹窗由前端通用渲染 ---- */
@@ -1857,42 +2039,36 @@ function linkTags(html){
 }
 function fmt(s){ return linkTags(mdText(s)); }
 /* 头像：琥珀主色 + 少量低饱和装饰色（细环 / 角点 / 底弧）。 */
-function avatarHash(id){ let x=0; const s=String(id||""); for(let i=0;i<s.length;i++) x=(x*31+s.charCodeAt(i))>>>0; return x; }
-const AVATAR_ACCENTS=["#6fb3a6","#c98aa0","#8fa0d8","#c9a86a","#8fb98a","#b58ad8","#d89a8a","#7fb0c9","#a8c98a","#c98ac9"];
-const AVATAR_FEATURES=["i-ft-hat","i-ft-cap","i-ft-hood","i-ft-glasses","i-ft-mask","i-ft-scarf","i-ft-ponytail","i-ft-headphones","i-ft-flower","i-ft-crown","i-ft-eyepatch","i-ft-bandage","i-ft-antenna","i-ft-earring"];
 function artImg(art,cls){ return `<img class="art-img ${cls||""}" src="${art}" alt="">`; }
 function iconOrArt(art,iconId,cls){ return art ? artImg(art,cls) : ic(iconId,cls||""); }
-/* 物资图标：**底色 + 品质色**——外置图当"底色"（mask 取形状），颜色由所在品质类给定。 */
-function itemIcon(art,iconId,qualityCls){
-  return art
-    ? `<span class="art-mask ${qualityCls||""}" style="--art:url('${art}')"></span>`
+/* 物资图标：内容层下发的**内联标记**（大部分近白底色 + 少量品质色特征，颜色后端已定好）；
+   物品没有图标文件时回退内置 i-* 零件（品质类给轮廓/点缀色）。 */
+function itemIcon(svg,iconId,qualityCls){
+  return svg
+    ? `<span class="art-inline ${qualityCls||""}">${svg}</span>`
     : ic(iconId, qualityCls||"");
 }
 /* 头像 = 整张图（外置美术 / 资源包的 avatars/characters）→ 否则「形状 × 专属特征 × 点缀色」组装。
-   组装件与点缀色由后端解析下发（avatar_parts：full/shape/feature/accent/decor）；
+   组装件由后端解析下发（avatar_parts：full/shape/feature/use_parts）；
    后端不可用时回退到内置图标 + id 哈希（保证旧进程也能看）。 */
 function avatarIcon(id,av,cls,art,parts){
   const p=parts||{};
   if(p.full) return artImg(p.full,"av-img "+(cls||""));
   /* 包声明了"零件组装"（avatar_mode=parts）时，立绘要让位 —— 否则和风那套永远看不到。 */
   if(art && !p.use_parts) return artImg(art,"av-img "+(cls||""));
+  /* 组装件：用了色槽的零件由后端替换颜色后内联；否则走"蒙版 + 主题色"。
+     （点缀环/点缀色已废弃，这里只拼"形状 × 特征"。） */
   if(p.shape||p.shape_svg){
-    const ac=p.accent||"#9aa79f";
-    /* 用了色槽的零件：后端把 var(--a/b/c) 换成具体颜色后内联；否则走"蒙版 + 主题色"。 */
     const shape=p.shape_svg
       ? `<span class="av-svg av-shape">${p.shape_svg}</span>`
       : `<span class="art-mask av-shape" style="--art:url('${p.shape}')"></span>`;
     const ft=p.feature_svg
       ? `<span class="av-svg av-ft">${p.feature_svg}</span>`
-      : (p.feature ? `<span class="art-mask av-ft" style="--art:url('${p.feature}');color:${ac}"></span>` : "");
-    return `<span class="av-wrap"><span class="av-accent ${p.decor||"ring"}" style="--ac:${ac}"></span>`
-      +`${shape}${ft}</span>`;
+      : (p.feature ? `<span class="art-mask av-ft" style="--art:url('${p.feature}')"></span>` : "");
+    return `<span class="av-wrap">${shape}${ft}</span>`;
   }
-  const hh=avatarHash(id);
-  const ac=AVATAR_ACCENTS[hh%AVATAR_ACCENTS.length];
-  const decor=["ring","dot","arc"][hh%3];
-  const ft=AVATAR_FEATURES[(hh>>>3)%AVATAR_FEATURES.length];
-  return `<span class="av-wrap"><span class="av-accent ${decor}" style="--ac:${ac}"></span>${ic(av||"i-person",cls||"")}<span class="av-ft" style="color:${ac}">${ic(ft)}</span></span>`;
+  /* 后端没下发 parts 时的兜底：只画形状图标。 */
+  return `<span class="av-wrap">${ic(av||"i-person",cls||"")}</span>`;
 }
 function showTagTip(el,label){
   const list=(tagIndexMap()[label])||[], L=$("tipLayer");
@@ -1945,12 +2121,76 @@ function card(tag,title,desc){return `<div class="card" onclick="closeDialog()">
   <span class="dim" style="font-size:11.5px;text-align:center">${desc}</span></div>`;}
 function toggleAcc(el){ el.parentNode.classList.toggle("open"); }
 function pickCard(el){ el.parentNode.querySelectorAll(".card").forEach(c=>c.classList.remove("sel")); el.classList.add("sel"); }
-function pickUnit(el){ el.parentNode.querySelectorAll(".pick-card").forEach(c=>c.classList.remove("sel")); el.classList.add("sel"); }
-function renderAll(){renderBondStrip();renderTenants();renderWarehouse();renderBackpack();renderMissions();renderIntel();renderLog();renderPbar();renderHud();syncSearchBtn();}
+/* 选择类弹窗的公共零件：统一卡片语言 + "读到当前选中项"。 */
+function pickUnit(el){
+  const box=el.parentNode; if(box) [...box.children].forEach(c=>c.classList.remove("sel"));
+  el.classList.add("sel");
+}
+function pickedEl(){ return document.querySelector("#dBody .pick-card.sel, #dBody .card.sel"); }
+/* 房客卡：头像 + 生命/理智 + 性格（技能目标、指派搜索、使用物资共用同一张）。 */
+function tenantChoiceCard(t,extra){
+  const hp=vitalBar(t.hp,t.hp_max||100,"hp"), san=vitalBar(t.san,t.san_max||100,"san");
+  return `<div class="card${t.searching?" busy":""}" data-id="${t.id}" onclick="pickUnit(this)">
+    <span class="cn">#${String(t.id).padStart(2,"0")}</span>
+    <span class="dc-av">${avatarIcon(t.character_id,t.avatar,"lg",t.art,t.avatar_parts)}</span>
+    <span class="dc-name"><b>${esc(t.name)}</b></span>
+    <span class="ch-vitals">
+      <span class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></span>
+      <span class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></span>
+    </span>
+    <span class="ch-persona">${personaHtml(t)}</span>
+    ${t.searching?'<span class="tag search">搜索中</span>':""}${extra||""}</div>`;
+}
+/* 小卡选项：图标 / 名称 / 说明。图标与说明由**内容层**在 options 的第 3、4 项声明，
+   没声明就给一个中性图标（前端不猜内容语义）。 */
+function optChoiceCard(value,label,icon,desc){
+  return `<div class="card" data-val="${esc(value)}" onclick="pickUnit(this)">
+    <span class="dc-av">${ic(icon||"i-b-steady","lg")}</span>
+    <span class="dc-name"><b>${esc(label)}</b></span>
+    ${desc?`<span class="dc-desc">${esc(desc)}</span>`:""}</div>`;
+}
+/* 横条卡：给"要读效果文本"的选择用（例如模仿谁的主动能力）。 */
+function barChoiceCard(value,icon,title,desc){
+  return `<div class="card wide" data-val="${esc(value)}" onclick="pickUnit(this)">
+    <span class="dc-av">${ic(icon||"i-gear","lg")}</span>
+    <span class="dc-main"><span class="dc-name"><b>${esc(title)}</b></span>
+    ${desc?`<span class="dc-desc">${esc(desc)}</span>`:""}</span></div>`;
+}
+/* 数量选择：步进 + 滑杆 + 格数条（比裸 input 直观）。 */
+function amountBox(spec){
+  const max=Math.max(1,Number(spec.amount_max)||1);
+  return `<div class="amount-box">
+      <button class="amt-btn" type="button" id="amtMinus" onclick="amtStep(-1)">−</button>
+      <input class="amt-num" id="abAmount" type="number" min="1" max="${max}" value="1" oninput="amtSync('num')">
+      <button class="amt-btn" type="button" id="amtPlus" onclick="amtStep(1)">＋</button>
+    </div>
+    <input class="amt-range" id="amtRange" type="range" min="1" max="${max}" value="1" oninput="amtSync('range')">
+    <div class="amt-bar" id="amtBar">${Array.from({length:max},(_,i)=>`<i data-i="${i}"></i>`).join("")}</div>
+    <div style="text-align:center;font-size:11px;color:var(--ink3);margin-top:8px">${esc(spec.amount_label||"数量")}（最多 ${max}）</div>`;
+}
+function amtClamp(v){
+  const num=$("abAmount"); const max=num?Math.max(1,Number(num.max)||1):1;
+  return Math.max(1,Math.min(max,Number(v)||1));
+}
+/* `from` 指明这次是谁变了：滑杆就用滑杆的值，输入框就用输入框的值（别互相打架）。 */
+function amtSync(from){
+  const num=$("abAmount"), rng=$("amtRange"); if(!num) return;
+  const v=amtClamp(from==="range"&&rng ? rng.value : num.value);
+  if(rng) rng.value=v;
+  if(from!=="num" || document.activeElement!==num) num.value=v;
+  const bar=$("amtBar"); if(bar) [...bar.children].forEach((c,i)=>c.classList.toggle("on",i<v));
+  const minus=$("amtMinus"), plus=$("amtPlus");
+  const max=Math.max(1,Number(num.max)||1);
+  if(minus) minus.disabled=v<=1; if(plus) plus.disabled=v>=max;
+}
+function amtStep(d){ const num=$("abAmount"); if(!num) return; num.value=amtClamp((Number(num.value)||1)+d); amtSync("num"); }
+function renderAll(){renderBondStrip();renderTenants();renderWarehouse();renderBackpack();renderPanel();renderMissions();renderIntel();renderLog();renderPbar();renderHud();syncSearchBtn();}
 
 /* ================= 真实接口接线（覆盖同名 demo 函数） ================= */
 function renderHud(){
   const s=STATE||{}, pd=s.pseudo||{};
+  /* 屋子名字来自内容层（将来是"地图"的名字）：前端不写死。 */
+  const hn=$("homeName"); if(hn&&s.home&&s.home.name) hn.textContent=s.home.name;
   const phaseName={created:"开局",action:"行动",turn_end:"结算",between_turns:"间歇",finished:"结束"}[s.phase]||s.phase||"-";
   $("hudTurn").textContent=(s.turn||0)+" / "+(s.max_turns||32);
   $("hudDiff").textContent=s.difficulty||"-";
@@ -2070,7 +2310,8 @@ function exportSelected(){
 }
 async function refresh(){ try{ const r=await api("/api/state"); mergeState(r.state); appendLog(r.messages); }catch(e){} }
 let MENU=null, SAVES=[], SEL_SAVE=null, SEL_DLC=null;
-let SETTINGS={difficulty:"a0",max_turns:32,pseudo:"",random_pseudo:false,show_full_skills:true};
+let SETTINGS={difficulty:"a0",max_turns:32,pseudo:"",random_pseudo:false,show_full_skills:true,
+  panel_draggable:true,panel_pos:{}};
 let DLC_ENABLED=new Set();
 /* 内容包优先级：完整启用序列（高 → 低），恒含 "base"；DLC_ENABLED 由它派生。 */
 let PACK_ORDER=["base"];
@@ -2102,7 +2343,13 @@ function enterGame(){
 }
 let GAME_ACTIVE=false;
 function resumeGame(){ enterGame(); maybePending(); }
-function hasPending(){ const p=STATE&&STATE.pending; return !!(p&&(p.interaction||(p.choice&&p.choice.options&&p.choice.options.length))); }
+/* 待选只拦**游戏内**的操作：回到启动器时不该被它挡住
+   （否则在开局「发现」里强退后，"开始游戏"等按钮会全部点不动）。 */
+function hasPending(){
+  if($("launcher") && $("launcher").classList.contains("on")) return false;
+  const p=STATE&&STATE.pending;
+  return !!(p&&(p.interaction||(p.choice&&p.choice.options&&p.choice.options.length)));
+}
 function syncPeek(){
   const b=$("pendingBtn"); if(!b) return;
   if(!hasPending()){ b.style.display="none"; return; }
@@ -2120,6 +2367,8 @@ async function showStart(){ return openLauncher(); }
 /* ---- 拼贴标题：报纸剪字（方块底 + 大小/位移/旋转微扰）；？！并排在右 ---- */
 function renderScrapTitle(){
   const host=document.querySelector(".mc-title"); if(!host) return;
+  /* 纸墨色是**材质包**的一部分：只认 token（base 的 `:root` 兜底块保证一定有值）。 */
+  const tok=(name)=>getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const rnd=(a,b)=>a+Math.random()*(b-a);
   const base=Math.max(36,Math.min(72,Math.round(window.innerWidth*0.062)));
   /* 标题每次加载都会随机字号/位移；**把整块的占位高度固定住**，
@@ -2129,8 +2378,9 @@ function renderScrapTitle(){
   host.style.height=Math.round(base*2.95)+"px";
   const enLine=document.querySelector("#titleEn");
   if(enLine) enLine.style.height=Math.round(base*0.75)+"px";
-  const paper=["#e9e3cf","#e3dcc4","#ded6bd","#ece6d3","#e6dfc8"];
-  const inks=["#241f18","#2b2419","#1d1913","#332a1c"];
+  const paper=[tok("--title-paper-1"),tok("--title-paper-2"),tok("--title-paper-3"),
+               tok("--title-paper-4"),tok("--title-paper-5")];
+  const inks=[tok("--title-ink-1"),tok("--title-ink-2"),tok("--title-ink-3"),tok("--title-ink-4")];
   const cn=host.querySelector(".title-cn");
   if(cn){
     const lines=["完蛋，","我被伪人包围了"];
@@ -2140,7 +2390,7 @@ function renderScrapTitle(){
         const size=base*(big?rnd(1.24,1.42):rnd(0.9,1.12));
         const dx=rnd(-0.05,0.05)*base, dy=rnd(-0.08,0.08)*base, rot=rnd(-6,6);
         let ink;
-        if("包围".includes(ch)) ink=(Math.random()<0.5?"#6f2c25":"#274a33");
+        if("包围".includes(ch)) ink=(Math.random()<0.5?tok("--title-ink-accent-1"):tok("--title-ink-accent-2"));
         else ink=inks[(ci+li)%inks.length];
         const bg=paper[(ci*2+li)%paper.length];
         return '<span class="title-ch" style="font-size:'+size.toFixed(1)+'px;color:'+ink+';background:'+bg+';'
@@ -2178,8 +2428,10 @@ window.addEventListener("resize",()=>{ clearTimeout(_pxTimer); _pxTimer=setTimeo
 async function openLauncher(){
   $("launcher").classList.add("on");
   try{ const r=await api("/api/menu"); MENU=r.menu||{}; }catch(e){ MENU=MENU||{}; }
+  CODEX=null;                  // 回到启动器后内容/外观可能已变：图鉴下次打开时重取
   const s=(MENU&&MENU.settings)||{};
-  SETTINGS={difficulty:s.difficulty||"a0",max_turns:s.max_turns||32,pseudo:s.pseudo||"",random_pseudo:!!s.random_pseudo,show_full_skills:s.show_full_skills!==false};
+  SETTINGS={difficulty:s.difficulty||"a0",max_turns:s.max_turns||32,pseudo:s.pseudo||"",random_pseudo:!!s.random_pseudo,show_full_skills:s.show_full_skills!==false,
+    panel_draggable:s.panel_draggable!==false,panel_pos:s.panel_pos||{}};
   PACK_ORDER=(s.pack_order&&s.pack_order.length?s.pack_order.slice():["base"]).map(String);
   DLC_ENABLED=new Set((s.enabled_dlc||[]).map(String));
   syncPackState();
@@ -2200,7 +2452,7 @@ async function loadSaves(){
 function fmtDate(t){ return t?String(t).replace("T"," ").slice(0,16):"—"; }
 function renderSaves(){
   const box=$("saveList");
-  if(!SAVES.length){ box.innerHTML='<div class="dim" style="padding:22px;text-align:center;color:#8f7f63">还没有存档。点击「创建新对局」开始一段新的夜晚。</div>'; return; }
+  if(!SAVES.length){ box.innerHTML='<div class="dim" style="padding:22px;text-align:center;color:var(--ink3)">还没有存档。点击「创建新对局」开始一段新的夜晚。</div>'; return; }
   box.innerHTML=SAVES.map((s,i)=>`<div class="save-row${i===SEL_SAVE?" sel":""}" onclick="selectSave(${i})" ondblclick="selectSave(${i});loadSelected()">
     <div class="save-ico">SAVE</div>
     <div class="save-main"><b>${esc(s.name)}</b>
@@ -2231,7 +2483,11 @@ function renderCreate(){
   const ps=(MENU&&MENU.pseudos)||[];
   $("cPseudo").innerHTML='<option value="">（随机）</option>'+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
   $("cTurns").value=SETTINGS.max_turns;
-  $("cRandom").checked=SETTINGS.random_pseudo;
+  /* 地图（区域包）：默认选内容层标记为 default 的那张（城郊小镇）。 */
+  const maps=(MENU&&MENU.maps)||[];
+  const cur=$("cMap").value;
+  $("cMap").innerHTML=maps.map(m=>`<option value="${esc(m.id)}"${(cur?m.id===cur:m.default)?" selected":""}>${esc(m.name)}（屋子：${esc(m.shelter)}）</option>`).join("")
+    ||'<option value="">（默认）</option>';
   $("cSeed").value="";
   const box=$("cName"); box.value=defaultSaveName(); box.focus(); box.select();
   $("cHint").textContent=(DLC_ENABLED.size?("内容包："+[...DLC_ENABLED].join("、")):"未启用额外内容包");
@@ -2239,12 +2495,13 @@ function renderCreate(){
 async function confirmCreate(){
   const name=$("cName").value.trim()||defaultSaveName();
   const seed=$("cSeed").value.trim();
-  /* 「随机伪人」勾选，或伪人下拉选到「（随机）」→ 明确告诉后端随机，而不是落到默认伪人。 */
+  /* 伪人下拉选到「（随机）」→ 明确告诉后端随机，而不是落到默认伪人。 */
   const selPseudo=$("cPseudo").value||"";
-  const randPseudo=$("cRandom").checked || !selPseudo;
+  const randPseudo=!selPseudo;
   const body={name:name, difficulty:$("cDiff").value||SETTINGS.difficulty,
     max_turns:Number($("cTurns").value)||SETTINGS.max_turns, seed:seed||null,
-    pseudo:randPseudo?null:selPseudo, random_pseudo:randPseudo, dlc:[...DLC_ENABLED]};
+    pseudo:randPseudo?null:selPseudo, random_pseudo:randPseudo, dlc:[...DLC_ENABLED],
+    map:$("cMap")?$("cMap").value:""};
   const r=await api("/api/new", body);
   if(r.error){ toast(r.error,"err"); return; }
   enterGame(); seedLog(r.state); mergeState(r.state); appendLog(r.messages);
@@ -2258,7 +2515,6 @@ function renderSettings(){
     <span class="diff-tag ${d.kind}">${d.kind==="hard"?"更难":d.kind==="easy"?"更易":"基准"}</span>
     <span class="diff-eff">${d.added&&d.added.length?esc(d.added.join("；")):"无附加效果"}</span></div>`).join("");
   $("setTurns").value=SETTINGS.max_turns;
-  $("setRandom").checked=SETTINGS.random_pseudo;
   const ps=(MENU&&MENU.pseudos)||[];
   $("setPseudo").innerHTML='<option value="">（随机）</option>'+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
   $("setHint").textContent="";
@@ -2266,9 +2522,11 @@ function renderSettings(){
 function pickDiff(id){ SETTINGS.difficulty=id; renderSettings(); }
 async function saveSettings(){
   SETTINGS.max_turns=Number($("setTurns").value)||32;
-  SETTINGS.random_pseudo=$("setRandom").checked;
   SETTINGS.pseudo=$("setPseudo").value;
-  const r=await api("/api/settings",{difficulty:SETTINGS.difficulty,max_turns:SETTINGS.max_turns,pseudo:SETTINGS.pseudo,random_pseudo:SETTINGS.random_pseudo,enabled_dlc:[...DLC_ENABLED]});
+  /* 资料包的启用清单只由「资料包」页的"应用"负责（applyDlc）。
+     这里不再顺带上报 enabled_dlc —— 否则 DLC_ENABLED 一旦是空/旧值，
+     保存设置就会把玩家启用的资料包悄悄清空（图鉴角色随之消失）。 */
+  const r=await api("/api/settings",{difficulty:SETTINGS.difficulty,max_turns:SETTINGS.max_turns,pseudo:SETTINGS.pseudo});
   $("setHint").textContent=r.error?("保存失败："+r.error):"已保存设置。";
 }
 
@@ -2324,6 +2582,9 @@ function codexOpen(tab,id){
 }
 function codexFilter(v){ CODEX_FILTER=(v||"").trim(); CODEX_SEL=0; renderCodexList(); renderCodexDetail(); }
 function codexItems(){
+  /* 图鉴数据是一次性取的：还没回来时先给空列表，别让列表/详情渲染炸掉
+     （打开图鉴后立刻切页签或搜索就会撞上）。 */
+  if(!CODEX) return [];
   const f=CODEX_FILTER, hit=t=>!f||String(t||"").indexOf(f)>=0;
   if(CODEX_TAB==="characters") return (CODEX.characters||[]).filter(c=>hit(c.name)||hit(c.persona)||hit(c.desc)||(c.tags||[]).some(hit));
   if(CODEX_TAB==="items"){
@@ -2340,11 +2601,25 @@ function codexItems(){
   if(CODEX_TAB==="mechanics") return (CODEX.mechanics||[]).filter(m=>hit(m.title));
   return (CODEX.personalities||[]).filter(p=>hit(p.label)||hit(p.desc)||(p.providers||[]).some(x=>hit(x.name)));
 }
+/* 图鉴符号墙的一格：内容给"一张一个内联 svg"，没给就画一条杠（方便看出还缺哪些）。 */
+function codexSymHtml(s){
+  const art=s.svg?`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${s.svg}</svg>`:'<span class="dim">—</span>';
+  return `<span class="cd-sym${s.svg?"":" none"}" title="${esc(s.label)}">${art}<b>${esc(s.label)}</b></span>`;
+}
 function codexRowIcon(o){
   if(CODEX_TAB==="characters"||CODEX_TAB==="pseudos") return o.avatar||"i-person";
   if(CODEX_TAB==="personalities") return o.icon||"i-mark";
   if(CODEX_TAB==="information") return "i-note";
   return o.icon||"i-note";
+}
+/* 图鉴左列表的图标：房客要**组装头像**（形状/特征的 `<symbol>` 已搬去内容层文件，
+   这里不能再把 `i-av*` 当内置符号用，否则 `<use>` 落空 = 空白）。 */
+function codexRowIconHtml(o){
+  if(CODEX_TAB==="items") return itemIcon(o.icon_svg, codexRowIcon(o), "q"+o.quality);
+  if(CODEX_TAB==="characters") return avatarIcon(o.id, o.avatar, "", o.art, o.avatar_parts);
+  /* 机制：每节有自己的低饱和分节色（内容层声明），图标外描一圈同色 = 徽章，不再清一色琥珀。 */
+  if(CODEX_TAB==="mechanics") return `<span class="cv-badge" style="color:${esc(o.tint||"var(--amber)")}">${ic(codexRowIcon(o))}</span>`;
+  return iconOrArt(o.art, codexRowIcon(o));
 }
 function codexRowLabel(o){
   if(CODEX_TAB==="personalities") return o.label;
@@ -2364,7 +2639,7 @@ function renderCodexList(){
   const rows=codexItems();
   if(CODEX_SEL>=rows.length) CODEX_SEL=0;
   $("codexList").innerHTML = rows.length
-    ? rows.map((o,i)=>`<div class="codex-row${i===CODEX_SEL?" sel":""}" onclick="codexPick(${i})"><span class="cv${CODEX_TAB==="items"?" q"+o.quality:""}">${CODEX_TAB==="items"?itemIcon(o.art,codexRowIcon(o),"q"+o.quality):iconOrArt(o.art,codexRowIcon(o))}</span><span>${esc(codexRowLabel(o))}</span><span class="dim" style="margin-left:auto;font-size:11px">${esc(codexRowSub(o))}</span></div>`).join("")
+    ? rows.map((o,i)=>`<div class="codex-row${i===CODEX_SEL?" sel":""}" onclick="codexPick(${i})"><span class="cv${CODEX_TAB==="items"?" q"+o.quality:""}">${codexRowIconHtml(o)}</span><span>${esc(codexRowLabel(o))}</span><span class="dim" style="margin-left:auto;font-size:11px">${esc(codexRowSub(o))}</span></div>`).join("")
     : '<div class="codex-empty">没有匹配项。</div>';
 }
 function codexPick(i){ CODEX_SEL=i; renderCodexList(); renderCodexDetail(); }
@@ -2382,14 +2657,14 @@ function renderCodexDetail(){
       <div class="cd-block">${fmt(o.desc)}</div>
       ${(o.actives||[]).length?`<div class="cd-section"><h4>主动能力</h4>${o.actives.map(a=>`<div class="cd-entry"><b>${esc(a.name)}</b>${(a.chips||[]).map(c=>`<span class="cd-chip" style="margin-left:6px">${esc(c)}</span>`).join("")}<br>${fmt(a.text)}</div>`).join("")}</div>`:""}
       ${(o.passives||[]).length?`<div class="cd-section"><h4>被动能力</h4>${o.passives.map(a=>`<div class="cd-entry"><b>${esc(a.name)}</b>${(a.chips||[]).map(c=>`<span class="cd-chip" style="margin-left:6px">${esc(c)}</span>`).join("")}<br>${fmt(a.text)}</div>`).join("")}</div>`:""}
-      ${(o.extra||[]).map(sec=>`<div class="cd-section"><h4>${esc(sec.title)}</h4>${sec.table?`<table class="cd-table"><thead><tr>${sec.table.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${sec.table.rows.map(r=>`<tr>${r.map((cell,i)=>`<td${i===0?' class="nm"':''}>${fmt(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table>`:(sec.entries||[]).map(e=>`<div class="cd-entry"><b>${esc(e[0])}</b><br>${fmt(e[1])}</div>`).join("")}</div>`).join("")}
+      ${(o.extra||[]).map(sec=>`<div class="cd-section"><h4>${esc(sec.title)}</h4>${sec.table?`<table class="cd-table"><thead><tr>${sec.table.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${sec.table.rows.map(r=>`<tr>${r.map((cell,i)=>`<td${i===0?' class="nm"':''}>${fmt(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table>`:sec.symbols?`<div class="cd-syms">${sec.symbols.map(codexSymHtml).join("")}</div>`:(sec.entries||[]).map(e=>`<div class="cd-entry"><b>${esc(e[0])}</b><br>${fmt(e[1])}</div>`).join("")}</div>`).join("")}
       ${(o.items||[]).length?`<div class="cd-section"><h4>相关物品</h4><div class="cd-chips">${o.items.map(x=>`<span class="cd-chip cd-link" onclick="codexOpen('items','${x.id}')">${esc(x.name)}</span>`).join("")}</div></div>`:""}`;
   } else if(CODEX_TAB==="items"){
-    h=`<div class="cd-dossier"><span class="cd-av q${o.quality}">${itemIcon(o.art,o.icon,"q"+o.quality)}</span>
+    h=`<div class="cd-dossier"><span class="cd-av q${o.quality}">${itemIcon(o.icon_svg,o.icon,"q"+o.quality)}</span>
         <div class="cd-doss-main"><div class="cd-name q${o.quality}">${esc(o.name)}</div>
         <div class="cd-sub">${esc(o.quality_label)} · ${esc(o.category_label)} · 堆叠上限 ${o.stack}</div></div></div>
       ${o.book?`<div class="cd-block">${fmt(o.book_main||o.full||o.desc)}</div>${o.book_gain?`<div class="cd-section cd-book"><h4>获得能力</h4><div class="cd-entry">${fmt(o.book_gain)}</div></div>`:""}`:`<div class="cd-block">${fmt(o.full||o.desc)}</div>`}
-      ${o.flavor?`<div class="cd-block" style="color:#c8b48f;font-style:italic">${fmt(o.flavor)}</div>`:""}
+      ${o.flavor?`<div class="cd-block flavor-line">${fmt(o.flavor)}</div>`:""}
       <div class="cd-section"><h4>标签</h4><div class="cd-chips">${(o.tags||[]).map(t=>`<span class="cd-chip cd-chip-tag" onmouseover="showTagTip(this,'${esc(t[1])}')" onmouseout="hideTip()">${esc(t[1])}</span>`).join("")||'<span class="dim">无</span>'}</div></div>
       ${o.links&&(o.links.bonds.length||o.links.characters.length||o.links.pseudos.length)?`<div class="cd-section"><h4>关联</h4><div class="cd-chips">${o.links.bonds.map(b=>`<span class="cd-chip cd-link" onclick="codexOpen('personalities','${b.key}')">羁绊 · ${esc(b.label)}</span>`).join("")}${o.links.characters.map(c=>`<span class="cd-chip cd-link" onclick="codexOpen('characters','${c.id}')">房客 · ${esc(c.name)}</span>`).join("")}${o.links.pseudos.map(p=>`<span class="cd-chip cd-link" onclick="codexOpen('pseudos','${p.id}')">伪人 · ${esc(p.name)}</span>`).join("")}</div></div>`:""}`;
   } else if(CODEX_TAB==="locations"){
@@ -2412,7 +2687,7 @@ function renderCodexDetail(){
         ${o.refuted?`<div class="cd-entry"><b>已证伪</b>　${fmt(o.refuted)}</div>`:""}
       </div>`:""}`;
   } else if(CODEX_TAB==="pseudos"){
-    h=`<div class="cd-dossier"><span class="cd-av">${avatarIcon(o.human_id||o.id,o.avatar,"lg",o.art,o.avatar_parts)}</span>
+    h=`<div class="cd-dossier"><span class="cd-av">${avatarIcon(o.id,o.avatar,"lg",o.art,o.avatar_parts)}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.name)}</div>
         <div class="cd-sub">人类原型：${o.human_id?`<span class="cd-link" onclick="codexOpen('characters','${o.human_id}')">${esc(o.human)}</span>`:esc(o.human)} · ${o.enters_house?"会亲自到访（门口事件）":"不会亲自到访（从外部行动）"}</div>
         ${o.mark_label?`<div class="cd-sub">印记：${esc(o.mark_label)}</div>`:""}</div></div>
@@ -2422,7 +2697,10 @@ function renderCodexDetail(){
       ${o.liberation?`<div class="cd-section"><h4>解放</h4><div class="cd-entry">${fmt(o.liberation)}</div></div>`:""}
       ${(o.items||[]).length?`<div class="cd-section"><h4>相关物资</h4><div class="cd-chips">${o.items.map(x=>`<span class="cd-chip cd-link" onclick="codexOpen('items','${x.id}')">${esc(x.name)}</span>`).join("")}</div></div>`:""}`;
   } else if(CODEX_TAB==="mechanics"){
-    h=`<div class="cd-name">${esc(o.title)}</div><div class="cd-section"><h4>说明</h4>${(o.entries||[]).map(e=>`<div class="cd-entry"><b>${esc(e[0])}</b><br>${fmt(e[1])}</div>`).join("")}</div>`;
+    h=`<div class="cd-dossier"><span class="cd-av" style="color:${esc(o.tint||"var(--amber)")}">${ic(o.icon||"i-note","lg")}</span>
+        <div class="cd-doss-main"><div class="cd-name">${esc(o.title)}</div>
+        <div class="cd-sub">通用机制 · 与代码一致</div></div></div>
+      <div class="cd-section">${(o.entries||[]).map(e=>`<div class="cd-entry"><b>${esc(e[0])}</b><br>${fmt(e[1])}</div>`).join("")}</div>`;
   } else {
     const tiers=(o.tiers||[]);
     const tierLines=(o.tier_text||[]).map((t,i)=>`<div class="cd-tier"><span class="tn">${tiers[i]!==undefined?tiers[i]:"·"}</span><span>${fmt(t)}</span></div>`).join("");
@@ -2453,14 +2731,31 @@ function renderDlc(){
   const all=(MENU&&MENU.dlc)||[];
   syncPackState();
   const left=all.filter(d=>!DLC_ENABLED.has(d.name));
-  const row=(name,side,extra)=>`<div class="dlc-item${SEL_DLC&&SEL_DLC.name===name&&SEL_DLC.side===side?" on":""}" onclick="selDlc('${name}','${side}')">${esc(name)}${extra||""}</div>`;
-  $("dlcLeft").innerHTML=left.length?left.map(d=>row(d.name,"left")).join(""):'<div class="dim" style="padding:10px;color:#8f7f63">（无）</div>';
+  const row=(name,side,extra)=>{
+    const sel=SEL_DLC&&SEL_DLC.name===name&&SEL_DLC.side===side;
+    /* 快捷开关：双击任意一行 = 左→右启用 / 右→左卸载。 */
+    const move=sel&&side==="right"
+      ? `<span class="dlc-move" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">`
+        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('up')" title="上移（提高优先级）">&#9650;</button>`
+        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('down')" title="下移（降低优先级）">&#9660;</button></span>`
+      : "";
+    return `<div class="dlc-item${sel?" on":""}" onclick="selDlc('${name}','${side}')" ondblclick="dlcToggle('${name}','${side}')">`
+      +`<span class="dlc-name">${esc(name)}${extra||""}</span>${move}</div>`;
+  };
+  $("dlcLeft").innerHTML=left.length?left.map(d=>row(d.name,"left")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（无）</div>';
   $("dlcRight").innerHTML=PACK_ORDER.map(n=>row(n,"right",n==="base"?'<span class="dim dlc-base-tag">基底</span>':"")).join("");
 }
 function selDlc(name,side){ SEL_DLC={name:name,side:side}; renderDlc(); }
+/* 双击 = 快捷启用/卸载（设计快捷键）；base 不可卸载，位次仍可调。 */
+function dlcToggle(name,side){
+  if(side==="left"){ PACK_ORDER.unshift(name); SEL_DLC=null; renderDlc(); return; }
+  if(name==="base"){ toast("base 基底不可卸载。"); return; }
+  PACK_ORDER=PACK_ORDER.filter(n=>n!==name); SEL_DLC=null; renderDlc();
+}
 function dlcMove(dir){
   if(!SEL_DLC){ toast("请先选择一个内容包。"); return; }
-  if(dir==="right"&&SEL_DLC.side==="left"){ PACK_ORDER.push(SEL_DLC.name); SEL_DLC=null; renderDlc(); return; }
+  /* 移入的包默认**放在最上面**（= 优先级最高），要降序再用 ▼ 调。 */
+  if(dir==="right"&&SEL_DLC.side==="left"){ PACK_ORDER.unshift(SEL_DLC.name); SEL_DLC=null; renderDlc(); return; }
   if(dir==="left"&&SEL_DLC.side==="right"){
     if(SEL_DLC.name==="base"){ toast("base 基底不可卸载。"); return; }
     PACK_ORDER=PACK_ORDER.filter(n=>n!==SEL_DLC.name); SEL_DLC=null; renderDlc(); return;
@@ -2476,6 +2771,9 @@ async function applyDlc(){
   const r=await api("/api/dlc",{pack_order:PACK_ORDER});
   if(r.error){ $("dlcHint").textContent="应用失败："+r.error; return; }
   MENU=r.menu||MENU;
+  /* 内容变了：图鉴缓存必须作废，否则新装的资料包角色/物品不会出现
+     （这正是"有时查得到、有时查不到"的原因）。 */
+  CODEX=null;
   PACK_ORDER=(((MENU||{}).settings||{}).pack_order||["base"]).slice();
   syncPackState(); renderDlc();
   await applyResourcePack();          // 资料包可能自带外观，重新套用一次
@@ -2521,14 +2819,29 @@ function renderResourcepack(){
       : `资源包目录：${root}（放 <名字>/ 进去即会出现在"可用资源包"）`;
   }
   const left=all.filter(x=>!RP_ORDER.includes(x.name));
-  const row=(name,side)=>`<div class="dlc-item${RP_SEL&&RP_SEL.name===name&&RP_SEL.side===side?" on":""}" onclick="selRp('${name}','${side}')">${esc(rpLabel(name))}${name===RP_BASE?'<span class="dim dlc-base-tag">基底</span>':""}</div>`;
-  $("rpLeft").innerHTML=left.length?left.map(x=>row(x.name,"left")).join(""):'<div class="dim" style="padding:10px;color:#8f7f63">（无）</div>';
-  $("rpRight").innerHTML=RP_ORDER.length?RP_ORDER.map(n=>row(n,"right")).join(""):'<div class="dim" style="padding:10px;color:#8f7f63">（未启用）</div>';
+  const row=(name,side)=>{
+    const sel=RP_SEL&&RP_SEL.name===name&&RP_SEL.side===side;
+    const move=sel&&side==="right"
+      ? `<span class="dlc-move" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">`
+        +`<button class="mc-btn dlc-arrow" onclick="rpMove('up')" title="上移（提高优先级）">&#9650;</button>`
+        +`<button class="mc-btn dlc-arrow" onclick="rpMove('down')" title="下移（降低优先级）">&#9660;</button></span>`
+      : "";
+    return `<div class="dlc-item${sel?" on":""}" onclick="selRp('${name}','${side}')" ondblclick="rpToggle('${name}','${side}')">`
+      +`<span class="dlc-name">${esc(rpLabel(name))}${name===RP_BASE?'<span class="dim dlc-base-tag">基底</span>':""}</span>${move}</div>`;
+  };
+  $("rpLeft").innerHTML=left.length?left.map(x=>row(x.name,"left")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（无）</div>';
+  $("rpRight").innerHTML=RP_ORDER.length?RP_ORDER.map(n=>row(n,"right")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（未启用）</div>';
 }
 function selRp(name,side){ RP_SEL={name:name,side:side}; renderResourcepack(); }
+/* 双击 = 快捷启用/卸载；`base` 不可卸载（它是内置材质本身）。 */
+function rpToggle(name,side){
+  if(side==="left"){ RP_ORDER.unshift(name); RP_SEL=null; renderResourcepack(); return; }
+  if(name===RP_BASE){ toast("base 基底不可卸载（它是内置材质本身）。"); return; }
+  RP_ORDER=RP_ORDER.filter(n=>n!==name); RP_SEL=null; renderResourcepack();
+}
 function rpMove(dir){
   if(!RP_SEL){ toast("请先选择一个资源包。"); return; }
-  if(dir==="right"&&RP_SEL.side==="left"){ RP_ORDER.push(RP_SEL.name); RP_SEL=null; renderResourcepack(); return; }
+  if(dir==="right"&&RP_SEL.side==="left"){ RP_ORDER.unshift(RP_SEL.name); RP_SEL=null; renderResourcepack(); return; }
   if(dir==="left"&&RP_SEL.side==="right"){
     if(RP_SEL.name===RP_BASE){ toast("base 基底不可卸载（它是内置材质本身）。"); return; }
     RP_ORDER=RP_ORDER.filter(n=>n!==RP_SEL.name); RP_SEL=null; renderResourcepack(); return;
@@ -2544,6 +2857,8 @@ async function applyResourcepacks(){
   const r=await api("/api/dlc",{pack_order:PACK_ORDER, resourcepack_order:RP_ORDER});
   if(r.error){ $("rpHint").textContent="应用失败："+r.error; return; }
   MENU=r.menu||MENU;
+  /* 图鉴里的图标由**后端按当前资源包**解析下发（内联/URL 都在里面），换包后必须重取。 */
+  CODEX=null;
   RP_ORDER=(((MENU||{}).settings||{}).resourcepack_order||[RP_BASE]).slice();
   syncRpState(); renderResourcepack();
   await applyResourcePack();          // 立刻把新外观应用到界面（无需刷新）
@@ -2593,9 +2908,17 @@ function pagedOptions(key,htmls){
   if(PAGER.key!==key){ PAGER={key:key,page:0}; }
   PAGER.page=Math.min(PAGER.page,pages-1);
   const slice=htmls.slice(PAGER.page*PER_PAGE,PAGER.page*PER_PAGE+PER_PAGE);
-  const left=PAGER.page<=0?"":`<button class="pg-arrow l" onclick="pagerGo(-1,${pages})" aria-label="上一页"></button>`;
-  const right=PAGER.page>=pages-1?"":`<button class="pg-arrow r" onclick="pagerGo(1,${pages})" aria-label="下一页"></button>`;
-  return `<div class="disc-opts">${left}<div class="disc-row">${slice.join("")}</div>${right}</div>`;
+  /* 总宽固定：卡片自己平分剩余宽度，**间距随张数收紧**（越多越紧，1 张时无所谓）。 */
+  const gap=Math.max(8,48-6*slice.length);
+  const row=`<div class="disc-row" style="--gap:${gap}px">${slice.join("")}</div>`;
+  if(pages<=1) return `<div class="disc-opts">${row}</div>`;
+  /* 多于一页才出现箭头；到达端点时置灰而不是隐藏（行宽不跳）。 */
+  const offL=PAGER.page<=0, offR=PAGER.page>=pages-1;
+  return `<div class="disc-opts">`
+    +`<button class="pg-arrow l${offL?" off":""}"${offL?" disabled":""} onclick="pagerGo(-1,${pages})" aria-label="上一页"></button>`
+    +row
+    +`<button class="pg-arrow r${offR?" off":""}"${offR?" disabled":""} onclick="pagerGo(1,${pages})" aria-label="下一页"></button>`
+    +`</div>`;
 }
 function pagerGo(delta,pages){ PAGER.page=Math.max(0,Math.min(pages-1,PAGER.page+delta)); maybePending(); }
 
@@ -2613,7 +2936,7 @@ function discoverCardHtml(index,v){
       +`<span class="dc-name">${esc(v.name)}</span>`;
   } else if(v.kind==="item"){
     inner=`<span class="cn">${String(index+1).padStart(2,"0")}</span>`
-      +`<span class="dc-av">${iconOrArt(v.art,v.icon||"i-note","lg")}</span>`
+      +`<span class="dc-av">${itemIcon(v.icon_svg,v.icon||"i-note","q"+(v.quality||0))}</span>`
       +`<span class="dc-name">${esc(v.name)}</span>`;
   } else {
     inner=`<span class="cn">${String(index+1).padStart(2,"0")}</span><span class="dc-name">${esc(v.name||"")}</span>`;
@@ -2659,16 +2982,18 @@ function maybePending(){
       const i=selectedIndex(); if(i==null){ toast("请先选择一项。"); return; }
       const r=await api("/api/action",{type:(pc.kind==="start_choice"?"start_choice":"discover"), index:i});
       mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err");
-    });
+    }, false, /* bare = 不要背景板 */ true);
 }
 let FATE=null;
 /* 抽到的选项：初始只给名称，方向在后续步骤决定；悬浮 0.25s 出两种效果。 */
 function fateCardHtml(index,o){
   const on=(SEL.key===PAGER.key&&SEL.index===index)?" sel":"";
+  /* 符号由内容自带（内联 svg），没给就只显示号码与名称。 */
+  const art=o.svg?`<span class="dc-av"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${o.svg}</svg></span>`:"";
   return `<div class="card${on}" data-index="${index}" onclick="tglSelect(${index})" ondblclick="optDbl(${index})"
     onmouseenter="fateHoverStart(event,${index})" onmouseleave="fateHoverEnd()">
     <span class="cn">${String(index+1).padStart(2,"0")}</span>
-    <span class="dc-name">${esc(o.display||o.name||"")}</span></div>`;
+    ${art}<span class="dc-name">${esc(o.display||o.name||"")}</span></div>`;
 }
 let _fateTimer=null;
 function fateHoverStart(ev,index){
@@ -2686,46 +3011,67 @@ function fateHoverStart(ev,index){
 }
 function fateHoverEnd(){ clearTimeout(_fateTimer); hideTip(); }
 function fateFlow(pi){
-  if(!FATE||FATE.pi!==pi){ FATE={pi:pi,stage:1,index:null,orientation:null,itemId:null,offer:null}; }
+  if(!FATE||FATE.pi!==pi){ FATE={pi:pi,stage:1,index:null,orientation:null,itemId:null,targetId:null}; }
   const opts=pi.options||[];
   const chosen=opts[FATE.index]||{};
-  /* ① 选牌 */
+  /* ① 选牌：和「发现」同一套浮层（bare：只调暗场面，不出面板底与标题栏），悬浮看两个方向各自的效果。 */
   if(FATE.stage===1){
     openDialog(pi.title||"","FATE",
       `<div class="disc-desc">${mdText(pi.prompt||"")}</div>`
       +pagedOptions("fate1", opts.map((o,i)=>fateCardHtml(i,o))),
-      false, ()=>{ const i=selectedIndex(); if(i==null){ toast("请选择一张。"); return; } FATE.index=i; fateAfterPick(); });
+      false, ()=>{ const i=selectedIndex(); if(i==null){ toast("请选择一张。"); return; } FATE.index=i; fateAfterPick(); },
+      false, true);
     return;
   }
-  /* ② 是否上供（自选牌跳过此步，直接选方向） */
+  /* ② 上供：一个紫格 + 「继续」。放了东西＝上供；空着继续＝不上供。 */
   if(FATE.stage===2){
-    openDialog(pi.title||"","FATE",
-      `<div class="disc-desc">${esc(pi.offer_prompt||"")}</div>`
-      +`<div class="disc-row"><div class="pick-card" onclick="fateOffer(true)"><b>${esc(pi.offer_yes||"")}</b></div>`
-      +`<div class="pick-card" onclick="fateOffer(false)"><b>${esc(pi.offer_no||"")}</b></div></div>`,
-      false, null, true);
-    return;
-  }
-  /* ③ 选择方向（上供时同时选一件物资；自选牌无需物资） */
-  if(FATE.stage===3){
     const spec=pi.submit||{};
-    const choices=((pi.orientation&&pi.orientation.choices)||[]);
     SUBMIT={itemId:null,name:null,quality:null,orientation:null,min:spec.min_quality||0};
-    let body=`<div class="disc-desc">${esc((pi.orientation&&pi.orientation.prompt)||"")}</div>`;
-    if(FATE.offer){
-      body+=submitSlotHtml();
-      body+=`<div class="submit-note">${esc(spec.label||"")}</div><div class="submit-pool" id="subPool">${submitPoolHtml()}</div>`;
-    }
-    body+=`<div class="submit-orient">`+choices.map(c=>`<button class="btn sub-orient-btn" data-val="${esc(c[0])}" onclick="pickSubOrient(this)">${esc(c[1])}</button>`).join("")+`</div>`;
-    openDialog(pi.title||"","FATE", body, true, ()=>{
-      if(!(SUBMIT&&SUBMIT.orientation)){ toast("请选择一项。"); return; }
-      if(FATE.offer && !(SUBMIT&&SUBMIT.itemId)){ toast("请选择一件要上交的物资。"); return; }
-      FATE.orientation=SUBMIT.orientation; FATE.itemId=SUBMIT.itemId||null;
-      FATE.stage=4; maybePending();
-    });
+    openDialog(pi.title||"","FATE",
+      `<div class="disc-desc">${esc(spec.label||"")}</div>`
+      +submitSlotHtml()
+      +`<div class="submit-pool" id="subPool">${submitPoolHtml()}</div>`
+      +`<div class="submit-note">${esc(pi.proceed_hint||"")}</div>`,
+      true, ()=>{ FATE.itemId=(SUBMIT&&SUBMIT.itemId)||null; fateProceed(); });
     return;
   }
-  /* ④ 宣布方向，并选择结算或反悔 */
+  /* ③ 选方向：上供买到的那一步；需要定向的那张牌直接从这里开始。
+     渲染与「发现」/选牌同一套卡片，两个方向各带一个符号（内容下发）。 */
+  if(FATE.stage===3){
+    const spec=pi.orientation||{};
+    const choices=(spec.choices||[]);
+    const symbols=spec.symbols||{};
+    const cards=choices.map((c,i)=>{
+      const art=symbols[c[0]]?`<span class="dc-av"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${symbols[c[0]]}</svg></span>`:"";
+      const on=(SEL.key===PAGER.key&&SEL.index===i)?" sel":"";
+      return `<div class="card${on}" data-index="${i}" onclick="tglSelect(${i})" ondblclick="optDbl(${i})">`
+        +`<span class="cn">${String(i+1).padStart(2,"0")}</span>${art}`
+        +`<span class="dc-name">${esc(c[1])}</span></div>`;
+    });
+    openDialog(pi.title||"","FATE",
+      `<div class="disc-desc">${esc(spec.prompt||"")}</div>`
+      +pagedOptions("fate-orient", cards),
+      false, ()=>{
+        const i=selectedIndex(); if(i==null){ toast("请选择一项。"); return; }
+        FATE.orientation=choices[i][0]; FATE.stage=fateNextStage(); maybePending();
+      }, false, true);
+    return;
+  }
+  /* ④ 指定房客：有些牌要玩家点一个"谁"（和「指派搜索」同一套房客卡）。 */
+  if(FATE.stage===4){
+    const cards=(pi.target.candidates||[]).map(c=>{
+      const t=(STATE.tenants||[]).find(x=>x.id===c.value);
+      return t?tenantChoiceCard(t,""):"";
+    }).join("");
+    if(!cards){ toast("屋里没有可以指定的房客。"); return; }
+    openDialog(pi.target.prompt||pi.title||"","FATE",
+      `<div class="choice-grid">${cards}</div>`, true, ()=>{
+        const el=pickedEl(); if(!el){ toast("请选择房客。"); return; }
+        FATE.targetId=Number(el.dataset.id); FATE.stage=5; maybePending();
+      }, false, true);
+    return;
+  }
+  /* ⑤ 揭晓：先把结果（牌 + 方向 + 效果）告诉玩家，再问「结算 / 反悔」；同样走无背景板浮层。 */
   const ori=FATE.orientation||chosen.orientation;
   const oriLabel=(ori==="reversed")?(pi.reversed_label||""):(pi.upright_label||"");
   const eff=(ori==="reversed")?chosen.reversed:chosen.upright;
@@ -2734,22 +3080,33 @@ function fateFlow(pi){
     `<div class="disc-desc">${esc(cardName)}${oriLabel?` · <b>${esc(oriLabel)}</b>`:""}${eff?`<br>${fmt(eff)}`:""}</div>`
     +`<div class="disc-row"><div class="pick-card" onclick="fateSettle()"><b>${esc(pi.settle||"")}</b></div>`
     +`<div class="pick-card" onclick="fateBack()"><b>${esc(pi.cancel||"")}</b></div></div>`,
-    false, null, true);
+    false, null, true, true);
 }
 function fateAfterPick(){
   const o=(FATE.pi.options||[])[FATE.index]||{};
   FATE.stage=o.requires_orientation?3:2;
   maybePending();
 }
-function fateOffer(yes){
-  FATE.offer=!!yes;
-  FATE.stage=yes?3:4;
+/* 下一步该去哪：需要指定房客的牌去第 4 步，否则直奔揭晓。 */
+function fateNeedsTarget(){
+  const pi=(FATE&&FATE.pi)||{}, t=pi.target||{};
+  const o=((pi.options||[])[FATE.index])||{};
+  if(!(t.numbers||[]).includes(o.number)) return false;
+  const ori=FATE.orientation||o.orientation;
+  return ((t.required_by||{})[String(o.number)]||[]).includes(ori);
+}
+function fateNextStage(){ return fateNeedsTarget()?4:5; }
+/* 上供那一步的出口：槽里有东西就进「选方向」，空着就按上面那条规则走。 */
+function fateProceed(){
+  const hasChoice=!!(((FATE.pi||{}).orientation||{}).choices||[]).length;
+  FATE.stage=(FATE.itemId&&hasChoice)?3:fateNextStage();
   maybePending();
 }
 async function fateSettle(){
   const value={index:FATE.index};
   if(FATE.orientation) value.orientation=FATE.orientation;
   if(FATE.itemId) value.item_id=FATE.itemId;
+  if(FATE.targetId) value.target_id=FATE.targetId;
   const r=await api("/api/action",{type:"resolve", value:value});
   if(r.error){ toast(r.error,"err"); return; }
   FATE=null; closeDialog(); mergeState(r.state); appendLog(r.messages);
@@ -2817,7 +3174,7 @@ function pickSubItemById(itemId){
   const slot=$("subSlot"), box=$("subSlotBox"), hint=$("subSlotHint");
   if(slot) slot.classList.add("filled");
   if(slot) slot.setAttribute("draggable","true");
-  if(box) box.innerHTML=iconOrArt(row.e[12],row.e[0]);
+  if(box) box.innerHTML=itemIcon(row.e[12],row.e[0]);
   if(hint) hint.textContent=row.e[1]+"（"+qName(q)+"）";
   refreshSubPool();
 }
@@ -2830,7 +3187,7 @@ function clearSubSlot(){ if(!SUBMIT||!SUBMIT.itemId) return; SUBMIT.itemId=null;
 function pickSubOrient(el){ document.querySelectorAll(".sub-orient-btn").forEach(b=>b.classList.remove("act"));
   el.classList.add("act"); SUBMIT.orientation=el.dataset.val; }
 async function submitResolve(){
-  const el=document.querySelector("#dBody .pick-card.sel");
+  const el=pickedEl();
   if(!el){ toast("请先选择目标。","err"); return; }
   const index=Number(el.dataset.index);
   const needsOrient=(SUBMIT.requiredIndices||[]).indexOf(index)>=0;
@@ -2860,18 +3217,19 @@ function showItemTip(el,name,q,dur,dmax){
   let top=r.top-L.offsetHeight-10; if(top<pad) top=r.bottom+10; L.style.top=top+"px";
 }
 
-function tenantPickRow(){ return STATE.tenants.filter(t=>!t.searching).map(t=>`<div class="pick-card" data-id="${t.id}" onclick="pickUnit(this)">${ic("i-person")}<b>${t.name}</b><span class="dim mono" style="font-size:10px">${t.hp}/${t.san}</span></div>`).join(""); }
+function tenantPickRow(){ return (STATE.tenants||[]).filter(t=>!t.searching).map(t=>tenantChoiceCard(t)).join(""); }
 
 function showItemUse(itemId,kind,index){
   const e=findEntry(itemId)||ITEM_INFO[itemId]||{};
   const equip=!!e[9], name=e[1]||itemId, desc=e[7]||"", flavor=e[8]||"";
   const fromBp=(kind==="bp"), srcTenant=fromBp?curBpTenantId():null;
-  const rows=(STATE.tenants||[]).filter(t=>!t.searching).map(t=>`<div class="pick-card" data-id="${t.id}" data-kind="tenant" onclick="pickUnit(this)">${ic("i-person")}<b>${esc(t.name)}</b><span class="dim mono" style="font-size:10px">${t.hp}/${t.san}</span></div>`).join("");
+  const rows=(STATE.tenants||[]).filter(t=>!t.searching).map(t=>tenantChoiceCard(t,' data-kind="tenant"')).join("");
   const backCard=(fromBp&&equip)?`<div class="pick-card" data-kind="warehouse" onclick="pickUnit(this)">${ic("i-bag")}<b>放回屋主仓库</b></div>`:"";
   openDialog((equip?"装备":"使用")+" · "+name,"SUPPLY",
     `<div class="it-desc">${desc}</div>${flavor?`<div class="it-flavor">${flavor}</div>`:""}
-     <div class="eyebrow" style="margin-top:6px">选择目标房客</div><div class="pick-row">${rows}${backCard}</div>`, false, ()=>{
-      const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请先选择房客。"); return; }
+     <div class="eyebrow" style="margin-top:10px">选择目标房客</div>
+     <div class="choice-grid" style="margin-top:6px">${rows}${backCard}</div>`, false, ()=>{
+      const el=pickedEl(); if(!el){ toast("请先选择房客。"); return; }
       if(el.dataset.kind==="warehouse"){ postAction({type:"unequip",tenant_id:srcTenant,item_id:itemId,slot:index}); return; }
       const tid=Number(el.dataset.id);
       if(fromBp && tid!==srcTenant){ postAction({type:"transfer_item",from_tenant:srcTenant,to_tenant:tid,item_id:itemId,slot:index},"已转移物资。"); return; }
@@ -2884,38 +3242,59 @@ function showItemUse(itemId,kind,index){
 }
 function showSearch(){
   if(STATE&&STATE.searchBlocked){ toast("本回合已经指派过搜索了。"); return; }
-  openDialog("指派搜索 · 选择房客","SEARCH",`<div class="pick-row">${tenantPickRow()}</div>`, true, ()=>{
-    const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请选择房客。"); return; }
-    chooseLocation(Number(el.dataset.id));
-  });
+  const cards=tenantPickRow();
+  if(!cards){ toast("屋里没有可以指派的房客。"); return; }
+  openDialog("指派搜索 · 选择房客","SEARCH",
+    `<div class="choice-grid">${cards}</div>`, true, ()=>{
+      const el=pickedEl(); if(!el){ toast("请选择房客。"); return; }
+      chooseLocation(Number(el.dataset.id));
+    });
 }
 let LOC_SEL=null;
 function chooseLocation(tenantId){
   const locs=STATE.locations||[];
   if(!locs.length){ toast("附近没有可搜索的地点。"); return; }
   LOC_SEL=locs[0].id;
-  const rows=locs.map(l=>`<div class="loc${l.id===LOC_SEL?" sel":""}" data-id="${esc(l.id)}" onclick="pickLoc('${esc(l.id)}')">`
-    +`<span class="loc-name">${iconOrArt(l.art,l.icon||"i-gate")}<b>${esc(l.name)}</b></span>`
-    +`<span class="loc-sup dim mono">${esc(l.supply||"")}</span></div>`).join("");
   openDialog("指派搜索 · 选择地点","SEARCH",
-    `<div class="search-layout"><div class="loc-list" id="locList">${rows}</div><div class="loc-detail" id="locDetail"></div></div>`,
+    `<div class="search-layout"><div class="loc-list" id="locList"></div><div class="loc-detail" id="locDetail"></div></div>`,
     true, async ()=>{
       if(!LOC_SEL){ toast("请选择地点。"); return; }
       const r=await api("/api/action",{type:"start_search",tenant_id:tenantId,location_id:LOC_SEL});
       mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err");
     });
+  renderLocList();
   renderLocDetail(LOC_SEL);
+}
+/* 一行地点：图标 + 名称 + 分组/固定 chip（掉落数字放进右侧详情，行里不再堆一长句）。 */
+/* 地点行的小 chip：只给**看得懂的东西**——档位是内部语言（低/中/高），不写出来，
+   它已经通过图标特征色表达了。 */
+function locChips(l){
+  return [l.group_label?`<span class="chip">${esc(l.group_label)}</span>`:"",
+          l.fixed?`<span class="chip warn">固定</span>`:""].filter(Boolean).join("");
+}
+function renderLocList(){
+  const el=$("locList"); if(!el) return;
+  el.innerHTML=(STATE.locations||[]).map(l=>`<div class="loc${l.id===LOC_SEL?" sel":""}" data-id="${esc(l.id)}" onclick="pickLoc('${esc(l.id)}')">
+      <span class="loc-ico">${iconOrArt(l.art,l.icon||"i-gate")}</span>
+      <span class="loc-main"><b>${esc(l.name)}</b><span class="loc-sub">${locChips(l)}</span></span>
+    </div>`).join("");
 }
 function pickLoc(id){
   LOC_SEL=id;
   document.querySelectorAll("#locList .loc").forEach(e=>e.classList.toggle("sel",e.dataset.id===id));
   renderLocDetail(id);
 }
+/* 右侧详情：描述 + **结构化**掉落分布 + 特别之处；原始长句收进"完整数值"折叠。 */
 function renderLocDetail(id){
   const l=(STATE.locations||[]).find(x=>x.id===id); const el=$("locDetail"); if(!el||!l) return;
-  el.innerHTML=`<div class="cd-title"><span class="cv">${iconOrArt(l.art,l.icon||"i-gate","lg")}</span>${esc(l.name)}</div>`
-    +`<div class="cd-block">${mdText(l.desc||"")}</div>`
-    +(l.supply?`<div class="cd-block"><b>补给</b><br>${mdText(l.supply)}</div>`:"");
+  const drop=(l.drop||[]).map(d=>`<li><span>${esc((d.tags||[]).join("、")||"其他物资")}</span><b>${d.weight}%</b></li>`).join("");
+  const mech=(l.mechanics||[]).map(m=>`<li>${esc(m)}</li>`).join("");
+  el.innerHTML=`<div class="cd-title"><span class="cv">${iconOrArt(l.art,l.icon||"i-gate","lg")}</span>${esc(l.name)}</div>
+    <div class="chips">${locChips(l)}</div>
+    <div class="cd-block">${mdText(l.desc||"")}</div>
+    ${drop?`<div class="cd-block"><b>掉落分布</b><ul class="loc-drop">${drop}</ul></div>`:""}
+    ${mech?`<div class="cd-block"><b>特别之处</b><ul class="loc-mech">${mech}</ul></div>`:""}
+    ${l.supply?`<details class="loc-raw"><summary>完整数值</summary><div>${mdText(l.supply)}</div></details>`:""}`;
 }
 function sendAbility(abilityId,actorId,targetId,option,amount,copiedAbilityId){
   const body={type:"ability",actor_id:actorId,ability_id:abilityId};
@@ -2928,7 +3307,7 @@ function sendAbility(abilityId,actorId,targetId,option,amount,copiedAbilityId){
 function specOf(actorId,abilityId){ return ABILITY_SPECS[actorId+"|"+abilityId]||{}; }
 function abTargetRows(excludeId){
   return (STATE.tenants||[]).filter(t=>t.id!==excludeId && !t.searching)
-    .map(t=>`<div class="pick-card" data-id="${t.id}" onclick="pickUnit(this)">${ic(t.avatar||"i-person")}<b>${esc(t.name)}</b><span class="dim mono" style="font-size:10px">${t.hp} / ${t.san}</span></div>`).join("");
+    .map(t=>tenantChoiceCard(t)).join("");
 }
 function abCond(abilityId,actorId,targetId,option){ closeDialog(); sendAbility(abilityId,actorId,targetId,option); }
 /* 选定目标后：技能声明了 options 就先选效果；若选中的是 nested_option，再选要模仿的主动能力。 */
@@ -2936,9 +3315,9 @@ function afterTarget(abilityId,actorId,targetId){
   const spec=specOf(actorId,abilityId), opts=spec.options||[];
   if(!opts.length){ sendAbility(abilityId,actorId,targetId); return; }
   openDialog("使用能力 · "+(spec.name||abilityId), spec.prompt||"选择要发动的效果",
-    `<div class="pick-row">${opts.map(o=>`<div class="pick-card" data-val="${esc(o[0])}" onclick="pickUnit(this)"><b>${esc(o[1])}</b></div>`).join("")}</div>`,
+    `<div class="choice-grid">${opts.map(o=>optChoiceCard(o[0],o[1],o[2],o[3])).join("")}</div>`,
     false, ()=>{
-      const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请选择一项。","err"); return; }
+      const el=pickedEl(); if(!el){ toast("请选择一项。","err"); return; }
       const val=el.dataset.val;
       if(spec.nested_option && val===spec.nested_option){ pickCopiedAbility(abilityId,actorId,targetId,val); return; }
       sendAbility(abilityId,actorId,targetId,val);
@@ -2949,9 +3328,9 @@ function pickCopiedAbility(abilityId,actorId,targetId,option){
   const actives=((t&&t.abilities)||[]).filter(a=>a.kind==="主动");
   if(!actives.length){ toast("目标没有可模仿的主动能力。","err"); return; }
   openDialog("使用能力 · 模仿","选择要模仿的主动能力",
-    `<div class="pick-row">${actives.map(a=>`<div class="pick-card" data-val="${esc(a.id)}" onclick="pickUnit(this)"><b>${esc(a.name)}</b><span class="dim" style="font-size:11px">${esc((a.text||"").slice(0,34))}</span></div>`).join("")}</div>`,
+    `<div class="choice-grid">${actives.map(a=>barChoiceCard(a.id,"i-gear",a.name,a.text||"")).join("")}</div>`,
     true, ()=>{
-      const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请选择一项。","err"); return; }
+      const el=pickedEl(); if(!el){ toast("请选择一项。","err"); return; }
       sendAbility(abilityId,actorId,targetId,option,undefined,el.dataset.val);
     });
 }
@@ -2964,31 +3343,34 @@ function useAbility(actorId,abilityId){
     const opts=spec.candidates||[];
     if(!opts.length){ toast("没有可选目标。","err"); return; }
     openDialog("使用能力 · "+name, prompt||"选择",
-      `<div class="pick-row">${opts.map(o=>`<div class="pick-card" data-val="${o.value}" onclick="pickUnit(this)"><b>${esc(o.label)}</b><span class="dim" style="font-size:11px">${esc(o.desc||"")}</span></div>`).join("")}</div>`,
-      false, ()=>{ const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
+      `<div class="choice-grid">${opts.map(o=>optChoiceCard(o.value,o.label,o.icon||"i-note",o.desc)).join("")}</div>`,
+      false, ()=>{ const el=pickedEl(); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
     return;
   }
   if(target==="resource"){
     const opts=spec.options||[];
     if(!opts.length){ toast("没有可选目标。","err"); return; }
     openDialog("使用能力 · "+name, prompt||"选择",
-      `<div class="pick-row">${opts.map(o=>`<div class="pick-card" data-val="${o[0]}" onclick="pickUnit(this)"><b>${esc(o[1])}</b></div>`).join("")}</div>`,
-      false, ()=>{ const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
+      `<div class="choice-grid">${opts.map(o=>optChoiceCard(o[0],o[1],o[2],o[3])).join("")}</div>`,
+      false, ()=>{ const el=pickedEl(); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
     return;
   }
   if(target==="amount"){
     const extra=(spec.options||[])[0];
     openDialog("使用能力 · "+name, prompt||"",
-      `<label class="mc-field">${esc(spec.amount_label||"数量")}<input id="abAmount" type="number" min="1" max="${spec.amount_max||99}" value="1" style="width:130px"></label>
-       ${extra?`<label class="mc-field" style="flex-direction:row;align-items:center;gap:8px">${esc(extra[1])}<input id="abExtra" type="checkbox"></label>`:""}`,
-      false, ()=>{ const on=extra&&$("abExtra")&&$("abExtra").checked; sendAbility(abilityId,actorId,null,on?extra[0]:null,Number($("abAmount").value)||1); });
+      amountBox(spec)
+      +(extra?`<label class="mc-field" style="flex-direction:row;align-items:center;gap:8px;margin-top:14px">${esc(extra[1])}<input id="abExtra" type="checkbox"></label>`:""),
+      false, ()=>{ const on=extra&&$("abExtra")&&$("abExtra").checked;
+        const num=$("abAmount"); const max=Math.max(1,Number(spec.amount_max)||1);
+        sendAbility(abilityId,actorId,null,on?extra[0]:null,Math.max(1,Math.min(max,Number(num?num.value:1)||1))); });
+    amtSync();
     return;
   }
   if(target==="tenant"||target==="other_tenant"){
     const rows=abTargetRows(target==="other_tenant"?actorId:null);
     if(!rows){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择目标房客", `<div class="pick-row">${rows}</div>`, false,
-      ()=>{ const el=document.querySelector("#dBody .pick-card.sel"); if(!el){ toast("请先选择目标房客。","err"); return; } afterTarget(abilityId,actorId,Number(el.dataset.id)); });
+    openDialog("使用能力 · "+name, prompt||"选择目标房客", `<div class="choice-grid">${rows}</div>`, false,
+      ()=>{ const el=pickedEl(); if(!el){ toast("请先选择目标房客。","err"); return; } afterTarget(abilityId,actorId,Number(el.dataset.id)); });
     return;
   }
   if(target==="tenant_condition"){
@@ -2996,10 +3378,11 @@ function useAbility(actorId,abilityId){
     const rows=targets.map(t=>{
       const chips=(t.conditions||[]).map(s=>`<div class="chip ${s[2]||""}" onclick="abCond('${abilityId}',${actorId},${t.tenant_id},'${s[3]}')">${ic(s[0])}${fmt(s[1])}</div>`).join("");
       if(!chips) return "";
-      return `<div class="codex-card" style="min-width:0"><div class="cc-head">${ic(t.avatar||"i-person")}<b>${esc(t.name)}</b></div><div class="chips" style="margin-top:8px">${chips}</div></div>`;
+      return `<div class="card" style="min-width:0"><span class="dc-av">${ic(t.avatar||"i-person","lg")}</span>
+        <span class="dc-name"><b>${esc(t.name)}</b></span><div class="chips" style="justify-content:center">${chips}</div></div>`;
     }).join("");
     if(!rows){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择要移除的状态", `<div class="codex-grid">${rows}</div>`, true);
+    openDialog("使用能力 · "+name, prompt||"选择要移除的状态", `<div class="choice-grid">${rows}</div>`, true);
     return;
   }
   sendAbility(abilityId,actorId,null);
@@ -3026,7 +3409,9 @@ function dropOnTenant(ev,id){
 }
 function dropOnBackpack(ev,index){
   ev.preventDefault(); ev.currentTarget.classList.remove("drop");
-  const src=_dragSrc; onDragEnd(); if(!src || index==null) return;
+  const src=_dragSrc; onDragEnd(); if(!src) return;
+  if(src.kind==="panel"){ postPanelAction(src.tenant,src.action,{slot:src.slot}); return; }
+  if(index==null) return;
   const tid=curBpTenantId(); if(tid==null) return;
   if(src.kind==="wh"){
     postAction({type:"equip",tenant_id:tid,item_id:src.itemId,slot:src.slot,target_slot:index});
@@ -3036,7 +3421,9 @@ function dropOnBackpack(ev,index){
 }
 function dropOnWarehouse(ev,index){
   ev.preventDefault(); ev.currentTarget.classList.remove("drop");
-  const src=_dragSrc; onDragEnd(); if(!src || index==null) return;
+  const src=_dragSrc; onDragEnd(); if(!src) return;
+  if(src.kind==="panel"){ postPanelAction(src.tenant,src.action,{slot:src.slot}); return; }
+  if(index==null) return;
   if(src.kind==="wh"){
     postAction({type:"move_item",container:"warehouse",from_slot:src.slot,to_slot:index});
   } else if(src.kind==="bp"){
@@ -3046,14 +3433,21 @@ function dropOnWarehouse(ev,index){
 }
 
 /* ---- ESC：询问是否退出对局 ---- */
-function openExitDialog(){
-  openDialog("退出游戏","",
-    '<div class="mc-row" style="margin-top:4px">'
-    +'<button class="mc-btn p" onclick="exitToMenu()">退出游戏</button>'
-    +'<button class="mc-btn" onclick="closeDialog()">返回游戏</button></div>',
-    false, null, true);
+/* ---- 游戏内 Esc 菜单（MC 风"桌面"）：长条「退出游戏」/ 并排「设置·图鉴」/「返回游戏」 ---- */
+function openPause(){ const el=$("pauseMenu"); if(el) el.classList.add("on"); }
+function closePause(){ const el=$("pauseMenu"); if(el) el.classList.remove("on"); }
+function openExitDialog(){ openPause(); }
+function pausePane(pane){ closePause(); Promise.resolve(openLauncher()).then(()=>lpane(pane)); }
+/* 退出到启动器。
+   在开局「发现」还没选完时强退：先让后端把这场"还没真正开始"的局丢掉
+   （等价于把存档回退到开始发现之前），否则那个待选会一直卡住启动器上的所有点击。 */
+async function exitToMenu(){
+  closePause();
+  let aborted=false;
+  try{ const r=await api("/api/abort_start",{}); aborted=!!(r&&r.aborted); }catch(e){}
+  if(aborted){ GAME_ACTIVE=false; STATE={started:false}; syncPeek(); }
+  openLauncher();
 }
-function exitToMenu(){ closeDialog(); openLauncher(); }
 document.addEventListener("keydown",(e)=>{
   if(e.key!=="Escape") return;
   if($("mask").classList.contains("on")){ closeDialog(); return; }
@@ -3064,14 +3458,18 @@ document.addEventListener("keydown",(e)=>{
     if(cur!=="main") lpane(back);
     return;
   }
-  openExitDialog();
+  /* 游戏内：先关专属面板，再开关 MC 风「桌面」菜单。 */
+  if(PANEL_OPEN!==null){ closePanel(); return; }
+  if($("pauseMenu").classList.contains("on")) closePause(); else openPause();
 });
 
 document.addEventListener("click",function(e){
   if(!hasPending()) return;
   const t=e.target;
-  // 放行：弹窗内部、隐藏按钮、吐司自身；以及一切"查看类"点击（空气/卡片/房客/日志等）。
-  if(t.closest("#dialog")||t.closest("#pendingBtn")||t.closest("#toastWrap")) return;
+  // 放行：弹窗内部、隐藏按钮、吐司自身；以及**菜单类**（Esc 菜单与顶栏菜单键 ——
+  // 它们不是对局操作，正是玩家在待选时"强行退出"的出口）；其余"查看类"点击（空气/卡片/房客/日志）也不拦。
+  if(t.closest("#dialog")||t.closest("#pendingBtn")||t.closest("#toastWrap")
+     ||t.closest("#pauseMenu")||t.closest("#menuBtn")) return;
   const act=t.closest("button,.btn,.slot,[data-act]");
   if(!act) return;
   e.preventDefault(); e.stopPropagation();
@@ -3111,15 +3509,24 @@ async function applyResourcePack(){
 }
 
 /* 素材位：封面背景（background）与大标题（title）。资源包给了就覆盖内置画面。 */
-function applyResourceAssets(assets){
+async function applyResourceAssets(assets){
   const bg=document.querySelector(".dusk-bg");
   if(bg){
-    let img=document.getElementById("bgArt");
     if(assets.background){
-      if(!img){ img=document.createElement("img"); img.id="bgArt"; img.className="bg-art"; img.alt=""; bg.appendChild(img); }
-      if(img.getAttribute("src")!==assets.background) img.src=assets.background;
-      bg.classList.add("has-art");
-    } else if(img){ img.remove(); bg.classList.remove("has-art"); }
+      /* 素材是 SVG 就**内联注入**（这样封面自带的 CSS 动画仍然生效）；位图退回 <img>。 */
+      if(bg.dataset.src!==assets.background){
+        bg.dataset.src=assets.background;
+        bg.innerHTML="";
+        let markup="";
+        try{ const resp=await fetch(assets.background); markup=(await resp.text()).trim(); }catch(e){ markup=""; }
+        if(markup.startsWith("<svg")){
+          bg.innerHTML=markup;
+        }else{
+          const img=document.createElement("img"); img.id="bgArt"; img.className="bg-art"; img.alt="";
+          img.src=assets.background; bg.appendChild(img);
+        }
+      }
+    }else if(bg.dataset.src){ bg.innerHTML=""; delete bg.dataset.src; }
   }
   /* title 素材替换**整块**（大标题 + 副标题那行），所以挂在 .title-block 上。 */
   const host=document.getElementById("titleBlock")||document.querySelector(".mc-title");

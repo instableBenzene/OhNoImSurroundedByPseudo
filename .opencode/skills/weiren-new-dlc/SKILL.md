@@ -19,6 +19,10 @@ dlc/<dlc_name>/
   tags/<tag>.py           # 文件名即 tag 的行为模块（进 TAG_BEHAVIORS）
   statuses/<name>.py      # 暴露 STATUSES / EMOTIONS
   resourcepack/<name>.py  # 暴露 THEME（CSS 变量/字体/追加 css）与 SYMBOLS（贴图零件）
+  avatars/<section>/<id>.svg  # 头像零件/整张头像（shapes/features/characters），按位次覆盖 base
+  item/item/<id>.svg      # 自带物品的图标；item/tag/<tag>.svg 按标签兜底
+  icon/<section>/<id>.<ext>  # 地点/信息/伪人图标（locations/information/pseudos）
+  maps/<id>/map.py        # 自带一张地图（显式地点名单 + 屋子名；或用 ctx.register_map_location）
   locations/<name>.py     # 暴露 LOCATIONS
                           #   可选 MAP_GROUPS：新分组纳入开局抽取
   information/<name>.py   # 暴露 INFORMATION_TEMPLATES
@@ -35,6 +39,8 @@ dlc/<dlc_name>/
 - **人类形态互斥**：`DEFINITION.human_character_id` 指向的角色会被自动排除出访客池，也不能被列入禁用角色。
 - **新增性格/状态/情绪/tag 行为/地点分组**都是"放文件即生效"；**全局事件**要在 `register(ctx)` 或模块导入时显式注册。
 - **新注册表**必须加进 `weiren_game/content.py` 的 `_BASE_CONTAINERS`，否则卸载后残留。
+  效果内核的修饰器 / 闸门表（`register_modifier_provider` / `register_gate_provider`）**已在快照里**：
+  装载、卸载都随包回滚，重复「应用」也不累积 —— **不需要**自己写去重或认领。
 - 版本：`min_game_version` 高于当前 `GAME_VERSION` 会被拒。
 - 热切换：界面 DLC 页"应用"会按包顺序重建注册表（`dlc.apply_pack_order`，见
   `tests/test_architecture.py::test_dlc_content_channels_and_rollback`）。
