@@ -164,6 +164,9 @@ class RoundEffectsSystemMixin:
             for hook in NODE_HOOKS.get("madness.available", ())
         )
 
+        # 这一段会逐人播报理智/生命变化；收起明细，只在最后播一条汇总（玩家可点开看）。
+        self._collect_start()
+        tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
             definition = self.character(tenant)
             sanity_cost = 1.0
@@ -190,6 +193,8 @@ class RoundEffectsSystemMixin:
 
             for _personality_id, end_health_hook in BOND_END_HEALTH_HOOKS.items():
                 end_health_hook(self, tenant)
+
+        self._collect_flush(f"回合末结算：{tenant_count} 名房客的理智与生命变化。")
 
     def _settle_buff_debuff_effects(self) -> None:
         """回合末依次结算创伤、紊乱及各情绪的自行演化。"""

@@ -941,7 +941,8 @@ def build_state(engine: GameEngine) -> dict:
         "tenants": tenants, "bonds": bonds, "events": _global_event_rows(engine),
         "warehouse": warehouse, "warehouseSize": len(warehouse),
         "backpack": [], "intel": intel, "missions": missions, "log": [],
-        "logEntries": [[entry["turn"], entry["text"]]
+        # 每条是 [回合, 文本, 明细]；没有明细时第三项为 None（前端照旧只渲染文本）。
+        "logEntries": [[entry["turn"], entry["text"], entry.get("detail")]
                        for entry in engine.state.log.entries if entry.get("shown", True)],
         # 本回合是否已无人可派（当前=已指派过；未来若一回合多次搜索，改这里即可，前端不写死）。
         "searchBlocked": bool(engine.state.round.searched_this_turn),
@@ -1189,7 +1190,7 @@ class Session:
         _write_index(index)
 
     def drain(self) -> list[str]:
-        return self.engine.drain_messages() if self.engine else []
+        return self.engine.drain_message_entries() if self.engine else []
 
     def perform(self, payload: dict) -> None:
         if self.engine is None:

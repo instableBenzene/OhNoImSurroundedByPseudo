@@ -2302,11 +2302,12 @@ let LOG=[];
 /* 重开对局 / 读档时用整局日志重建面板，避免把上一局的内容留在可视日志里。 */
 function seedLog(state){
   const entries=(state&&state.logEntries)||[];
-  LOG=entries.map(([t,m])=>[`T${t}`, String(m)]);
+  LOG=entries.map(([t,m,d])=>[`T${t}`, String(m), d||null]);
   renderLog();
 }
 function appendLog(msgs){ if(!msgs||!msgs.length) return;
-  for(const m of msgs) LOG.push([`T${STATE.turn||0}`, String(m)]);
+  for(const m of msgs){ const pair=Array.isArray(m)?m:[m,null];
+    LOG.push([`T${STATE.turn||0}`, String(pair[0]), pair[1]||null]); }
   if(LOG.length>800) LOG=LOG.slice(-800);
   renderLog(true);
 }
@@ -2318,13 +2319,26 @@ function logBodyHtml(m){
   return `<div>${fmt(m)}</div>`;
 }
 function renderLog(smooth){ const box=$("logList"); if(!box) return;
-  box.innerHTML=LOG.map(([t,m])=>`<li><span class="t">${t}</span>${logBodyHtml(m)}</li>`).join("");
+  box.innerHTML=LOG.map(([t,m,d])=>`<li><span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`).join("");
   /* 新消息逐条冒出时平滑滚到底，而不是一口气刷新。 */
   const scroller=box.closest(".body")||box;
   if(smooth){ try{ scroller.scrollTo({top:scroller.scrollHeight,behavior:"smooth"}); }
     catch(e){ scroller.scrollTop=scroller.scrollHeight; } }
   else scroller.scrollTop=scroller.scrollHeight;
 }
+/* 明细折叠：默认只留一行汇总，点「明细 N」在下面铺出逐条（谁 / 多少 / 说明）。 */
+function logDetailHtml(d){
+  const rows=((d&&d.rows)||[]).filter(r=>r&&(r.label||r.value));
+  if(!rows.length) return "";
+  const body=rows.map(r=>`<div class="mono" style="font-size:11px;line-height:1.6">`
+    +(r.label?`<span class="dim">${esc(r.label)}</span>`:"")
+    +(r.value?` &nbsp;${esc(r.value)}`:"")
+    +(r.note?` &nbsp;<span class="dim">${esc(r.note)}</span>`:"")+`</div>`).join("");
+  return `<button class="btn ld-toggle" style="margin-left:6px;padding:1px 6px;font-size:10px"`
+    +` onclick="logToggle(this)">明细 ${rows.length}</button>`
+    +`<div class="ld-box" hidden style="margin:4px 0 6px 10px;border-left:1px solid var(--edge);padding-left:8px">${body}</div>`;
+}
+function logToggle(btn){ const box=btn.nextElementSibling; if(box) box.hidden=!box.hidden; }
 function clearLog(){ LOG=[]; renderLog(); }
 /* 导出：当前对局或所选存档的完整日志/动作流程（后端 /api/export）。 */
 function downloadUrl(url){

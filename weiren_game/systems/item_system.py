@@ -359,7 +359,7 @@ class ItemSystemMixin:
             if target_slot is not None:
                 inventory.move_to(instance, int(target_slot))
             self._record_action("equip", tenant=tenant.id, item=item_id)
-            self._log(f"{self.character(tenant).name}整理了{item.name}的携带位置。")
+            self._log(f"{self.character(tenant).name}整理了{item.name}的携带位置。", shown=False)
             return
         if slot is not None:
             instance = inventory.at_plot(int(slot))
@@ -377,7 +377,7 @@ class ItemSystemMixin:
         if source is not None:
             self._spill_tenant_overflow(source)
         self._record_action("equip", tenant=tenant.id, item=item_id)
-        self._log(f"{self.character(tenant).name}装备了{item.name}。")
+        self._log(f"{self.character(tenant).name}装备了{item.name}。", shown=False)
 
     def unequip_item(
         self,
@@ -403,7 +403,7 @@ class ItemSystemMixin:
         self.state.house.inventory.add(held, plot=target_slot)
         self._spill_tenant_overflow(tenant)
         self._record_action("unequip", tenant=tenant.id, item=item_id)
-        self._log(f"{self.character(tenant).name}卸下了{ITEMS[item_id].name}。")
+        self._log(f"{self.character(tenant).name}卸下了{ITEMS[item_id].name}。", shown=False)
 
     def use_item(
         self,

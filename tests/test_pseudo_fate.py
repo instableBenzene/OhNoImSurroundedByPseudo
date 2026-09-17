@@ -117,7 +117,7 @@ class PseudoTests(unittest.TestCase):
         state = engine.state.pseudo_state
         self.assertTrue(state.known)
         self.assertFalse(state.revealed)  # 机制门控仍以初访为准
-        self.assertIn("伪人已确认", engine._messages[-1])
+        self.assertIn("伪人已确认", engine._messages[-1][0])
         after = build_state(engine)["pseudo"]
         self.assertTrue(after["known"])
         self.assertEqual(after["name"], PSEUDOS["pseudo_onion"].name)

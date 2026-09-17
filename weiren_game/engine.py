@@ -81,7 +81,8 @@ class GameEngine(
     def __init__(self, state: GameState):
         """初始化引擎，绑定游戏状态并准备消息队列。"""
         self.state = state
-        self._messages: list[str] = []
+        self._messages: list[tuple[str, dict | None]] = []
+        self._log_collector: list[dict] | None = None
         self._pending_ability: list[dict[str, Any]] = []
         self._pending_interaction: object | None = None
         # 通用待选（任何 discover 期间）：非 None 时禁止其它行为。
@@ -479,30 +480,57 @@ class GameEngine(
 
     # ---------------------------------------------------------------- messages/actions
     def drain_messages(self) -> list[str]:
-        """取出并清空待展示的可见消息列表。"""
+        """取出并清空待展示的可见消息（只要文本；CLI 等旧入口用这个）。"""
+        result = [text for text, _detail in self._messages]
+        self._messages.clear()
+        return result
+
+    def drain_message_entries(self) -> list[tuple[str, dict | None]]:
+        """取出并清空可见消息（文本 + 明细），供前端渲染可折叠日志。"""
         result = self._messages[:]
         self._messages.clear()
         return result
 
-    def _log(self, message: str, *, shown: bool = True) -> None:
-        """统一日志入口：shown 为 True 时作为可见消息，否则只落完整日志。"""
-        if shown:
-            self._show_message(message)
-        else:
+    def _collect_start(self) -> None:
+        """开始收集可见播报（配合 `_collect_flush`）：块内不逐条播，仍逐条进完整日志。"""
+        self._log_collector = []
+
+    def _collect_flush(self, summary: str, *, detail: dict | None = None) -> None:
+        """把收集到的播报合并成**一条**汇总播出（明细挂在其下，前端可折叠）。"""
+        collected, self._log_collector = self._log_collector, None
+        if not collected:
+            return
+        self._show_message(summary, detail or {"rows": collected})
+
+    def _log(self, message: str, *, shown: bool = True, detail: dict | None = None) -> None:
+        """统一日志入口：`shown=True` 进玩家可见日志，否则只落完整日志。
+
+        收集期内（`_collect_start` 之后、`_collect_flush` 之前）可见播报会被收起：
+        仍然逐条写进完整日志，但玩家只看到 flush 出来的那一条汇总 —— 明细点开看。
+        """
+        if self._log_collector is not None:
             self._record_log(message)
+            self._log_collector.append({"label": message})
+            return
+        if shown:
+            self._show_message(message, detail)
+        else:
+            self._record_log(message, detail)
 
-    def _record_log(self, message: str) -> None:
+    def _record_log(self, message: str, detail: dict | None = None) -> None:
         """把一条文本记入完整对局日志，不进入玩家的可见消息队列。"""
-        self.state.log.entries.append(
-            {"turn": self.state.flow.turn, "shown": False, "text": message}
-        )
+        entry: dict = {"turn": self.state.flow.turn, "shown": False, "text": message}
+        if detail:
+            entry["detail"] = detail
+        self.state.log.entries.append(entry)
 
-    def _show_message(self, message: str) -> None:
-        """把一条文本同时记入日志并作为可见消息交给玩家。"""
-        self._messages.append(message)
-        self.state.log.entries.append(
-            {"turn": self.state.flow.turn, "shown": True, "text": message}
-        )
+    def _show_message(self, message: str, detail: dict | None = None) -> None:
+        """把一条文本同时记入日志并作为可见消息交给玩家（可带明细）。"""
+        self._messages.append((message, detail))
+        entry: dict = {"turn": self.state.flow.turn, "shown": True, "text": message}
+        if detail:
+            entry["detail"] = detail
+        self.state.log.entries.append(entry)
 
     def _log_lines(self) -> list[str]:
         """将完整日志逐行渲染为文本（含未公开记录与对应回合号）。"""
