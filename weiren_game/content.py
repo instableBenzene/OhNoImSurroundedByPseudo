@@ -423,7 +423,7 @@ _BASE_CONTAINERS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("weiren_game.data.labels", (
         "ITEM_CATEGORY_LABELS", "ITEM_TAG_LABELS", "LOCATION_GROUP_LABELS",
         "LOCATION_GROUP_ICONS", "INFORMATION_KIND_LABELS",
-        "ITEM_TAG_ICONS", "ITEM_TAG_ICON_PRIORITY",
+        "ITEM_TAG_ICONS", "ITEM_TAG_ICON_PRIORITY", "ACCUSE_TEXTS",
     )),
     ("weiren_game.data.codex_pack", (
         "EXTRA_SECTIONS", "PERSONALITY_BASE", "PERSONALITY_REQUIREMENT",

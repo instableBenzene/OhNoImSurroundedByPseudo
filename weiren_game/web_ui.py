@@ -500,6 +500,20 @@ def pseudo_avatar_art(pseudo_id: str) -> dict:
     return view
 
 
+def _expel_texts(evidence: dict) -> dict:
+    """指认（驱逐）的界面文案：**内容层给词**，这里只按"证据是否已证实"挑一份下发。"""
+    from .data.labels import ACCUSE_TEXTS
+
+    texts = ACCUSE_TEXTS.get("confirmed" if evidence.get("confirmed") else "pending") or {}
+    return {
+        "action": str(texts.get("action") or ""),
+        "hint": str(texts.get("hint") or ""),
+        "confirm": str(texts.get("confirm") or ""),
+        # 危险动作：界面据此上危险色（`.btn.danger` / `--danger`），不写死颜色。
+        "danger": True,
+    }
+
+
 def _global_event_rows(engine: GameEngine) -> list[dict]:
     """把生效中的全局事件映射为界面行：图标 + 名称 + 剩余回合 + 内容。
 
@@ -630,6 +644,9 @@ def build_state(engine: GameEngine) -> dict:
             "searching": tenant.id in searching_ids,
             "expellable": can_expel,
             "expel_risk": bool(can_expel and not evidence["confirmed"]),
+            # 指认（驱逐）的界面文案：**由内容层给词**（`data/labels.ACCUSE_TEXTS`），
+            # 这里只按"证据是否已证实"挑一份下发；前端不写任何机制说明。
+            "expel": _expel_texts(evidence) if can_expel else None,
             "character_id": tenant.character_id,
             "name": info.name,
             "avatar": avatar_of(tenant.character_id),

@@ -69,6 +69,21 @@ def information_kind_label(kind: str) -> str:
 # 可"装备"的 tag（用于下发物品的 equip 标志，前端不写死）。
 EQUIP_TAGS = frozenset({"armor", "tool", "information_carrier", "craft"})
 
+# 指认（驱逐）的机制说明：**内容层下发**，前端只渲染（不许写死在前端）。
+# 键是证据状态：`confirmed`（已有已证实的指认）/ `pending`（只有待验证的指认，可能误逐）。
+ACCUSE_TEXTS: dict[str, dict[str, str]] = {
+    "confirmed": {
+        "action": "指认驱逐",
+        "hint": "证据已证实：他是混进来的伪人。",
+        "confirm": "确定要驱逐他吗？此操作不可撤销。",
+    },
+    "pending": {
+        "action": "指认驱逐",
+        "hint": "手头只有待验证的指认，判断有误会误逐一名无辜房客。",
+        "confirm": "证据还只是待验证的指认——一旦驱逐不可撤销。确定吗？",
+    },
+}
+
 # tag -> 图标（物资图鉴/格子用；取首个命中的 tag，回退到分类图标）。
 ITEM_TAG_ICONS = {
     "ammo": "i-bullet", "flintlock": "i-target", "armor": "i-armor", "book": "i-book",

@@ -373,13 +373,11 @@
   .tenant .tn .tag,.tenant .tn .tag.search{flex:none}
   .tenant .tag{font-family:var(--mono);font-size:10.5px;color:var(--ink3);border:1px solid var(--line);padding:0 4px}
   /* 屋主直接驱逐：达标后在头像右上角冒出小按钮 + 是/否确认弹窗 */
-  .expel-btn{position:absolute;top:-1px;right:-1px;z-index:2;font-family:var(--hei);font-size:10.5px;
-    line-height:1.5;letter-spacing:.04em;padding:0 5px;color:var(--danger-ink);cursor:pointer;
-    border:1px solid var(--danger);background:linear-gradient(var(--danger-1),var(--danger-2));box-shadow:var(--shadow-chip)}
-  .expel-btn:hover{border-color:var(--amber);color:var(--ink-hi);background:linear-gradient(var(--danger-hi-1),var(--danger-hi-2))}
-  .expel-btn.inline{position:static;margin-left:8px;padding:2px 9px;font-size:12px}
-  .expel-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-  .expel-warn{font-family:var(--hei);font-size:12.5px;color:var(--warn);margin-top:8px}
+  /* 危险动作的提示色：一律走语义色 token（锁定），不新造颜色 */
+  .tag.danger{border-color:var(--danger);color:var(--danger)}
+  .choice-grid .card.danger{border-color:var(--danger)}
+  .pick-card.danger{border-color:var(--danger);color:var(--danger)}
+  .pick-card.danger:hover{background:color-mix(in srgb,var(--danger) 18%,transparent)}
   .vit{display:flex;flex-direction:column;gap:3px;margin-top:6px}
   .vit .lab{font-family:var(--mono);font-size:10.5px;color:var(--ink3);display:flex;justify-content:space-between}
   .bar{height:6px;border:1px solid var(--line2);display:flex;gap:2px;padding:1px}
@@ -1342,6 +1340,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
         <div class="section-heading">
           <div><span class="eyebrow">TENANT ROSTER</span><h3>房客席位</h3></div>
           <span class="muted" style="font-size:11px">点选房客查看背包与状态</span>
+          <button class="btn danger" id="accuseBtn" onclick="askAccuse()" hidden>指认</button>
         </div>
         <div id="expandedWrap"></div>
         <div class="tenant-grid" id="tenantGrid"></div>
@@ -1630,7 +1629,7 @@ function tenantDetailHtml(id){
   }).join("");
   return `<div class="td-inline" onclick="selectTenant(null)">
     <div class="td-head"><button class="btn" onclick="event.stopPropagation();selectTenant(null)">‹ 返回席位</button>
-      <b>${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>${expelBtn(t,1)}
+      <b>${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>
       <span style="margin-left:auto;font-size:13px">${personaHtml(t)}</span></div>
     <div class="td-body">
       <div class="td-left"><div class="td-avid"><div class="av">${avatarIcon(t.character_id,t.avatar,"lg",t.art,t.avatar_parts)}</div>
@@ -1677,7 +1676,7 @@ function tenantCardHtml(t){
     ...t.emotions.map(e=>chip(e[1],e[0],e[2]||"")),
     t.mark?chip(t.mark,"i-mark",""):""].join("");
   return `<div class="tenant${t.id===bpTenant?" sel":""}${t.searching?" searching":""}" onclick="selectTenant(${t.id})" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="dropOnTenant(event,${t.id})">
-    <div class="t-top"><div class="av">${avatarIcon(t.character_id,t.avatar,"av",t.art,t.avatar_parts)}${expelBtn(t)}</div>
+    <div class="t-top"><div class="av">${avatarIcon(t.character_id,t.avatar,"av",t.art,t.avatar_parts)}</div>
       <div class="t-main">
         <div class="tn"><b style="font-size:${nameFont(t.name)}">${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>${t.searching?`<span class="tag search">搜索中</span>`:""}</div>
         <div class="t-persona"><span>${personaPart(t,ps[0])}</span><i>·</i><span>${personaPart(t,ps[1])}</span></div>
@@ -1928,22 +1927,47 @@ function closeDialog(){ $("mask").classList.remove("on"); $("mask").classList.re
   _confirmCb=null; syncPeek(); }
 function confirmDialog(){ const cb=_confirmCb; _confirmCb=null; $("mask").classList.remove("on"); if(cb) cb(); }
 
-/* ---- 屋主直接驱逐：系统只下发「可否驱逐 + 风险」，按钮与弹窗由前端通用渲染 ---- */
-function expelBtn(t,inline){
-  if(!t||!t.expellable) return "";
-  const tip=t.expel_risk?"直接驱逐（证据仅为待验证指认，判断有误会误逐无辜房客）":"直接驱逐";
-  return `<button class="expel-btn${inline?" inline":""}" title="${tip}" onclick="event.stopPropagation();askExpel(${t.id})">驱逐</button>`;
+/* ---- 指认（驱逐）：本质是"选一个房客 + 不可撤销"，所以走现成的选人范式 ----
+   文案（动作名/提示/确认句）全部由内容层下发（`data/labels.ACCUSE_TEXTS` → `t.expel`），
+   前端只负责画：入口收敛成一个按钮，选中后再确认一次。 */
+function _accuseTargets(){ return (STATE.tenants||[]).filter(t=>t.expellable); }
+function syncAccuseBtn(){
+  const b=$("accuseBtn"); if(!b) return;
+  const list=_accuseTargets();
+  b.hidden=!list.length;
+  if(list.length) b.textContent=((list[0].expel||{}).action)||"指认";
 }
-function askExpel(id){
-  const t=(STATE.tenants||[]).find(x=>x.id===id); if(!t) return;
-  const risk=t.expel_risk?`<div class="expel-warn">提示：目前只有待验证的指认，若判断有误，会误逐一名无辜房客。</div>`:"";
-  openDialog("驱逐房客","EXILE",
-    `<div class="disc-desc">确定要驱逐 ${esc(t.name)} 吗？此操作不可撤销。</div>${risk}
-     <div class="expel-foot"><button class="btn" onclick="closeDialog()">否</button>
-     <button class="btn danger" onclick="doExpel(${id})">是</button></div>`,
-    false, null, true);
+/* 公共「确认」范式：不可撤销的动作都用它。文案由调用方给（通常来自内容层下发）。 */
+let _confirmYes=null;
+function askConfirm(o){
+  o=o||{};
+  _confirmYes=o.onYes||null;
+  const yes=`<div class="pick-card${o.danger!==false?" danger":""}" onclick="confirmYes()"><b>${esc(o.yes||"是")}</b></div>`;
+  openDialog(o.title||"", "CONFIRM",
+    `<div class="disc-desc">${esc(o.question||"")}</div>`
+    + (o.note?`<div class="disc-desc">${esc(o.note)}</div>`:"")
+    + `<div class="disc-row"><div class="pick-card" onclick="closeConfirm()"><b>${esc(o.no||"否")}</b></div>${yes}</div>`,
+    false, null, true, true);
 }
-function doExpel(id){ closeDialog(); postAction({type:"accuse", tenant_id:id}); }
+function closeConfirm(){ _confirmYes=null; closeDialog(); }
+function confirmYes(){ const cb=_confirmYes; _confirmYes=null; closeDialog(); if(cb) cb(); }
+function askAccuse(){
+  const list=_accuseTargets();
+  if(!list.length){ toast("目前没有可以指认的房客。","err"); return; }
+  const rows=list.map(t=>{
+    const hint=(t.expel||{}).hint||"";
+    return tenantChoiceCard(t, hint?`<span class="tag danger">${esc(hint)}</span>`:"");
+  }).join("");
+  openDialog(((list[0].expel||{}).action)||"指认","ACCUSE",
+    `<div class="choice-grid">${rows}</div>`, true, ()=>{
+      const el=pickedEl(); if(!el){ toast("请先选择房客。","err"); return; }
+      const id=Number(el.dataset.id);
+      const t=list.find(x=>x.id===id)||{};
+      askConfirm({ title:((t.expel||{}).action)||"指认", question:(t.expel||{}).confirm||"",
+        danger:true, yes:"驱逐", no:"取消",
+        onYes:()=>postAction({type:"accuse", tenant_id:id}) });
+    });
+}
 let _dragItem=null;
 let BP_LOCKED=false;
 let _dragSrc=null;
@@ -2184,7 +2208,7 @@ function amtSync(from){
   if(minus) minus.disabled=v<=1; if(plus) plus.disabled=v>=max;
 }
 function amtStep(d){ const num=$("abAmount"); if(!num) return; num.value=amtClamp((Number(num.value)||1)+d); amtSync("num"); }
-function renderAll(){renderBondStrip();renderTenants();renderWarehouse();renderBackpack();renderPanel();renderMissions();renderIntel();renderLog();renderPbar();renderHud();syncSearchBtn();}
+function renderAll(){renderBondStrip();renderTenants();renderWarehouse();renderBackpack();renderPanel();renderMissions();renderIntel();renderLog();renderPbar();renderHud();syncSearchBtn();syncAccuseBtn();}
 
 /* ================= 真实接口接线（覆盖同名 demo 函数） ================= */
 function renderHud(){
@@ -2986,14 +3010,19 @@ function maybePending(){
 }
 let FATE=null;
 /* 抽到的选项：初始只给名称，方向在后续步骤决定；悬浮 0.25s 出两种效果。 */
-function fateCardHtml(index,o){
+/* 「一张卡片」的公共画法：序号 + 可选符号（内容自带的**内联 svg**）+ 名称；选牌、选方向、
+   以及以后任何"带符号的卡"都用这一份（`hover` 可选，例如悬浮看两个方向各自的效果）。
+   符号没给就只显示序号与名称。 */
+function svgCardHtml(index,label,svg,hover){
   const on=(SEL.key===PAGER.key&&SEL.index===index)?" sel":"";
-  /* 符号由内容自带（内联 svg），没给就只显示号码与名称。 */
-  const art=o.svg?`<span class="dc-av"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${o.svg}</svg></span>`:"";
-  return `<div class="card${on}" data-index="${index}" onclick="tglSelect(${index})" ondblclick="optDbl(${index})"
-    onmouseenter="fateHoverStart(event,${index})" onmouseleave="fateHoverEnd()">
-    <span class="cn">${String(index+1).padStart(2,"0")}</span>
-    ${art}<span class="dc-name">${esc(o.display||o.name||"")}</span></div>`;
+  const art=svg?`<span class="dc-av"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></span>`:"";
+  return `<div class="card${on}" data-index="${index}" onclick="tglSelect(${index})" ondblclick="optDbl(${index})"${hover||""}>`
+    +`<span class="cn">${String(index+1).padStart(2,"0")}</span>${art}`
+    +`<span class="dc-name">${esc(label||"")}</span></div>`;
+}
+function fateCardHtml(index,o){
+  return svgCardHtml(index, o.display||o.name||"", o.svg,
+    ` onmouseenter="fateHoverStart(event,${index})" onmouseleave="fateHoverEnd()"`);
 }
 let _fateTimer=null;
 function fateHoverStart(ev,index){
@@ -3041,13 +3070,7 @@ function fateFlow(pi){
     const spec=pi.orientation||{};
     const choices=(spec.choices||[]);
     const symbols=spec.symbols||{};
-    const cards=choices.map((c,i)=>{
-      const art=symbols[c[0]]?`<span class="dc-av"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${symbols[c[0]]}</svg></span>`:"";
-      const on=(SEL.key===PAGER.key&&SEL.index===i)?" sel":"";
-      return `<div class="card${on}" data-index="${i}" onclick="tglSelect(${i})" ondblclick="optDbl(${i})">`
-        +`<span class="cn">${String(i+1).padStart(2,"0")}</span>${art}`
-        +`<span class="dc-name">${esc(c[1])}</span></div>`;
-    });
+    const cards=choices.map((c,i)=>svgCardHtml(i, c[1], symbols[c[0]]||"", ""));
     openDialog(pi.title||"","FATE",
       `<div class="disc-desc">${esc(spec.prompt||"")}</div>`
       +pagedOptions("fate-orient", cards),
@@ -3148,7 +3171,8 @@ function submitPoolHtml(){
     const icon=r.e[0],name=r.e[1],q=r.e[2],count=r.e[3],stack=r.e[4],itemId=r.e[5];
     const ok=q>=(SUBMIT?SUBMIT.min:0);
     const sel=(SUBMIT&&SUBMIT.itemId===itemId)?" sel":"";
-    return `<div class="slot q${q}${ok?"":" off"}${sel}" draggable="${ok}" ondragstart="onSubDrag(event,'${esc(itemId)}',${ok})" onclick="${ok?`pickSubItemById('${esc(itemId)}')`:""}">${itemIcon(r.e[12],icon,"q"+q)}<span class="n">${esc(name)}</span>${(stack&&count>1)?`<span class="c">×${count}</span>`:""}<span class="submit-src">${esc(r.src)}</span></div>`;
+    /* 格子内容复用 slotInner（别再抄一份图标/名字/数量）；只在末尾多挂一个来源标签。 */
+    return `<div class="slot q${q}${ok?"":" off"}${sel}" draggable="${ok}" ondragstart="onSubDrag(event,'${esc(itemId)}',${ok})" onclick="${ok?`pickSubItemById('${esc(itemId)}')`:""}">${slotInner(r.e)}<span class="submit-src">${esc(r.src)}</span></div>`;
   }).join("");
 }
 function onSubDragOut(ev){ if(!SUBMIT||!SUBMIT.itemId||!ev.dataTransfer) return; ev.dataTransfer.setData("text/plain",SUBMIT.itemId); ev.dataTransfer.effectAllowed="move"; }
