@@ -454,6 +454,8 @@ python tools/audit_separation.py
 - **待处理视图**：`PENDING_VIEW = (build, resolve)`；`build` 返回 `{prompt, options, cancel, submit?}`。
   - `submit` 规格支持"提交物资"交互（如厄瑞玻斯上交紫色物资改定牌面）；`resolve` 接受结构化值 `{index, item_id, orientation}`。
 - 后端 `build_state` 把这些规格与图鉴数据一并下发；`web_ui` 不做内容判断。
+- **界面照现有范式拼**：选人＝房客卡、物品＝格子、选一个＝卡片行、描述＝行式信息条目——
+  完整清单与各自用例见 `docs/STYLE.md` **§10 UI 范式（照着用，别另造）**。
 
 ### 10. 边界自检
 

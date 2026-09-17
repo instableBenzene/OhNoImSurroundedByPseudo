@@ -168,10 +168,68 @@
   （≤1360 收窄、≤1120 纵向堆叠、≤720 紧凑、`max-height:840` 压缩门口区）
 - 搜索两栏 `.search-layout`：`1fr 1fr`，`height:40vh; min-height:210px`
 - 图鉴 `.codex-split`：`310px | 1fr`，`height:64vh`
-- `z-index`：dusk-bg `0` < lpane `1` < mask `20` < bond-drawer `45` < launcher/tip `60` <
-  pending-btn `70` < peek-toggle `71` < lc-dialog `80` < toast-wrap `95` < tip-layer `300`
+- `z-index`（低 → 高）：dusk-bg `0` < lpane `1` < 羁绊条 `15` < mask `20` < 专属面板 `26` <
+  pause（ESC）`40` < launcher / tip `60` < pending-btn `70` < peek-toggle `71` < lc-dialog `80` <
+  bond-drawer `85` < toast-wrap `95` < tip-layer `300` < quit-screen `999`
+- **羁绊条只需要高过页内普通内容**（抬高它是为了让 chip 自己的悬浮窗不掉到可视日志之下），
+  **不要给到覆盖层之上**——它曾经是 `80`，结果把遮罩 / ESC / 专属面板全压住了。
 
 ### 动效
 - 过渡 `.14s`（按钮）/ `.15s`（卡片）；吐司 `toastIn .18s`；启动器背景 `flicker`/`fogmove`；
   `@keyframes`：`flicker, fogmove, peer, toastIn`
 - 悬停详情：普通 chip 即显；伪人技能 **1s** 后弹出（`.door-zone` 整块触发）
+
+---
+
+## 10. UI 范式（**照着用，别另造**）
+
+> 做新界面时的第一步：从下面挑现成的范式。挑不出来，才轮到"扩范式 / 扩词表"——
+> 而那是**核心改动**，一次为全体服务（与卡片的 `svg` 图标位、面板的 `backdrop` 同一条规矩）。
+> 只有一句话要守：**形归范式，值归内容**——内容给 id / 数量 / 值，图标、品质色、尺寸、间距由范式决定；
+> 文案一律由内容随视图下发。
+
+### 10.1 选人（房客）
+
+- 组件：`tenantChoiceCard(t, extra)` + 容器 `.choice-grid`；点选 `pickUnit(this)`、读取 `pickedEl()`、
+  取 id `Number(el.dataset.id)`。卡片自带头像（**必须走 `avatarIcon()`**）、`#id`、名字、**生命/理智条**、性格，
+  以及可选的"搜索中"标签。
+- 现有用例：**指派搜索选房客**（`showSearch()`，这就是最初的好样例）、**技能目标选择**、
+  **命运抽牌的「指定房客」那一步**。
+- 别自己拼"一行名字 + 确定按钮"的选人界面。
+
+### 10.2 物品（一个格子）
+
+- 组件：`.slot` + `slotInner(item)`（只画"格子里有什么"）；图标走 `itemIcon(entry[12], entry[0], "q"+品质)`。
+- 一个**物品条目**的形状由后端 `web_ui._item_entry()` 决定（图标标记 / 名字 / 品质 / 数量 / 是否堆叠 / `item_id` /
+  中文标签 / 描述 / 风味 / 是否装备 / 耐久 / 上限）。**前端不去别处查物品**：仓库、背包、专属面板、上交池
+  吃的是同一种条目。
+- 现有用例：屋主仓库、房客背包、**专属面板的格子**、上交 / 提交池。
+
+### 10.3 卡片选项（选一个）
+
+- 组件：`.card`（`.cn` 序号 / `.dc-av` 图标位 / `.dc-name` 名称）+ `pagedOptions(key, cards)`：每页 5 张、
+  超过一页才出箭头（端点置灰、不隐藏）；点选 `tglSelect(i)`、读取 `selectedIndex()`、
+  **双击 = 选中并确认**（`optDbl(i)`）。
+- `.dc-av` 图标位可以放：头像（`avatarIcon`）、物品图（`itemIcon`）、或**内容自带的内联 svg**
+  （24×24 内坐标、不写颜色与线宽，见 `docs/GUIDE.md` §14.11）。
+- 现有用例：**发现**（`discoverCardHtml`）、命运抽牌的**选牌**与**选方向**。
+
+### 10.4 行式信息（描述一块状态）
+
+- 组件：`slotHtml(rows)`。词表只有五种：`mark`（引用印记）/ `bar`（可带档位刻度）/ `text` / `tags` /
+  `glyph`（可旋转、悬停给文案）。
+- 现有用例：房客详情页的**小面板**（`DETAIL_SLOT`）、**专属面板的 `rows`**。
+
+### 10.5 按钮与反馈
+
+- 按钮只有三种：`.btn`（普通）/ `.btn.p`（主要）/ `.pick-card`（大块选择）。**新按钮一律复用，不另起一套参数。**
+- 反馈用 `toast(msg, kind)`；查看类信息走悬浮层（`tipLayer`），不要挤进正文。
+
+### 10.6 浮层放哪
+
+- 弹窗：`openDialog(title, sub, html, wide, cb, hideFoot, bare)`。
+  **`bare=true` ＝「发现」那套无背景板浮层**（只把场面调暗，不出面板底与标题栏）——
+  所有"选一个"的流程都用它。
+- 贴底浮窗：`.bp-float`（背包）/ `.mission-float`（外出搜索）；可拖动浮窗：`.panel-float`（专属面板，
+  位置记进 `game_config.json`）。
+- 阻断只留给**必须做的决定**；一切"查看"类操作都放行。
