@@ -59,6 +59,7 @@ python game_ui.py         # 直接在终端运行（可见日志）
 | `docs/PACKAGING.md` | 免安装分发（便携 `runtime/` + macOS / PyInstaller） |
 | `dlc/README.md`、`dlc/_template/` | 内容包 / 伪人编写规范与模板 |
 | `resourcepacks/README.md` | 资源包（外观/材质）编写规范 |
+| `CONTRIBUTING.md`、`.github/` | 归属边界：开放区只有 `dlc/`、`resourcepacks/`；外部 PR 触碰自留区会被 `ownership-guard` 打回 |
 | `../完蛋，我被伪人包围了？！/` | 设计原稿（在项目外）：docx、`md/` 转换稿、差异附录 |
 
 ## 内容可插拔

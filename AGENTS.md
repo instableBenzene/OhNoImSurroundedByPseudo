@@ -44,6 +44,7 @@
 | `docs/PACKAGING.md` | 免安装分发（便携 `runtime/` + VBS；可选 PyInstaller exe） |
 | `docs/archive/` | **归档**（旧任务书、被替换的实现与数值快照）：**非现行参考、不要主动读**，只在追溯或回滚时看。约定见 `docs/archive/README.md` |
 | `dlc/README.md` / `dlc/_template/` | 内容包（含 `codex/`）编写规范与模板 |
+| `CONTRIBUTING.md` + `.github/` | **归属边界**：开放区只有 `dlc/`、`resourcepacks/`；外部 PR 触碰自留区由 `ownership-guard` 打回（CODEOWNERS 同步声明） |
 | `design/README.md` + `design/svc-mock.html` | **冻结的界面设计稿基准**（静态假数据，SVC 风）；参数以实现为准，见 `docs/STYLE.md` §9 |
 | `../完蛋，我被伪人包围了？！/` | **设计原稿（项目外）**：`*.docx` 与 `md/*.md`（附录 A 记差异） |
 
@@ -110,12 +111,14 @@ weiren_game/icon_files.py           地点/信息/伪人图标（data/icon/<sect
 docs/*.md                     GUIDE/PRINCIPLES/STYLE/ADD_CONTENT/DECISIONS/PACKAGING（archive/ 为归档）
 dlc/                          外部内容包 + _template（含 codex/）
 resourcepacks/                独立资源包（只改外观：色调/字体/贴图/素材位），与 dlc/ 并列、各自有序
+.github/                      归属守卫（CODEOWNERS + ownership-guard workflow + PR 模板）；开放区只有上面两行，见 CONTRIBUTING.md
 tests/                        单元 / 回归测试（命令与约束见 §1）
 tools/smoke_simulation.py     批量对局冒烟
 tools/audit_separation.py     分离度自检（系统/前端无内容泄漏；data 不依赖 systems）
 tools/browser_playtest.mjs    浏览器对局压测（CDP 驱动）
 tools/validate_content.py     内容校验（编号/头像/性格/技能派发/引用完整性）
 tools/audit_text.py           日志文案自检（句式/长度/标点/标记；规则见 docs/STYLE.md §11）
+tools/audit_ownership.py      归属边界自检（外部 PR 只准动 dlc/、resourcepacks/；**只用在 PR 上**，不进"每次改完的固定动作"）
 tools/dump_effects.py         效果注册表 dump（只读；核对 docs/ARCH.md 的闸门/数值目录）
 tools/new_character.py        房客脚手架（自动分配 source_id 与 AVATAR）
 tools/prepare_portable.py     准备便携运行时（embeddable Python → runtime/）

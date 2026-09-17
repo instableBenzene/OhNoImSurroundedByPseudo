@@ -3,6 +3,24 @@
 > `AGENTS.md` 只保留"现状速览"；**具体到某次为何这么改、当时踩了什么坑**记在这里。
 > 目的：不把入口文档撑成流水账，又不丢上下文。要加新条目就追加在顶部。
 
+## 归属边界：只有 `dlc/`、`resourcepacks/` 开放，核心区自留
+
+**要什么**：别人能给这个游戏加内容包，但不能改核心代码。所以定一条**可执行**的边界，而不是写在嘴上。
+
+- **开放区**：`dlc/`、`resourcepacks/`（以新增文件为主，独立装载、同名覆盖）。
+- **自留区**：其余一切 —— `weiren_game/`（核心与内置内容）、`tools/`、`tests/`、`docs/`、`design/`、
+  根目录入口与配置、`.github/`、`.opencode/`。
+- **落地**：`.github/CODEOWNERS`（自留区逐条声明 owner；开放区**刻意不列** —— CODEOWNERS 没有"取消归属"
+  的写法）+ `.github/workflows/ownership-guard.yml` + `tools/audit_ownership.py`（同一套规则，本地可自查）
+  + `CONTRIBUTING.md` / PR 模板写清提交路径。
+- **守卫为什么放行作者**：作者在核心区工作是正当行为，所以 `audit_ownership.py` 只认 `--trusted`
+  （`author_association` = OWNER/MEMBER/COLLABORATOR 时跳过）。因此它**不进**「每次改完的固定动作」，
+  它是 PR 检查，不是提交流程。
+- **还差一步（GitHub 网页）**：给 `main` 开分支保护（Require a pull request + Require review from Code Owners），
+  并把 `ownership-guard` 设为 required status check；**不要**勾"Do not allow bypassing"，否则作者自己也会被卡。
+  CODEOWNERS 只有配上分支保护才真正咬人。
+- **说明**：fork 是 GitHub 的既定行为，仓库里禁止不了；能控的是**上游**这一侧。
+
 ## 伪人卡「已确认」：初访前技能生效也要刷新（`pseudo.known`）
 
 **现象**：洋葱的「潮汐的诱惑」（搜索袭击）等技能在**初访前**就会生效，玩家看得到结果，

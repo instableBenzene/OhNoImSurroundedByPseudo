@@ -1,0 +1,22 @@
+name: ownership-guard
+
+# 归属守卫：外部 PR 只准动开放区（dlc/、resourcepacks/）。
+# 作者/协作者本人（author_association = OWNER/MEMBER/COLLABORATOR）在脚本里跳过 ——
+# 在核心区工作是作者的正当行为，这里挡的只是**外部**改动。
+# 规则说明见 CONTRIBUTING.md；本地同款自查：python tools/audit_ownership.py --base origin/main
+
+on:
+  pull_request:
+
+jobs:
+  ownership-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: 只允许改动 dlc/ 与 resourcepacks/
+        env:
+          AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          BASE_REF: ${{ github.base_ref }}
+        run: python3 tools/audit_ownership.py --base "origin/${BASE_REF}" --trusted "${AUTHOR_ASSOCIATION}"
