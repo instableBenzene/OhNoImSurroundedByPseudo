@@ -70,15 +70,17 @@ OPEN = "([{"
 CLOSE = ")]}"
 
 
-def _parts(argument: str) -> tuple[str, int]:
-    """取**最外层**字面量拼成正文；返回 (正文, `{…}` 占位符个数)。
+def _parts(argument: str) -> tuple[str, int, bool]:
+    """取**最外层**字面量拼成正文；返回 (正文, `{…}` 占位符个数, 最后一段是否字面量)。
 
-    任何括号/方括号/花括号里的字符串都不算正文（`spec["log"]`、`"{0}".format(x)` 里的那段）。
+    注意：f-string 的 `{}` 是**写在引号里**的，所以引号状态里也要数花括号深度
+    （只在引号外数，会把 `{item.name}` 整段当正文——这正是 v1 那一批假阳性的来源）。
     """
     sentence: list[str] = []
     braces = 0
     depth = 0
     quote = ""
+    last_literal = False
     i = 0
     while i < len(argument):
         ch = argument[i]
@@ -86,14 +88,27 @@ def _parts(argument: str) -> tuple[str, int]:
             if ch == "\\":
                 if depth == 0:
                     sentence.append(argument[i + 1] if i + 1 < len(argument) else "")
+                    last_literal = True
                 i += 2
                 continue
             if ch == quote:
                 quote = ""
                 i += 1
                 continue
+            if ch == "{":
+                depth += 1
+                if depth == 1:
+                    braces += 1
+                    last_literal = False
+                i += 1
+                continue
+            if ch == "}":
+                depth = max(0, depth - 1)
+                i += 1
+                continue
             if depth == 0:
                 sentence.append(ch)
+                last_literal = True
             i += 1
             continue
         if ch in "\"'":
@@ -108,12 +123,7 @@ def _parts(argument: str) -> tuple[str, int]:
             depth = max(0, depth - 1)
         # 字符串外的字符（f 前缀、换行、缩进、+ 号）都不是正文，不进句子
         i += 1
-    return "".join(sentence).strip(), braces
-
-
-def _ends_with_literal(argument: str) -> bool:
-    """参数是否以**字面量**结尾：是才由这里负责句号（后面接变量/调用的，句号可能来自它）。"""
-    return argument.rstrip().rstrip(",").endswith(("\"", "'"))
+    return "".join(sentence).strip(), braces, last_literal
 
 
 def scan(path: pathlib.Path) -> list[tuple[str, str, str]]:
@@ -122,13 +132,16 @@ def scan(path: pathlib.Path) -> list[tuple[str, str, str]]:
     text = path.read_text(encoding="utf-8", errors="replace")
     for match in CALL.finditer(text):
         argument = _argument(text, match.end())
-        sentence, braces = _parts(argument)
+        sentence, braces, last_literal = _parts(argument)
         if not sentence:
             continue                                     # 全是占位符 / 表达式，没有可审的文字
         if STRUCT.search(sentence):
             continue                                     # 结构行（回合分隔）不按句子的规则要求
-        if _ends_with_literal(argument) and not sentence.endswith(END_OK):
-            rows.append(("error", "\u672a\u6536\u5c3e\uff08\u7f3a\u53e5\u53f7\uff09", sentence))
+        if not sentence.endswith(END_OK):
+            if last_literal:
+                rows.append(("error", "\u672a\u6536\u5c3e\uff08\u7f3a\u53e5\u53f7\uff09", sentence))
+            else:
+                rows.append(("warn", "\u7ed3\u5c3e\u662f\u53d8\u91cf\uff0c\u53e5\u53f7\u53ef\u80fd\u5728\u5b83\u91cc\uff08\u4eba\u773c\u4e00\u770b\uff09", sentence))
         if "**" in sentence:
             rows.append(("error", "\u542b\u52a0\u7c97\u6807\u8bb0 **", sentence))
         if len(sentence) + braces * PLACEHOLDER_W > MAX_LEN:
