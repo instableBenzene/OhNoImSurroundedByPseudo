@@ -144,11 +144,11 @@ class VisitorSystemMixin:
                     tenant.at_home = True
                     tenant.temporarily_away = False
                     tenant.return_event_pending = False
-                    self._log(f"你重新接纳了{definition.name}（{tenant.id}）。")
+                    self._log(f"{definition.name}被重新接纳（房客编号{tenant.id}）。")
                     self._on_accept_healing(tenant)
                 else:
                     tenant = self._add_tenant(definition.tenant_id)
-                    self._log(f"你接纳了{definition.name}，其房客编号为{tenant.id}。")
+                    self._log(f"{definition.name}被接纳，房客编号{tenant.id}。")
                     self._on_tenant_accepted(tenant)
                 self.state.world.visitors.visitor_rejections[definition.tenant_id] = 0
                 self._pseudo_visitor_mark()
@@ -184,7 +184,7 @@ class VisitorSystemMixin:
                 elif rejected < 2:
                     self.state.world.visitors.visitor_pool.append(definition.tenant_id)
                 suffix = "；连续拒绝两次后将不再来访" if rejected >= 2 else "；他/她以后还会再尝试一次"
-                self._log(f"你拒绝了{definition.name}，脚步声消失在黑暗中{suffix}。")
+                self._log(f"{definition.name}被拒绝，脚步声消失在黑暗中{suffix}。")
                 self._emit_node(
                     "door.reject",
                     kind="human",
@@ -219,7 +219,7 @@ class VisitorSystemMixin:
                 ]
             for item_id in rewards:
                 self._gain_item(item_id)
-            self._log("你收下补给：" + "、".join(ITEMS[item_id].name for item_id in rewards) + "。")
+            self._log("补给入库：" + "、".join(ITEMS[item_id].name for item_id in rewards) + "。")
             if counts_as_accept:
                 self._pseudo_visitor_mark()
                 self._on_accept_healing(None)
