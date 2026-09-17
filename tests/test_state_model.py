@@ -121,11 +121,13 @@ class StateModelTests(unittest.TestCase):
         state.house.inventory.add(ItemInstance("H1", "garlic", count=3))
         state.world.visitors.next_pseudo_turn = 7
         state.pseudo_state.revealed = True
+        state.pseudo_state.known = True
         state.pseudo_state.whisper_marks = 4
         raw = state.to_dict()
         restored = GameState.from_dict(raw)
         self.assertEqual(restored.to_dict(), raw)
         self.assertEqual(restored.pseudo_state.scenario().whisper_marks, 4)
+        self.assertTrue(restored.pseudo_state.known)
         raw["ghost"] = True
         with self.assertRaises(ValueError):
             GameState.from_dict(raw)

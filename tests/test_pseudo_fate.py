@@ -102,6 +102,28 @@ class PseudoTests(unittest.TestCase):
         self.assertEqual(expel.state.pseudo_state.deaths_since_last_visit, 1)
         self.assertTrue(expel.state.pseudo_state.death_since_last_curse)
 
+    def test_pre_visit_skill_confirms_door_card(self) -> None:
+        """初访前的技能生效也要把伪人卡转成「已确认」，但不动 revealed 门控。"""
+        from weiren_game.web_ui import build_state
+
+        engine = bare_engine("known-before-visit", "pseudo_onion")
+        before = build_state(engine)["pseudo"]
+        self.assertFalse(before["known"])
+        self.assertEqual(before["name"], "")
+        self.assertEqual(before["mark_value"], 0)
+
+        engine._observe_pseudo_skill("tide")
+
+        state = engine.state.pseudo_state
+        self.assertTrue(state.known)
+        self.assertFalse(state.revealed)  # 机制门控仍以初访为准
+        self.assertIn("伪人已确认", engine._messages[-1])
+        after = build_state(engine)["pseudo"]
+        self.assertTrue(after["known"])
+        self.assertEqual(after["name"], PSEUDOS["pseudo_onion"].name)
+        self.assertTrue(after["mark_label"])
+        self.assertTrue(after["card"]["skills"])
+
     def test_onion_no_auto_whisper_liberation_and_echo(self) -> None:
         from weiren_game.data.pseudos.pseudo_onion import cast_whisper
 
