@@ -55,6 +55,8 @@ python game_ui.py         # 直接在终端运行（可见日志）
 | `docs/COOKBOOK.md` | 创作样例集（给人读）：照着改就能用的最小样例 |
 | `docs/DECISIONS.md` | 决策与修正记录 |
 | `docs/BALANCE.md` | 平衡改动记录（各技能的增强/削弱账） |
+| `docs/ARCH.md` | 效果内核：数值通道 × 布尔闸门、令牌词表与闸门目录 |
+| `docs/PACKAGING.md` | 免安装分发（便携 `runtime/` + macOS / PyInstaller） |
 | `dlc/README.md`、`dlc/_template/` | 内容包 / 伪人编写规范与模板 |
 | `resourcepacks/README.md` | 资源包（外观/材质）编写规范 |
 | `../完蛋，我被伪人包围了？！/` | 设计原稿（在项目外）：docx、`md/` 转换稿、差异附录 |
