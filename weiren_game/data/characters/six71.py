@@ -11,7 +11,10 @@ CHARACTER = CharacterDefinition(
     "six71", 8, "柳七鱼", "不擅长与人相处、喜欢独处的男大学生。",
     "suspicious", "loner", 3, ("大学生", "18-24岁", "男性"),
     (A("suspension_bridge", "吊桥效应", "当屋内人数＞4人时，柳七鱼回合末理智消耗+30%。"),),
-    (A("cannot_stand", "不行，我要受不了了", "驱逐1名房客，立即获得10份随机物资，并根据目标已损失的生命值获得时运修正（基础 +5，目标每损失 10 点生命值则时运 -1，最低 -5）。*柳七鱼不会因自己驱逐房客受到理智惩罚。", "other_tenant"),),
+    (A("cannot_stand", "不行，我要受不了了", "驱逐1名房客，立即获得10份随机物资，并根据目标已损失的生命值获得时运修正（基础 +5，目标每损失 10 点生命值则时运 -1，最低 -5）。*柳七鱼不会因自己驱逐房客受到理智惩罚。", "other_tenant",
+       # 不可撤销：选定目标后先确认一次（文案与危险色都由内容声明，前端只渲染）。
+       confirm="驱逐不可撤销：他会离屋、不再来访，其余房客理智 −5。确定吗？",
+       danger=True),),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -69,6 +72,26 @@ ACTIVE_DISPATCH = {
         use_cannot_stand(engine, actor, target_id)
     ),
 }
+
+
+def cannot_stand_targets(engine: EngineProtocol, actor: object) -> list:
+    """选人卡上直接写明这一刀能换到多少：时运随目标已损失的生命衰减。"""
+    rows = []
+    for tenant in engine.home_tenants():
+        if tenant.id == actor.id:
+            continue
+        lost = max(0.0, float(tenant.max_health) - float(tenant.health))
+        fortune = max(-5, 5 - int(lost // 10))
+        rows.append({
+            "value": tenant.id,
+            "label": engine.character(tenant).name,
+            "desc": f"驱逐他：得 10 份物资，时运 {fortune:+d}（已损失 {int(lost)} 生命）",
+        })
+    return rows
+
+
+# 选人时的逐项说明（界面画到房客卡上）；形状见 `web_ui._ability_target_options`。
+TARGET_OPTIONS = {"cannot_stand": cannot_stand_targets}
 
 
 def end_of_turn_sanity_cost(

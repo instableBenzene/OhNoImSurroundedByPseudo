@@ -117,6 +117,10 @@ class AbilityDefinition:
     # True：这条"主动技能"不结算效果，只负责**打开本角色的专属面板**（`PANEL`）。
     # 前端把它渲染成开/关；引擎侧不掷失败、不付代价、不记冷却。
     opens_panel: bool = False
+    # 不可撤销的动作：选定目标后先弹一次确认，文案由内容给（前端不写死）。
+    # `danger=True` 时界面用危险色（语义色 token）；空字符串＝不需要确认。
+    confirm: str = ""
+    danger: bool = False
 
 
 @dataclass(frozen=True)
@@ -320,6 +324,8 @@ def A(
     nested_option: str = "",
     per_turn: bool = False,
     opens_panel: bool = False,
+    confirm: str = "",
+    danger: bool = False,
 ) -> AbilityDefinition:
     """构造 AbilityDefinition 的简写工厂函数。"""
     return AbilityDefinition(
@@ -337,6 +343,8 @@ def A(
         nested_option=nested_option,
         per_turn=per_turn,
         opens_panel=opens_panel,
+        confirm=confirm,
+        danger=danger,
     )
 
 

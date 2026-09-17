@@ -3329,9 +3329,15 @@ function sendAbility(abilityId,actorId,targetId,option,amount,copiedAbilityId){
   api("/api/action",body).then(r=>{ if(r.error){ toast(r.error,"err"); return; } mergeState(r.state); appendLog(r.messages); maybePending(); });
 }
 function specOf(actorId,abilityId){ return ABILITY_SPECS[actorId+"|"+abilityId]||{}; }
-function abTargetRows(excludeId){
+/* 技能选人：房客卡 + **逐项说明**（说明由内容声明 `TARGET_OPTIONS` 下发，前端不写文案）。 */
+function abTargetRows(spec,excludeId){
+  const notes={};
+  ((spec&&spec.target_options)||[]).forEach(o=>{ if(o.desc) notes[String(o.value)]=o.desc; });
   return (STATE.tenants||[]).filter(t=>t.id!==excludeId && !t.searching)
-    .map(t=>tenantChoiceCard(t)).join("");
+    .map(t=>{
+      const d=notes[String(t.id)];
+      return tenantChoiceCard(t, d?`<span class="tag">${esc(d)}</span>`:"");
+    }).join("");
 }
 function abCond(abilityId,actorId,targetId,option){ closeDialog(); sendAbility(abilityId,actorId,targetId,option); }
 /* 选定目标后：技能声明了 options 就先选效果；若选中的是 nested_option，再选要模仿的主动能力。 */
@@ -3391,10 +3397,20 @@ function useAbility(actorId,abilityId){
     return;
   }
   if(target==="tenant"||target==="other_tenant"){
-    const rows=abTargetRows(target==="other_tenant"?actorId:null);
+    const rows=abTargetRows(spec, target==="other_tenant"?actorId:null);
     if(!rows){ toast("没有可选目标。","err"); return; }
     openDialog("使用能力 · "+name, prompt||"选择目标房客", `<div class="choice-grid">${rows}</div>`, false,
-      ()=>{ const el=pickedEl(); if(!el){ toast("请先选择目标房客。","err"); return; } afterTarget(abilityId,actorId,Number(el.dataset.id)); });
+      ()=>{
+        const el=pickedEl(); if(!el){ toast("请先选择目标房客。","err"); return; }
+        const tid=Number(el.dataset.id);
+        /* 不可撤销的动作：内容声明了 `confirm` 就先确认一次（文案与危险色都由内容定）。 */
+        if(spec.confirm){
+          askConfirm({ title:name, question:spec.confirm, danger:!!spec.danger,
+            yes:"确定", no:"取消", onYes:()=>afterTarget(abilityId,actorId,tid) });
+          return;
+        }
+        afterTarget(abilityId,actorId,tid);
+      });
     return;
   }
   if(target==="tenant_condition"){

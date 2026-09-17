@@ -514,6 +514,33 @@ def _expel_texts(evidence: dict) -> dict:
     }
 
 
+def _ability_target_options(engine: GameEngine, actor, ability_id: str) -> list[dict]:
+    """技能选人时每个候选的**逐项说明**（内容声明 `TARGET_OPTIONS` 时才有）。
+
+    内容只给 `{value,label,desc}`；界面把它画到房客卡上（前端不写任何内容文案）。
+    内容出问题就当作没有说明，**不拖垮状态下发**（与面板/小角落同一态度）。
+    """
+    from .data import ABILITY_TARGET_OPTIONS
+
+    fn = ABILITY_TARGET_OPTIONS.get(ability_id)
+    if fn is None:
+        return []
+    try:
+        raw = fn(engine, actor) or ()
+    except Exception:  # noqa: BLE001 - 内容出错不该拖垮状态下发
+        return []
+    rows: list[dict] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        rows.append({
+            "value": str(item.get("value")),
+            "label": str(item.get("label") or ""),
+            "desc": str(item.get("desc") or ""),
+        })
+    return rows
+
+
 def _global_event_rows(engine: GameEngine) -> list[dict]:
     """把生效中的全局事件映射为界面行：图标 + 名称 + 剩余回合 + 内容。
 
@@ -585,6 +612,11 @@ def build_state(engine: GameEngine) -> dict:
                                      - engine.state.flow.turn),
                     # True：这条"主动技能"只是打开专属面板（界面渲染成开/关，不走 use_ability）。
                     "opens_panel": bool(getattr(ability, "opens_panel", False)),
+                    # 不可撤销的动作：文案由内容声明，界面据此先确认一次；`danger` 决定危险色。
+                    "confirm": str(getattr(ability, "confirm", "") or ""),
+                    "danger": bool(getattr(ability, "danger", False)),
+                    # 目标候选的逐项说明（内容声明 `TARGET_OPTIONS` 时才有；形状同目标候选）。
+                    "target_options": _ability_target_options(engine, tenant, ability.id),
                     # 目标选择的界面规格：由内容自描述，前端不写死任何内容文案。
                     "prompt": getattr(ability, "prompt", ""),
                     "options": [list(opt) for opt in getattr(ability, "options", ())],
