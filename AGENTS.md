@@ -24,6 +24,7 @@
 - 冒烟：`python tools/smoke_simulation.py --seeds 3 --log-dir <dir>`
 - 分离度自检：`python tools/audit_separation.py`
 - 内容校验：`python tools/validate_content.py`
+- 日志文案自检：`python tools/audit_text.py`（规则见 `docs/STYLE.md` §11；有 error 退出码 1）
 - 角色脚手架：`python tools/new_character.py <ascii_id> <中文名> [--carry N]`
 - 浏览器对局压测：`node tools/browser_playtest.mjs url=http://127.0.0.1:8730/ games=30 turns=12 budget=420`
 - 版本：`GAME_VERSION="2.1.0"`（`weiren_game/data/__init__.py`）；存档 `meta.packs` 与当前启用包不一致会拒读。
@@ -114,6 +115,7 @@ tools/smoke_simulation.py     批量对局冒烟
 tools/audit_separation.py     分离度自检（系统/前端无内容泄漏；data 不依赖 systems）
 tools/browser_playtest.mjs    浏览器对局压测（CDP 驱动）
 tools/validate_content.py     内容校验（编号/头像/性格/技能派发/引用完整性）
+tools/audit_text.py           日志文案自检（句式/长度/标点/标记；规则见 docs/STYLE.md §11）
 tools/dump_effects.py         效果注册表 dump（只读；核对 docs/ARCH.md 的闸门/数值目录）
 tools/new_character.py        房客脚手架（自动分配 source_id 与 AVATAR）
 tools/prepare_portable.py     准备便携运行时（embeddable Python → runtime/）
@@ -126,7 +128,7 @@ runtime/                       便携 Python 运行时（免安装用；非源�
 0. **先读 `docs/PRINCIPLES.md`**（品味与手法）；改前再读 `docs/GUIDE.md` 对应小节；不确定以**代码实际行为**为准。
 1. 加内容优先复用现有节点/通道/修饰器，目标是**零改核心系统**。
 2. 按 PRINCIPLES 的工程手法：**先复现 → 找根因 → 在正确的层修**；机制用**后端既有方法**（别把前端算法抄进后端）；前端只做展示。
-3. 改后跑：`compileall` → 单测 → `validate_content` → `audit_separation`；前端另做 `node --check` 与无头浏览器实测；发布前 `browser_playtest`。**起服务看 traceback**，别凭猜。
+3. 改后跑：`compileall` → 单测 → `validate_content` → `audit_separation` → `audit_text`（动了文案才跑）；前端另做 `node --check` 与无头浏览器实测；发布前 `browser_playtest`。**起服务看 traceback**，别凭猜。
 4. 若行为与设计稿不符，更新 `../完蛋，我被伪人包围了？！/md/` 的「附录 A」。
 5. **"为什么这么改"记进 `docs/DECISIONS.md`**，别堆进本文件；**动了平衡**（某个技能/数值的强度变化）先照格式记一条进 `docs/BALANCE.md`，再改代码。
 
@@ -250,7 +252,7 @@ runtime/                       便携 Python 运行时（免安装用；非源�
 - **决策记录 / 归档**：`docs/DECISIONS.md`（**为什么这么改 + 踩坑**）；`docs/archive/QA_TASK.md`（旧任务书）。文档地图见 §2。
 - **内容全景 / 样例 / 美术**：`docs/ADD_CONTENT.md`（base vs DLC 全类型）、`docs/COOKBOOK.md`
   （给人读的样例集：照着改就能用）。
-- **自检/压测/脚手架/分发**：`tools/audit_separation.py`、`tools/validate_content.py`、`tools/dump_effects.py`（核对 `docs/ARCH.md` 的闸门目录）、`tools/new_character.py`、`tools/browser_playtest.mjs`、`tools/smoke_simulation.py`、`tools/prepare_portable.py`、`docs/PACKAGING.md`。
+- **自检/压测/脚手架/分发**：`tools/audit_separation.py`、`tools/audit_text.py`（日志文案，规则见 `docs/STYLE.md` §11）、`tools/validate_content.py`、`tools/dump_effects.py`（核对 `docs/ARCH.md` 的闸门目录）、`tools/new_character.py`、`tools/browser_playtest.mjs`、`tools/smoke_simulation.py`、`tools/prepare_portable.py`、`docs/PACKAGING.md`。
 
 **每次改完的固定动作**：
 ```
@@ -258,6 +260,7 @@ python -m compileall -q weiren_game
 python -m unittest discover -s tests -p "test_*.py"
 python tools/smoke_simulation.py --seeds 3 --log-dir <tmp>
 python tools/audit_separation.py
+python tools/audit_text.py
 ```
 
 > 修改 `.opencode/` 下的 skill/agent/config 后，**需重启 opencode** 才会加载。
