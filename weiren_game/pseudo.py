@@ -14,9 +14,14 @@ from weiren_game.data.pseudos import PSEUDO_MODULES
 
 @dataclass
 class PseudoCommonState:
-    """剧本通用进度：揭露、来访次数、压制截止与解放标记。"""
+    """剧本通用进度：揭露、已知、来访次数与解放标记。
+
+    ``revealed`` 是**机制**门控（初访已发生：内容层多个被动以它为"初访后"判据）；
+    ``known`` 只是**对外可见性**（初访前技能生效、玩家已看到结果）。
+    """
 
     revealed: bool = False
+    known: bool = False
     visit_count: int = 0
     liberated: bool = False
 
@@ -29,6 +34,7 @@ class PseudoCommonState:
         """序列化为普通字典。"""
         return {
             "revealed": self.revealed,
+            "known": self.known,
             "visit_count": self.visit_count,
             "liberated": self.liberated,
         }
@@ -81,7 +87,7 @@ class PseudoRuntime:
     # common 字段与当前场景 State 的字段都可直接读写；后续应改读
     # common / scenario() 子状态。
     _COMMON_FIELDS = frozenset(
-        {"revealed", "visit_count", "liberated"}
+        {"revealed", "known", "visit_count", "liberated"}
     )
 
     def __getattr__(self, name: str) -> Any:

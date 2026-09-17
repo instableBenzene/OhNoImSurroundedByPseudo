@@ -2002,7 +2002,7 @@ function abilityHoverEnd(){ clearTimeout(_abilTimer); hideTip(); }
 let _pseudoTimer=null;
 function pseudoHoverStart(){
   const pd=(STATE&&STATE.pseudo)||{}; const card=pd.card;
-  if(!pd.revealed||!card||!(card.skills||[]).length) return;
+  if(!pd.known||!card||!(card.skills||[]).length) return;
   clearTimeout(_pseudoTimer);
   _pseudoTimer=setTimeout(()=>showPseudoSkills(pd),500);
 }
@@ -2225,15 +2225,15 @@ function renderHud(){
   $("hudHome").textContent=(s.tenants||[]).length;
   $("hudDoor").textContent=(s.door||[]).length;
   $("hudLine").textContent="回合 "+(s.turn||0)+" / "+(s.max_turns||32)+" · 难度 "+(s.difficulty||"-")+" · 阶段 "+phaseName;
-  $("pseudoName").textContent=pd.revealed?(pd.name||"?"):"尚未确认";
+  $("pseudoName").textContent=pd.known?(pd.name||"?"):"尚未确认";
   const card=pd.card||{};
-  $("pseudoInfo").innerHTML = pd.revealed
+  $("pseudoInfo").innerHTML = pd.known
     ? `到访 ${pd.visits||0} 次`
       + (card.liberation?`<br><span class="dim">解放</span> ${esc(card.liberation)}`:"")
       + (card.breakthrough?`<br><span class="dim">突破</span> ${esc(card.breakthrough)}`:"")
     : "尚未确认";
-  $("pseudoMarkLab").textContent=pd.revealed?((pd.mark_label||"印记").split("-")[0]):"印记";
-  $("pseudoMark").textContent=pd.revealed?((pd.mark_value||0)+" / "+(pd.mark_max||20)):"? / ?";
+  $("pseudoMarkLab").textContent=pd.known?((pd.mark_label||"印记").split("-")[0]):"印记";
+  $("pseudoMark").textContent=pd.known?((pd.mark_value||0)+" / "+(pd.mark_max||20)):"? / ?";
   renderPbar();
   $("doorSummary").textContent=(s.door&&s.door.length)?("门外有 "+s.door.length+" 个事件等待处理。"):"门外暂时没有动静。";
   $("doorBadge").textContent=(s.door||[]).length;
@@ -2241,13 +2241,13 @@ function renderHud(){
 function renderPbar(){ const pd=STATE.pseudo||{};
   const pbar=$("pbar"); if(!pbar) return;
   const slot=$("pseudoSlot");
-  if(!pd.revealed){ pbar.innerHTML=""; if(slot) slot.innerHTML=""; return; }
+  if(!pd.known){ pbar.innerHTML=""; if(slot) slot.innerHTML=""; return; }
   const n=pd.mark_max||20, v=pd.mark_value||0;
   $("pbar").innerHTML=[...Array(n)].map((_,i)=>`<i class="${i<v?"d":""}"></i>`).join("");
   /* 袖珍卡里由内容支配的小面板（内容没声明就为空）。 */
   if(slot) slot.innerHTML=slotHtml(pd.slot||[]); }
 function emptyState(){ return {turn:0,max_turns:32,phase:"created",difficulty:"-",seed:"",
-  pseudo:{name:"?",revealed:false,visits:0},door:[],locations:[],pseudos:[],
+  pseudo:{name:"?",revealed:false,known:false,visits:0},door:[],locations:[],pseudos:[],
   tenants:[],bonds:[],warehouse:[],warehouseSize:27,backpack:[],intel:[],missions:[],log:[],pending:{},events:[]}; }
 
 function showChipTip(el){ if(_dragItem) return; const L=$("tipLayer");

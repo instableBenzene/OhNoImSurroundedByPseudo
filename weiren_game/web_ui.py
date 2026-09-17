@@ -883,6 +883,9 @@ def build_state(engine: GameEngine) -> dict:
         mark_value = getattr(pseudo.scenario(), mark_field, 0) if mark_field else 0
     except Exception:  # noqa: BLE001 - 场景状态缺失时回退
         mark_value = 0
+    # 「已确认」= 初访揭示（revealed），或初访前技能生效已被观察到（known）：
+    # 两种情况都对外显示身份与印记，卡片不会停在「尚未确认」。
+    known = bool(pseudo.revealed or getattr(pseudo, "known", False))
 
     return {
         "turn": flow.turn, "max_turns": flow.max_turns, "phase": flow.phase,
@@ -897,10 +900,10 @@ def build_state(engine: GameEngine) -> dict:
         "searchReturnNote": SEARCH_RETURN_NOTE,
         "pseudo": {
             # 未揭示时不泄露名字与印记名（对外只显示"尚未确认"）。
-            "name": pseudo.name if pseudo.revealed else "",
-            "revealed": pseudo.revealed, "visits": pseudo.visit_count,
-            "mark_label": mark_label if pseudo.revealed else "",
-            "mark_value": int(mark_value or 0) if pseudo.revealed else 0,
+            "name": pseudo.name if known else "",
+            "revealed": pseudo.revealed, "known": known, "visits": pseudo.visit_count,
+            "mark_label": mark_label if known else "",
+            "mark_value": int(mark_value or 0) if known else 0,
             "mark_max": int((_pseudo_card(engine, pseudo.scenario_id) or {}).get("mark_need", 20)),
             "progress": _pseudo_progress(engine, pseudo.scenario_id),
             "card": _pseudo_card(engine, pseudo.scenario_id),

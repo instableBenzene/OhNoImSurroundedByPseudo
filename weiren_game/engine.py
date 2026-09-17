@@ -850,7 +850,8 @@ class GameEngine(
             f"难度：{self.state.meta.difficulty} | 种子：{self.state.meta.seed}"
         ]
         pseudo = self.state.pseudo_state
-        if pseudo.revealed:
+        # 「已确认」含初访前就生效的技能（known），与伪人卡口径一致。
+        if pseudo.revealed or pseudo.known:
             from weiren_game.data import SCENARIO_HANDLERS
 
             progress_handler = SCENARIO_HANDLERS.get(pseudo.scenario_id, {}).get(

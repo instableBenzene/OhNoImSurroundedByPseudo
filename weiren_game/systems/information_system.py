@@ -241,11 +241,20 @@ class InformationSystemMixin:
             self._verify_information_object(info)
 
     def _observe_pseudo_skill(self, skill_id: str) -> None:
-        """伪人技能实际触发时，核实其预告信息的真伪并结算。"""
+        """伪人技能实际触发时，核实其预告信息的真伪并结算。
+
+        技能可能在初访**之前**就产生玩家看得到的结果（如搜索袭击），
+        因此这里顺手把伪人对外标为「已确认」：卡片随即显示身份与印记，
+        不再停在「尚未确认」。机制门控仍以 `revealed`（初访）为准。
+        """
+        pseudo = self.state.pseudo_state
+        if not pseudo.revealed and not pseudo.known:
+            pseudo.known = True
+            self._log(f"伪人已确认：{pseudo.name}。")
         for info in self.state.house.information:
             if (
                 info.status == "pending" and info.kind == "pseudo_skill"
-                and info.data.get("pseudo_id") == self.state.pseudo_state.scenario_id
+                and info.data.get("pseudo_id") == pseudo.scenario_id
                 and info.data.get("skill_id") == skill_id
             ):
                 info.truth = info.data.get("prediction") == "trigger"
