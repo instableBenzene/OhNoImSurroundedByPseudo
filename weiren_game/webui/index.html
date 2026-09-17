@@ -760,6 +760,9 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   .dialog.bare .disc-opts{width:min(1180px,94vw)}
   .disc-row{display:flex;gap:var(--gap,10px);justify-content:center;align-items:stretch;flex:1 1 auto;flex-wrap:nowrap;min-width:0}
   .disc-row .card{flex:1 1 0;min-width:0;max-width:190px}
+  /* 并排的"两个选项"（确认的是/否、结算/反悔）也要等宽——`.card` 有 flex，`.pick-card` 原本没有，
+     结果按内容宽排，违反"等效选项等宽、总宽相同"。 */
+  .disc-row > .pick-card{flex:1 1 0;min-width:0;max-width:240px}
   .dialog.bare .disc-row .card{max-width:240px;padding:18px 12px;gap:12px;
     background:var(--card-glass)}
   .dialog.bare .card:hover{background:rgba(var(--amber-rgb),.14);border-color:var(--amber)}
