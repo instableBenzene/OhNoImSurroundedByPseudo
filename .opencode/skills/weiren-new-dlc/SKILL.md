@@ -51,6 +51,9 @@ dlc/<dlc_name>/
 - 存档记录 `meta.packs`，与当前启用包不一致会拒读。
 
 ## 验证
+
+> 资料包里如果带**专属界面**（角色专属面板 / 可拖拽浮窗 / 进存档的专属状态），
+> 先读 `.opencode/skills/weiren-custom-ui`；界面验收走 `.opencode/skills/weiren-ui-probe`。
 ```
 python tools/validate_content.py
 python -m unittest discover -s tests -p "test_*.py"

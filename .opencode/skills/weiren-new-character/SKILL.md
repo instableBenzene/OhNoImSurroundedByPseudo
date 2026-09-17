@@ -134,4 +134,8 @@ ACTIVE_DISPATCH = {
 - 文案里的角色名/机制名都是内容，写在本文件即可；**数值与判定不要写进系统层**。
 
 ## 7. 完成标准
+
+> 这个角色要**自己的界面或自己的状态**（专属面板 / 可拖拽浮窗 / 进存档的专属数据）？
+> 那不是一个角色文件能兜住的：先读 `.opencode/skills/weiren-custom-ui`（怎么做），
+> 验收再走 `.opencode/skills/weiren-ui-probe`。
 - `validate_content` 与单测全绿；运行 `python game_ui.py` 能在候选/访客中看到该角色。
