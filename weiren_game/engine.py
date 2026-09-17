@@ -669,7 +669,7 @@ class GameEngine(
                 f"{max(0, mission.remain_search_turns)}回合返回"
                 for mission in self.state.world.missions
             )
-            self._log(f"搜索中：{details}")
+            self._log(f"搜索中：{details}。")
 
     def _run_pseudo_end_effects(self) -> None:
         """回合结束阶段：执行当前伪人场景注册的 settle_end 处理器。"""

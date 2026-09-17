@@ -207,7 +207,7 @@ class PseudoSystemMixin:
             )
             if reveal_handler is not None:
                 reveal_handler(self)
-            self._log(f"伪人初访：你确认了{pseudo.name}。初访不会触发突破。")
+            self._log(f"伪人初访：{pseudo.name}首次到访，本次不触发突破。")
             self._create_visit_information(True, "伪人初访")
             return
         from weiren_game.data import SCENARIO_HANDLERS

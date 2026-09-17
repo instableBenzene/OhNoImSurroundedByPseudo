@@ -111,9 +111,10 @@ def cast_whisper(engine: object) -> None:
         0 if health_lost else pseudo.safe_health_whispers + 1
     )
     pseudo.resolving_skill = False
+    engine._log("洋葱发动“不可名状的低语”。")
     engine._log(
-        f"洋葱发动“不可名状的低语”；理智的裂隙进度：无烦躁"
-        f"{pseudo.safe_irritation_whispers}/2，无生命损失{pseudo.safe_health_whispers}/4。"
+        f"理智的裂隙：连续无烦躁{pseudo.safe_irritation_whispers}/2，"
+        f"连续无生命损失{pseudo.safe_health_whispers}/4。"
     )
     if pseudo.safe_irritation_whispers >= 2 or pseudo.safe_health_whispers >= 4:
         pseudo.liberated = True

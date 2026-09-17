@@ -357,8 +357,11 @@ class SearchSystemMixin:
             tool=None, loadout=list(all_loadout),
         )
         self._log(
-            f"{self.character(tenant).name}前往{location.name}：搜索{mission.search_turns}回合，"
-            f"{mission.search_behavior_count}次行为，成功率{mission.search_success_rate:.0%}，"
+            f"{self.character(tenant).name}前往{location.name}，搜索"
+            f"{mission.search_turns}回合、{mission.search_behavior_count}次行为。"
+        )
+        self._log(
+            f"成功率{mission.search_success_rate:.0%}，"
             f"容量{mission.carry_capacity}（携带物占{occupied_groups}组）。"
         )
 
