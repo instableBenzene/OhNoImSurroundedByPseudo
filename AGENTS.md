@@ -43,6 +43,7 @@
 | `docs/STYLE.md` | 美术与 UI 风格；**§9 是可直接抄用的参数表**（颜色 token / 字体栈 / 按钮 / 弹窗 / chip / 槽位 / 断点 / z-index / 动效） |
 | `docs/DECISIONS.md` | 近期交互/机制/状态的具体决策与踩坑记录（AGENTS.md 现状速览的展开） |
 | `docs/BALANCE.md` | **平衡改动记录**：每个技能被增强/削弱过几轮的账（只记"改了什么"；为什么改在 DECISIONS） |
+| `docs/ROADMAP.md` | **想做的系统（讨论结论）**：无尽/故事模式、对话系统、规则战底线、存档迁移——写清"复用/新造/待答" |
 | `docs/ARCH.md` | **效果内核**：数值通道 × 布尔闸门（共用 path/source、分用算术/逻辑）、令牌词表、闸门目录、迁移策略 |
 | `docs/ADD_CONTENT.md` | **内容创作**（合并原 CONTENT_TYPES / ADD_CHARACTER / ADD_DLC）：内容类型全景、加房客步骤、写 DLC 步骤、检查清单、已知限制 |
 | `docs/COOKBOOK.md` | **创作样例集（给人读）**：需求模板 + 可抄改的最小样例（物品/技能/被动/伪人/信息/事件/DLC）与常见坑 |
