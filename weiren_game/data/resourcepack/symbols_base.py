@@ -15,7 +15,9 @@ SYMBOLS: dict[str, str] = {
     "i-gate": '<path d="M4.2 7h15.6M5.8 7v13.4M18.2 7v13.4M5.8 11.4h12.4"/>',
     "i-search": '<circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6l4.6 4.6"/>',
     "i-hand": '<path d="M8.2 12.4V6.6a1.5 1.5 0 0 1 3 0v4.8"/><path d="M11.2 11.4V5.4a1.5 1.5 0 0 1 3 0v6"/><path d="M14.2 11.4V7.4a1.5 1.5 0 0 1 3 0v8a5.6 5.6 0 0 1-5.6 5.6h-1A5.6 5.6 0 0 1 5 15.4v-2.8a1.5 1.5 0 0 1 3 0"/>',
-    "i-gear": '<circle cx="12" cy="12" r="3.1"/><path d="M12 2.4v3.2M12 18.4v3.2M2.4 12h3.2M18.4 12h3.2M5.2 5.2l2.3 2.3M16.5 16.5l2.3 2.3M18.8 5.2l-2.3 2.3M7.5 16.5l-2.3 2.3"/>',
+    # 齿轮：大圈 + 短齿（旧版是"小圆 + 长射线"，渲染出来是一颗太阳，
+    # 而它是技能条目的默认兜底图标 —— 见 index.html 的 i-gear 用法）。
+    "i-gear": '<circle cx="12" cy="12" r="5.2"/><path d="M12 4.4v2.4M12 17.2v2.4M4.4 12h2.4M17.2 12h2.4M6.7 6.7l1.7 1.7M15.6 15.6l1.7 1.7M17.3 6.7l-1.7 1.7M6.7 17.3l1.7-1.7"/>',
     "i-book": '<path d="M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2z"/><path d="M8 3v18"/>',
     "i-cross": '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8v8M8 12h8"/>',
     "i-tool": '<path d="M5 19.2 14.6 9.6"/><path d="M13.2 5.6l5.2 5.2-3.1 3.1-5.2-5.2z"/><path d="M4 20.4l2.6-2.6"/>',
@@ -53,7 +55,8 @@ SYMBOLS: dict[str, str] = {
     "i-loc-book": '<path d="M5 4h6v16H5z"/><path d="M11 4h8v16h-8z"/><path d="M8 8h.01M8 11h.01M15 8h.01"/>',
     "i-loc-scales": '<path d="M12 3v18M6 21h12"/><path d="M4 7h16"/><path d="M4 7l-2 6h4zM20 7l-2 6h4z"/>',
     "i-seal": '<path d="M12 3.4l6.8 3.9v5.2c0 3.8-2.9 5.8-6.8 7.7-3.9-1.9-6.8-3.9-6.8-7.7V7.3z"/><path d="M9.2 12.2l2 2 3.6-3.8"/>',
-    "i-craft": '<path d="M6 10l6-5 6 5v8H6z"/><path d="M9 18v-5h6v5"/>',
+    # 制作：锤子 + 工作台（旧版是个房子，和 i-loc-house 撞概念）
+    "i-craft": '<path d="M14.2 4.2l5.6 5.6-2.1 2.1-5.6-5.6z"/><path d="M12.1 6.3L4.5 13.9"/><path d="M3.6 19.6h16.8"/>',
     "i-drink": '<path d="M6 4h12l-1 15H7z"/><path d="M8 9h8"/>',
     "i-ammo": '<rect x="9" y="7" width="6" height="12" rx="3"/><path d="M12 3v4"/>',
     "i-snack": '<path d="M7 3h10l-1 18H8z"/><path d="M8 10h8M8 14h8"/>',

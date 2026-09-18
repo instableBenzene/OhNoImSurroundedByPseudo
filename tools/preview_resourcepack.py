@@ -4,6 +4,7 @@
 
     python tools/preview_resourcepack.py night_ward
     python tools/preview_resourcepack.py blood_moon --out D:\\tmp\\shots
+    python tools/preview_resourcepack.py base          # 内置材质（content 层）也照这个流程看
 
 产物（默认写到系统临时目录 `weiren-preview/<包名>/`）：
     view_bg.png      背景素材 + 标题素材（叠在一起看构图与对比度）
@@ -71,6 +72,80 @@ def render(edge: str, work: pathlib.Path, name: str, markup: str, size: tuple[in
     return png
 
 
+def _symbol_sheet(work: pathlib.Path, symbols: dict[str, str]) -> tuple[str, tuple[int, int]]:
+    """把 `SYMBOLS`（`i-*` 贴图零件）铺成联络表：24×24 viewBox，放大到 72px 看轮廓。"""
+    cells = []
+    for name in sorted(symbols):
+        markup = "%s" % symbols[name]
+        cells.append(
+            "<div class='cell'><svg viewBox='0 0 24 24' style='width:72px;height:72px;color:#dfe8e6'"
+            " fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round'"
+            " stroke-linejoin='round'>%s</svg><div class='cap'>%s</div></div>" % (markup, name)
+        )
+    size = (1180, 240 + 120 * (len(cells) // 13))
+    return page("<div class='sheet'>" + "".join(cells) + "</div>"), size
+
+
+def _file_sheet(work: pathlib.Path, paths: list[pathlib.Path], prefix: str,
+                box: int = 96) -> tuple[str, tuple[int, int]]:
+    """把一批 svg 文件铺成联络表（每格按 box 像素渲染，标签写文件名）。"""
+    cells = []
+    for path in paths:
+        markup = (work / (prefix + path.name)).read_text(encoding="utf-8")
+        markup = markup.replace("<svg ", "<svg style='width:%dpx;height:%dpx;color:#dfe8e6' " % (box, box), 1)
+        cells.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (markup, path.stem))
+    size = (1180, 260 + (box + 60) * max(1, len(cells) // 10))
+    return page("<div class='sheet'>" + "".join(cells) + "</div>"), size
+
+
+def _base_sheets(work: pathlib.Path) -> dict[str, tuple[str, tuple[int, int]]]:
+    """base（content 层）的材质联络表：贴图零件、头像零件/立绘、物品与标签图标、封面。"""
+    data = ROOT / "weiren_game" / "data"
+    sheets: dict[str, tuple[str, tuple[int, int]]] = {}
+
+    for path in sorted((data / "resourcepack" / "assets").glob("*.svg")):
+        shutil.copy(path, work / ("cover_" + path.name))
+    cover = {path.stem for path in (data / "resourcepack" / "assets").glob("*.svg")}
+    if "background" in cover:
+        body = "<img class='bg' src='cover_background.svg'>"
+        sheets["bgplain"] = (page(body), (1600, 900))
+        if "title" in cover:
+            body += ("<img class='bg' src='cover_title.svg' style='object-fit:contain;"
+                     "object-position:50%% 12%%;height:46%%'>")
+        sheets["bg"] = (page(body), (1600, 900))
+
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "symbols_base", data / "resourcepack" / "symbols_base.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        sheets["symbols"] = _symbol_sheet(work, module.SYMBOLS)
+    except Exception as exc:  # noqa: BLE001 - 缺这份表就跳过
+        print("symbols skipped:", exc)
+
+    for section in ("shapes", "features", "characters"):
+        directory = data / "avatars" / section
+        if not directory.is_dir():
+            continue
+        paths = sorted(directory.glob("*.svg"))
+        for path in paths:
+            shutil.copy(path, work / ("av_" + path.name))
+        box = 84 if section != "characters" else 96
+        sheets["avatar_" + section] = _file_sheet(work, paths, "av_", box)
+
+    for section in ("item", "tag"):
+        directory = data / "item" / section
+        if not directory.is_dir():
+            continue
+        paths = sorted(directory.glob("*.svg"))
+        for path in paths:
+            shutil.copy(path, work / ("ic_" + path.name))
+        sheets["item_" + section] = _file_sheet(work, paths, "ic_", 72)
+    return sheets
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="把资源包渲染成 PNG 供肉眼复核")
     parser.add_argument("pack", help="resourcepacks/ 下的包名")
@@ -79,14 +154,22 @@ def main() -> int:
     args = parser.parse_args()
 
     edge = args.edge or find_edge()
-    pack = ROOT / "resourcepacks" / args.pack
+    is_base = args.pack == "base"
+    pack = (ROOT / "weiren_game" / "data") if is_base else (ROOT / "resourcepacks" / args.pack)
     if not pack.is_dir():
-        raise SystemExit("没有这个资源包：%s" % pack)
+        raise SystemExit("没有这个包：%s" % pack)
 
     work = pathlib.Path(args.out) if args.out else pathlib.Path(tempfile.gettempdir()) / "weiren-preview" / args.pack
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
+
+    if is_base:
+        sheets = _base_sheets(work)
+        for name, (markup, size) in sheets.items():
+            png = render(edge, work, name, markup, size)
+            print("%-16s %s (%d bytes)" % (name, png, png.stat().st_size if png.exists() else 0))
+        return 0
 
     # 素材拷成 ASCII 路径（file:// 遇中文路径容易出问题）
     assets: dict[str, str] = {}

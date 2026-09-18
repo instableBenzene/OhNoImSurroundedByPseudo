@@ -58,8 +58,8 @@
     <path d="M100 738 l-26 -50 l-12 50 z"/>
     <path d="M1340 740 l26 -52 l12 52 z"/>
   </g>
-  <ellipse class="fog" cx="720" cy="796" rx="760" ry="70" fill="#c9a877" opacity=".10"/>
-  <ellipse class="fog slow" cx="1180" cy="826" rx="520" ry="46" fill="#c9a877" opacity=".08"/>
+<ellipse class="fog" cx="720" cy="806" rx="820" ry="44" fill="#c9a877" opacity=".06"/>
+<ellipse class="fog slow" cx="1180" cy="834" rx="560" ry="30" fill="#c9a877" opacity=".05"/>
   <rect x="0" y="690" width="1440" height="210" fill="url(#fog)"/>
   <rect x="0" y="840" width="1440" height="60" fill="#050a0a" opacity=".85"/>
 </svg>
