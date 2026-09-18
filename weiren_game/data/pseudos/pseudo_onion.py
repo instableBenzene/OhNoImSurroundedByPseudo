@@ -90,6 +90,9 @@ def cast_whisper(engine: object) -> None:
     )
     if blocked:
         targets = []
+    # AOE 收成一条：逐人播报会刷屏，这里只播一条汇总 + 可点开的三列明细。
+    engine._collect_start()
+    rows: list[dict] = []
     for target in targets:
         if engine._skill_respond_skill(
             "不可名状的低语", "lock",
@@ -101,9 +104,18 @@ def cast_whisper(engine: object) -> None:
         before_h = target.health
         engine._apply_emotion(target, "irritation", 2, 5, "深潜低语")
         irritation_gained |= target.irritation.intensity + target.irritation.layers > before_i
+        gained = target.irritation.intensity + target.irritation.layers - before_i
+        if gained > 0:
+            rows.append({"label": engine.character(target).name,
+                         "value": "+%d 烦躁" % gained, "note": "不可名状的低语"})
         if target.irritation.intensity >= 5:
             engine._damage_health(target, 10, "深潜低语")
         health_lost |= target.health < before_h
+        if target.health < before_h:
+            rows.append({"label": engine.character(target).name,
+                         "value": "−%g 生命" % (before_h - target.health),
+                         "note": "不可名状的低语"})
+    engine._collect_flush(f"不可名状的低语：{len(rows)} 项变化。", rows=rows)
     pseudo.safe_irritation_whispers = (
         0 if irritation_gained else pseudo.safe_irritation_whispers + 1
     )

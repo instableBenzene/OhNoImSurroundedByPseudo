@@ -133,6 +133,14 @@ def cast_curse(engine: object) -> None:
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     )
     resistant_ids: set[str] = set()
+    # AOE 收成一条：全员 15 伤害 + 后续多次强度/层数累积（后者原本完全没有播报）。
+    engine._collect_start()
+    before: dict[int, tuple] = {
+        value.id: (value.health, value.trauma.intensity, value.trauma.layers,
+                   value.disorder.intensity, value.disorder.layers)
+        for value in engine.home_tenants()
+    }
+    rows: list[dict] = []
     if not blocked:
         for tenant in list(engine.home_tenants()):
             if engine._skill_respond_skill(
@@ -169,6 +177,22 @@ def cast_curse(engine: object) -> None:
                 condition.layers = min(99, condition.layers + 1)
                 if condition.intensity == 0:
                     condition.intensity = 1
+    for value in engine.home_tenants():
+        health_before, t_i, t_l, d_i, d_l = before.get(
+            value.id, (value.health, 0, 0, 0, 0))
+        name = engine.character(value).name
+        if health_before - value.health > 0:
+            rows.append({"label": name, "value": "−%g 生命" % (health_before - value.health),
+                         "note": "希波克拉底诅咒"})
+        trauma_gain = (value.trauma.intensity + value.trauma.layers) - (t_i + t_l)
+        if trauma_gain > 0:
+            rows.append({"label": name, "value": "+%d 创伤" % trauma_gain,
+                         "note": "希波克拉底诅咒"})
+        disorder_gain = (value.disorder.intensity + value.disorder.layers) - (d_i + d_l)
+        if disorder_gain > 0:
+            rows.append({"label": name, "value": "+%d 紊乱" % disorder_gain,
+                         "note": "希波克拉底诅咒"})
+    engine._collect_flush(f"希波克拉底诅咒：{len(rows)} 项变化。", rows=rows)
     home = engine.home_tenants()
     if any(value.shock for value in home):
         pseudo.safe_no_shock_streak = 0
