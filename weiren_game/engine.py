@@ -495,19 +495,28 @@ class GameEngine(
         """开始收集可见播报（配合 `_collect_flush`）：块内不逐条播，仍逐条进完整日志。"""
         self._log_collector = []
 
-    def _collect_flush(self, summary: str, *, detail: dict | None = None,
-                       rows: list[dict] | None = None) -> None:
-        """把收集到的播报合并成**一条**汇总播出。
+    def _collect_flush(self, summary: str = "", *, title: str = "",
+                       detail: dict | None = None, rows: list[dict] | None = None) -> None:
+        """把收集到的播报合并成**一条**汇总播出（明细可点开）。
 
-        明细优先用调用方给的 `rows`（**结构化三列**：`label` 谁 / `value` 多少 / `note` 为什么）；
-        没给就把收集到的逐条原文塞进去当兜底（那是旧行为，能结构化就别用）。
+        明细**默认由 log 层按形状自动归并**（`weiren_game/log_shape.py`）：值层那些
+        `X因{因为}流失{N}生命。` 之类的行会被解析成三列，认不出的行保持原文。
+        所以技能侧只要"把这一段包起来 + 起个标题"，**不用自己组装明细**。
+
+        传 `title` 时汇总文案自动写成 `「{title}：N 项变化。」`；传 `summary` 则用原话
+        （回合末那种要写"名房客"的用这个）。
         """
         collected, self._log_collector = self._log_collector, None
-        payload = detail or ({"rows": rows} if rows
-                             else ({"rows": collected} if collected else None))
-        if not payload or not payload.get("rows"):
+        if rows is None:
+            from .log_shape import rows_from_lines
+
+            rows = rows_from_lines(collected)
+        if not rows:
             return
-        self._show_message(summary, payload)
+        text = summary or (f"{title}：{len(rows)} 项变化。" if title else "")
+        if not text:
+            return
+        self._show_message(text, detail or {"rows": rows})
 
     def _log(self, message: str, *, shown: bool = True, detail: dict | None = None,
              kind: str = "") -> None:
@@ -521,7 +530,7 @@ class GameEngine(
         """
         if self._log_collector is not None:
             self._record_log(message)
-            self._log_collector.append({"label": message})
+            self._log_collector.append(message)      # 存原文：明细由 log 层按形状归并
             return
         if shown:
             self._show_message(message, detail, kind)

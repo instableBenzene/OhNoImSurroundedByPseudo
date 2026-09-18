@@ -166,7 +166,6 @@ class RoundEffectsSystemMixin:
 
         # 这一段会逐人播报理智/生命变化；收起明细，只在最后播一条汇总（玩家可点开看）。
         self._collect_start()
-        rows: list[dict] = []
         tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
             definition = self.character(tenant)
@@ -186,33 +185,17 @@ class RoundEffectsSystemMixin:
                 "sanityConsume", sanity_cost,
                 ("回合末消耗", tenant.character_id), {"tenant": tenant},
             )
-            sanity_before = tenant.sanity
             self._consume_sanity(tenant, max(0, sanity_cost), "回合末消耗")
-            sanity_lost = sanity_before - tenant.sanity
-            if sanity_lost > 0:
-                rows.append({
-                    "label": definition.name,
-                    "value": "−%g 理智" % sanity_lost,
-                    "note": "回合末消耗",
-                })
 
             if tenant.health >= 70:
-                health_before = tenant.health
                 self._loss_health(tenant, 3 + (2 if tenant.health >= 90 else 0), "高生命值自然流失")
-                health_lost = health_before - tenant.health
-                if health_lost > 0:
-                    rows.append({
-                        "label": definition.name,
-                        "value": "−%g 生命" % health_lost,
-                        "note": "高生命值自然流失",
-                    })
             from weiren_game.data.personalities import BOND_END_HEALTH_HOOKS
 
             for _personality_id, end_health_hook in BOND_END_HEALTH_HOOKS.items():
                 end_health_hook(self, tenant)
 
-        self._collect_flush(
-            f"回合末结算：{tenant_count} 名房客的理智与生命变化。", rows=rows)
+        # 明细不在这里组装：log 层按播报形状自动归并（weiren_game/log_shape.py）。
+        self._collect_flush(f"回合末结算：{tenant_count} 名房客的理智与生命变化。")
 
     def _settle_buff_debuff_effects(self) -> None:
         """回合末依次结算创伤、紊乱及各情绪的自行演化。
@@ -221,32 +204,13 @@ class RoundEffectsSystemMixin:
         否则玩家日志会被几十条逐人明细淹没。
         """
         self._collect_start()
-        rows: list[dict] = []
         tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
-            name = self.character(tenant).name
-            for label, status, physical in (
-                ("创伤", tenant.trauma, True),
-                ("紊乱", tenant.disorder, False),
-            ):
-                health_before, sanity_before = tenant.health, tenant.sanity
-                self._apply_status_end(tenant, status, physical=physical, label=label)
-                lost_health = health_before - tenant.health
-                lost_sanity = sanity_before - tenant.sanity
-                if lost_health > 0:
-                    rows.append({"label": name, "value": "−%g 生命" % lost_health, "note": label})
-                if lost_sanity > 0:
-                    rows.append({"label": name, "value": "−%g 理智" % lost_sanity, "note": label})
+            self._apply_status_end(tenant, tenant.trauma, physical=True, label="创伤")
+            self._apply_status_end(tenant, tenant.disorder, physical=False, label="紊乱")
             for key, label in {**EROSION_EMOTIONS, **AWAKENING_EMOTIONS}.items():
-                health_before, sanity_before = tenant.health, tenant.sanity
                 self._apply_emotion_end(tenant, tenant.condition(key), label)
-                lost_health = health_before - tenant.health
-                lost_sanity = sanity_before - tenant.sanity
-                if lost_health > 0:
-                    rows.append({"label": name, "value": "−%g 生命" % lost_health, "note": label})
-                if lost_sanity > 0:
-                    rows.append({"label": name, "value": "−%g 理智" % lost_sanity, "note": label})
-        self._collect_flush(f"回合末状态结算：{tenant_count} 名房客的创伤与紊乱。", rows=rows)
+        self._collect_flush(f"回合末状态结算：{tenant_count} 名房客的创伤与紊乱。")
 
     def _decay_conditions(self) -> None:
         """回合末公共衰减：所有状态层数 -1，归零移除。
