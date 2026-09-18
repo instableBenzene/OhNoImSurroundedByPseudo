@@ -1074,10 +1074,14 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
     .board-topline{flex-direction:column;align-items:stretch;gap:8px}
     .turn-controls{flex-wrap:wrap}
   }
-  @media (max-height:840px){
-    .door-zone{padding-top:6px;padding-bottom:6px}
-    .door-button{padding:10px}
-  }
+@media (max-height:840px){
+.door-zone{padding-top:6px;padding-bottom:6px}
+.door-button{padding:10px}
+}
+/* 播报的语义色：**只有内容层声明了 kind 的条目才上色**（见 docs/STYLE.md §11）。
+   颜色是冗余提示，不是主要表达手段；`--warn/--danger` 都是锁定 token，换包不会变色。 */
+#logList li.lg-warn{color:var(--warn)}
+#logList li.lg-danger{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -2302,12 +2306,12 @@ let LOG=[];
 /* 重开对局 / 读档时用整局日志重建面板，避免把上一局的内容留在可视日志里。 */
 function seedLog(state){
   const entries=(state&&state.logEntries)||[];
-  LOG=entries.map(([t,m,d])=>[`T${t}`, String(m), d||null]);
+  LOG=entries.map(([t,m,d,k])=>[`T${t}`, String(m), d||null, k||""]);
   renderLog();
 }
 function appendLog(msgs){ if(!msgs||!msgs.length) return;
-  for(const m of msgs){ const pair=Array.isArray(m)?m:[m,null];
-    LOG.push([`T${STATE.turn||0}`, String(pair[0]), pair[1]||null]); }
+  for(const m of msgs){ const row=Array.isArray(m)?m:[m];
+    LOG.push([`T${STATE.turn||0}`, String(row[0]), row[1]||null, row[2]||""]); }
   if(LOG.length>800) LOG=LOG.slice(-800);
   renderLog(true);
 }
@@ -2319,7 +2323,7 @@ function logBodyHtml(m){
   return `<div>${fmt(m)}</div>`;
 }
 function renderLog(smooth){ const box=$("logList"); if(!box) return;
-  box.innerHTML=LOG.map(([t,m,d])=>`<li><span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`).join("");
+  box.innerHTML=LOG.map(([t,m,d,k])=>`<li${k?` class="lg-${esc(k)}"`:""}><span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`).join("");
   /* 新消息逐条冒出时平滑滚到底，而不是一口气刷新。 */
   const scroller=box.closest(".body")||box;
   if(smooth){ try{ scroller.scrollTo({top:scroller.scrollHeight,behavior:"smooth"}); }

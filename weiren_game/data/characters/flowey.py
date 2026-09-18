@@ -206,7 +206,8 @@ def _wither(engine: EngineProtocol, tenant: object, plot: dict, why: str) -> Non
     """枯死：种下的东西没了，地重新变回荒地（产物也跟着没了）。"""
     name = _item_name(plot["seed"])
     plot.update(_empty_plot())
-    engine._log(f"{engine.character(tenant).name}的{NAME_FIELD}里，{name}{why}，枯了。")
+    # 真警告（少用）：作物枯死是不可逆的损失，值得让玩家一眼看到。
+    engine._log(f"{engine.character(tenant).name}的{NAME_FIELD}里，{name}{why}，枯了。", kind="warn")
 
 
 # ---------------------------------------------------------------- 面板

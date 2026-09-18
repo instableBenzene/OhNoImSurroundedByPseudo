@@ -116,7 +116,8 @@ def on_mark_reached(
     engine._gain_mark(tenant, "magic", 1)
     tenant.health = tenant.max_health
     tenant.skip_until_turn = engine.state.flow.turn + 1
-    engine._log("罗兹集齐6层恶魔印记：魔化、恢复全部生命，并将在下一回合无法行动。")
+    # 真警告（少用）：魔化是强力但有代价的状态，下一回合不能行动要提前让人看到。
+    engine._log("罗兹集齐6层恶魔印记：魔化、恢复全部生命，并将在下一回合无法行动。", kind="warn")
 
 
 ON_MARK_REACHED = on_mark_reached

@@ -481,7 +481,7 @@ class GameEngine(
     # ---------------------------------------------------------------- messages/actions
     def drain_messages(self) -> list[str]:
         """取出并清空待展示的可见消息（只要文本；CLI 等旧入口用这个）。"""
-        result = [text for text, _detail in self._messages]
+        result = [text for text, _detail, _kind in self._messages]
         self._messages.clear()
         return result
 
@@ -502,18 +502,22 @@ class GameEngine(
             return
         self._show_message(summary, detail or {"rows": collected})
 
-    def _log(self, message: str, *, shown: bool = True, detail: dict | None = None) -> None:
+    def _log(self, message: str, *, shown: bool = True, detail: dict | None = None,
+             kind: str = "") -> None:
         """统一日志入口：`shown=True` 进玩家可见日志，否则只落完整日志。
 
         收集期内（`_collect_start` 之后、`_collect_flush` 之前）可见播报会被收起：
         仍然逐条写进完整日志，但玩家只看到 flush 出来的那一条汇总 —— 明细点开看。
+
+        `kind` 是**给界面用的类别**（目前只有 `"warn"` / `"danger"`），由内容层声明；
+        界面把它映射到锁定语义色。**默认空**：颜色只作为冗余提示，别当主要表达手段。
         """
         if self._log_collector is not None:
             self._record_log(message)
             self._log_collector.append({"label": message})
             return
         if shown:
-            self._show_message(message, detail)
+            self._show_message(message, detail, kind)
         else:
             self._record_log(message, detail)
 
@@ -524,12 +528,14 @@ class GameEngine(
             entry["detail"] = detail
         self.state.log.entries.append(entry)
 
-    def _show_message(self, message: str, detail: dict | None = None) -> None:
+    def _show_message(self, message: str, detail: dict | None = None, kind: str = "") -> None:
         """把一条文本同时记入日志并作为可见消息交给玩家（可带明细）。"""
-        self._messages.append((message, detail))
+        self._messages.append((message, detail, kind))
         entry: dict = {"turn": self.state.flow.turn, "shown": True, "text": message}
         if detail:
             entry["detail"] = detail
+        if kind:
+            entry["kind"] = kind
         self.state.log.entries.append(entry)
 
     def _log_lines(self) -> list[str]:

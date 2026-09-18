@@ -942,7 +942,7 @@ def build_state(engine: GameEngine) -> dict:
         "warehouse": warehouse, "warehouseSize": len(warehouse),
         "backpack": [], "intel": intel, "missions": missions, "log": [],
         # 每条是 [回合, 文本, 明细]；没有明细时第三项为 None（前端照旧只渲染文本）。
-        "logEntries": [[entry["turn"], entry["text"], entry.get("detail")]
+        "logEntries": [[entry["turn"], entry["text"], entry.get("detail"), entry.get("kind", "")]
                        for entry in engine.state.log.entries if entry.get("shown", True)],
         # 本回合是否已无人可派（当前=已指派过；未来若一回合多次搜索，改这里即可，前端不写死）。
         "searchBlocked": bool(engine.state.round.searched_this_turn),
