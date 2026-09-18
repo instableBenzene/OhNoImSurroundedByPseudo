@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 夜班病区・殒痛片：泡罩药板（板是底色，药粒是特征色） -->
+<rect x="5" y="7" width="22" height="18" rx="2.5"/>
+<circle cx="11" cy="12.5" r="2.2"/><circle cx="16" cy="12.5" r="2.2"/><circle cx="21" cy="12.5" r="2.2"/>
+<circle cx="11" cy="19.5" r="2.2" stroke="#a77ad1"/><circle cx="16" cy="19.5" r="2.2"/>
+<circle cx="21" cy="19.5" r="2.2" stroke="#a77ad1"/><path d="M5 16h22"/>
+</svg>
