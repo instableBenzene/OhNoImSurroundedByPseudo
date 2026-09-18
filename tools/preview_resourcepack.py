@@ -214,19 +214,20 @@ def main() -> int:
     for path in sorted((pack / "assets").glob("*.svg")):
         shutil.copy(path, work / path.name)
         assets[path.stem] = path.name
-    for path in sorted((pack / "item" / "item").glob("*.svg")):
-        shutil.copy(path, work / ("item_" + path.name))
-    for path in sorted((pack / "avatars" / "characters").glob("*.svg")):
-        shutil.copy(path, work / ("pack_" + path.name))
-    for path in sorted((ROOT / "weiren_game" / "data" / "avatars" / "characters").glob("*.svg")):
-        if (pack / "avatars" / "characters" / path.name).exists():
-            shutil.copy(path, work / ("base_" + path.name))
-            break
+    for section in ("item", "tag"):
+        for path in sorted((pack / "item" / section).glob("*.svg")):
+            shutil.copy(path, work / ("ic_%s_" % section + path.name))
+    for section in ("characters", "shapes", "features"):
+        for path in sorted((pack / "avatars" / section).glob("*.svg")):
+            shutil.copy(path, work / ("av_%s_" % section + path.name))
     base_portrait = next(
         (path.name for path in sorted((ROOT / "weiren_game" / "data" / "avatars" / "characters").glob("*.svg"))
          if (pack / "avatars" / "characters" / path.name).exists()),
         "",
     )
+    if base_portrait:
+        shutil.copy(ROOT / "weiren_game" / "data" / "avatars" / "characters" / base_portrait,
+                    work / ("base_" + base_portrait))
 
     sheets: dict[str, tuple[str, tuple[int, int]]] = {}
     if "background" in assets:
@@ -237,35 +238,51 @@ def main() -> int:
                      "object-position:50%% 12%%;height:46%%'>" % assets["title"])
         sheets["bg"] = (page(body), (1600, 900))
 
-    items = sorted(path.stem for path in (pack / "item" / "item").glob("*.svg"))
-    if items:
+    # 物品图标：专属与标签兜底各一张，按运行期同一套两色规则上色
+    for section, sheet_name in (("item", "items"), ("tag", "tags")):
+        paths = sorted((pack / "item" / section).glob("*.svg"))
+        if not paths:
+            continue
         cells = []
-        for index, item in enumerate(items):
-            markup = (work / ("item_" + item + ".svg")).read_text(encoding="utf-8")
+        for index, path in enumerate(paths):
+            markup = (work / ("ic_%s_" % section + path.name)).read_text(encoding="utf-8")
             markup = markup.replace("#d7ddd2", "currentColor")
             markup = markup.replace("#a77ad1", QUALITY_COLORS[index % len(QUALITY_COLORS)])
             markup = markup.replace("<svg ", "<svg style='color:#dfe8e6' ", 1)
-            cells.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (markup, item))
-        sheets["items"] = (page("<div class='sheet'>" + "".join(cells) + "</div>"), (1000, 780))
+            cells.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (markup, path.stem))
+        sheets[sheet_name] = (page("<div class='sheet'>" + "".join(cells) + "</div>"), (1000, 980))
 
-    avatars = sorted(path.name for path in (pack / "avatars" / "characters").glob("*.svg"))
-    if avatars:
+    # 头像三类：整张立绘（与 base 对照）/ 形状 / 特征
+    for section in ("characters", "shapes", "features"):
+        paths = sorted((pack / "avatars" / section).glob("*.svg"))
+        if not paths:
+            continue
+        box = 220 if section == "characters" else 96
         cells = []
-        if base_portrait:
-            cells.append(("<div class='cell'>%s<div class='cap'>base %s</div></div>" % (
-                (work / ("base_" + base_portrait)).read_text(encoding="utf-8").replace(
-                    "<svg ", "<svg style='width:220px;height:220px' ", 1), base_portrait)))
-        for name in avatars:
+        if section == "characters" and base_portrait:
+            base_markup = (work / ("base_" + base_portrait)).read_text(encoding="utf-8")
+            cells.append("<div class='cell'>%s<div class='cap'>base %s</div></div>" % (
+                base_markup.replace("<svg ", "<svg style='width:220px;height:220px' ", 1), base_portrait))
+        for path in paths:
+            markup = (work / ("av_%s_" % section + path.name)).read_text(encoding="utf-8")
             cells.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (
-                (work / ("pack_" + name)).read_text(encoding="utf-8").replace(
-                    "<svg ", "<svg style='width:220px;height:220px' ", 1), name))
-        sheets["avatars"] = (page("<div class='sheet'>" + "".join(cells) + "</div>"), (860, 400))
-        big = []
-        for name in avatars:
-            big.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (
-                (work / ("pack_" + name)).read_text(encoding="utf-8").replace(
-                    "<svg ", "<svg style='width:300px;height:300px' ", 1), name))
-        sheets["big"] = (page("<div class='sheet'>" + "".join(big) + "</div>"), (860, 420))
+                markup.replace("<svg ", "<svg style='width:%dpx;height:%dpx' " % (box, box), 1), path.stem))
+        per_row = max(1, (1000 - 48) // (box + 38))
+        rows = (len(cells) + per_row - 1) // per_row
+        sheets["avatar_" + section] = (page("<div class='sheet'>" + "".join(cells) + "</div>"),
+                                       (1000, 300 + (box + 60) * rows))
+
+    # 包自带的符号模块（资源包也可以带 SYMBOLS）
+    import importlib.util
+
+    for path in sorted(pack.glob("*symbols*.py")):
+        spec = importlib.util.spec_from_file_location("pack_symbols_" + path.stem, path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for attr in dir(module):
+            table = getattr(module, attr)
+            if attr.isupper() and isinstance(table, dict) and table:
+                sheets["sym_" + attr.lower()] = _symbol_sheet(work, table, args.box)
 
     for name, (markup, size) in sheets.items():
         png = render(edge, work, name, markup, size)

@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<!-- 这一格 id 叫 ponytail，但本包画的是**发簪**（簪）：马尾由形状层提供
+     （i-av7 双马尾 / i-av10 侧马尾），所以特征层这一格改成和风头饰。
+     看着"名不符实"是刻意的，别照 id 名改回去。 -->
   <path d="M14.8 8.8 19.6 3.6" fill="none" stroke="#c9a86a" stroke-width="1.3"/><circle cx="20.2" cy="3.2" r="1.7" fill="#e8b6c0" stroke="#20171b" stroke-width=".8"/><path d="M19.4 1.7 21.1 4.7" stroke="#20171b" stroke-width=".6"/>
 </svg>
