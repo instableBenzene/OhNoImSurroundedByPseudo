@@ -119,6 +119,9 @@ tools/browser_playtest.mjs    浏览器对局压测（CDP 驱动）
 tools/validate_content.py     内容校验（编号/头像/性格/技能派发/引用完整性）
 tools/audit_text.py           日志文案自检（句式/长度/标点/标记；规则见 docs/STYLE.md §11）
 tools/audit_ownership.py      归属边界自检（外部 PR 只准动 dlc/、resourcepacks/；**只用在 PR 上**，不进"每次改完的固定动作"）
+tools/preview_resourcepack.py 把资源包/base 材质渲成 PNG（背景/物品/头像/符号）供肉眼复核
+tools/dump_codex_text.py      导出技能正文（含 chips）供排版复核（**导入内容层，不手抄**）
+tools/render_text_sheet.mjs   把导出的正文过一遍真实 `fmt()` 排版并截图
 tools/dump_effects.py         效果注册表 dump（只读；核对 docs/ARCH.md 的闸门/数值目录）
 tools/new_character.py        房客脚手架（自动分配 source_id 与 AVATAR）
 tools/prepare_portable.py     准备便携运行时（embeddable Python → runtime/）
