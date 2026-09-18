@@ -59,9 +59,13 @@
   <polygon points="0,880 620,548 620,560 0,900" fill="#8d9793" opacity=".55"/>
   <polygon points="1600,880 980,548 980,560 1600,900" fill="#8d9793" opacity=".45"/>
 
-  <!-- 旧血 ①：墙裙高度的一段擦拭痕（干涸色，不鲜红） -->
-  <path d="M96 610 L268 582 L272 606 L100 636 Z" fill="#7d1f24" opacity=".62"/>
-  <path d="M118 616 L242 596" stroke="#5e171b" stroke-width="3" opacity=".5"/>
+  <!-- 旧血 ①：墙裙高度的一段擦拭痕（不规则 + 边缘发虚，不是红管子） -->
+  <g filter="url(#ward-soft)" opacity=".42">
+    <path d="M100 612 q54 -16 108 -6 q42 8 62 -2 q-22 22 -74 22 q-58 2 -96 -14z" fill="#7d1f24"/>
+    <ellipse cx="128" cy="626" rx="16" ry="7" fill="#7d1f24"/>
+    <ellipse cx="252" cy="606" rx="11" ry="6" fill="#7d1f24"/>
+  </g>
+  <path d="M136 608 q34 -8 62 -3" stroke="#5e171b" stroke-width="2.4" opacity=".38"/>
 
   <!-- 顶灯：格栅灯管 ×3（最近那盏在闪，class 由资源包的 css 提供） -->
   <g>
@@ -73,25 +77,39 @@
     <polygon class="ward-flicker" points="320,26 1280,26 1300,46 300,46" fill="#ffffff"/>
     <polygon points="300,14 1300,14 1340,58 260,58" fill="#ffffff" opacity=".55" filter="url(#ward-lamp)"/>
   </g>
-  <!-- 灯下墙面的硬边光斑（荧光灯的光是方的） -->
-  <g fill="#ffffff" opacity=".34">
-    <polygon points="60,120 420,196 420,318 60,252"/>
-    <polygon points="1540,120 1180,196 1180,318 1540,252"/>
-    <polygon points="20,330 300,376 300,470 20,430"/>
+  <!-- 灯下墙面的硬边光斑：每盏灯一对，正对灯位、贴墙收敛（不是贴板子） -->
+  <g fill="#ffffff" opacity=".62">
+    <polygon points="486,190 620,168 620,318 486,346"/>
+    <polygon points="1114,190 980,168 980,318 1114,346"/>
+    <polygon points="200,60 420,124 420,232 200,176"/>
+    <polygon points="1400,60 1180,124 1180,232 1400,176"/>
   </g>
   <!-- 地面反光：灯管的倒影（惨白的走廊靠这个"亮"起来） -->
   <g fill="#f4f9f7" opacity=".22">
     <polygon points="300,742 1300,742 1180,800 420,800"/>
     <polygon points="560,660 1040,660 1000,700 600,700"/>
   </g>
+  <!-- 地面瓷砖：横缝（向消失点收） + 纵缝，缝线低对比 -->
+  <g stroke="#8b9591" stroke-width="1.6" opacity=".5" fill="none">
+    <path d="M0 646 L1600 646 M0 712 L1600 712 M0 792 L1600 792"/>
+    <path d="M760 900 L796 562 M640 900 L760 562 M520 900 L724 562 M400 900 L688 562 M280 900 L652 562"/>
+    <path d="M840 900 L804 562 M960 900 L840 562 M1080 900 L876 562 M1200 900 L912 562 M1320 900 L948 562"/>
+  </g>
+  <!-- 地面靠墙的深色边条（瓷砖靠墙那一圈），比棋盘格更稳 -->
+  <g fill="#5f6a67" opacity=".5">
+    <polygon points="0,900 620,560 620,596 0,900"/>
+    <polygon points="1600,900 980,560 980,596 1600,900"/>
+  </g>
 
-  <!-- 左墙细节：通风口（格栅后是纯黑） + 呼叫铃（常亮） -->
+  <!-- 左墙细节：通风口（细框 + 暗缝） + 呼叫铃（常亮） -->
   <g>
-    <rect x="140" y="180" width="124" height="72" fill="#1a2021" stroke="#7f8a86" stroke-width="3"/>
-    <path d="M146 196 H258 M146 212 H258 M146 228 H258 M146 242 H258" stroke="#5c6663" stroke-width="2"/>
-    <rect x="300" y="392" width="28" height="36" rx="4" fill="#e8f0eb" stroke="#7f8a86" stroke-width="2.4"/>
-    <circle cx="314" cy="405" r="5" fill="#5f9c90"/>
-    <circle cx="314" cy="405" r="13" fill="#9fd3c7" opacity=".7" filter="url(#ward-soft)"/>
+    <rect x="140" y="180" width="124" height="72" fill="#9aa4a0" stroke="#7f8a86" stroke-width="2"/>
+    <path d="M146 192 H258 M146 206 H258 M146 220 H258 M146 234 H258 M146 246 H258" stroke="#39433e" stroke-width="4"/>
+    <path d="M140 252 h124" stroke="#8b9591" stroke-width="2" opacity=".7"/>
+    <rect x="298" y="388" width="34" height="46" rx="4" fill="#eef3f0" stroke="#7f8a86" stroke-width="2.4"/>
+    <path d="M303 400 h24" stroke="#8b9591" stroke-width="2" opacity=".7"/>
+    <circle cx="315" cy="419" r="6" fill="#b0433d"/>
+    <circle cx="315" cy="419" r="15" fill="#b0433d" opacity=".28" filter="url(#ward-soft)"/>
   </g>
 
   <!-- 右墙：歪掉的挂钟 -->
@@ -111,10 +129,10 @@
       <use href="#dg-3" x="1166" y="344"/><use href="#dg-f" x="1182" y="344"/>
       <use href="#dg-5" x="1166" y="416"/><use href="#dg-f" x="1182" y="416"/>
     </g>
-    <!-- 旧血 ②：4F 那一行被擦过，边缘一点渗色 -->
+    <!-- 旧血 ②：4F 那一行被擦过，边缘一点渗色（不规则、不发光） -->
     <path d="M1160 372 L1196 366 L1194 390 L1158 396 Z" fill="#d3dbd7"/>
     <path d="M1152 384 L1204 376" stroke="#a8b2ae" stroke-width="2" opacity=".7"/>
-    <path d="M1188 366 L1206 368 L1202 382 L1186 380 Z" fill="#7d1f24" opacity=".45"/>
+    <path d="M1190 370 q8 -3 12 2 q-4 6 -12 4 q-6 -2 0 -6z" fill="#7d1f24" opacity=".38"/>
   </g>
 
   <!-- 尽头墙：门（门后纯黑）+ 门牌 404 + 门缝冷光 -->
@@ -123,18 +141,18 @@
     <path d="M760 318 V560 M840 318 V560" stroke="#3d4744" stroke-width="2"/>
     <rect x="762" y="342" width="76" height="30" fill="#f2f7f4"/>
     <g stroke="#2a3431" stroke-width="3.4" stroke-linecap="square">
-      <use href="#dg-4" x="770" y="350"/><use href="#dg-0" x="784" y="350"/><use href="#dg-4" x="798" y="350"/>
-      <use href="#dg-0" x="812" y="350"/>
+      <use href="#dg-4" x="778" y="350"/><use href="#dg-0" x="790" y="350"/><use href="#dg-4" x="802" y="350"/>
     </g>
     <rect x="736" y="550" width="128" height="10" fill="#dff0ea" opacity=".85"/>
     <rect x="736" y="550" width="128" height="24" fill="#dff0ea" opacity=".4" filter="url(#ward-soft)"/>
     <rect x="848" y="430" width="10" height="42" rx="3" fill="#7f8a86"/>
   </g>
 
-  <!-- 旧血 ③：门缝下的拖拽痕，朝观者拖出来 -->
-  <path d="M784 566 L826 566 L904 792 L742 792 Z" fill="#7d1f24" opacity=".5"/>
-  <path d="M796 600 L818 600" stroke="#5e171b" stroke-width="4" opacity=".4"/>
-  <path d="M752 700 L888 700" stroke="#5e171b" stroke-width="6" opacity=".28"/>
+  <!-- 旧血 ③：门缝下拖出来的一道窄痕（断续、不对称，不是红毯） -->
+  <path d="M792 562 q10 22 4 40 q-6 16 2 28 q-10 -4 -14 -18 q-6 -20 2 -34 q4 -10 6 -16z" fill="#7d1f24" opacity=".42"/>
+  <path d="M818 566 q6 18 14 30 q-12 -2 -18 -14 q-4 -10 4 -16z" fill="#7d1f24" opacity=".3"/>
+  <ellipse cx="772" cy="640" rx="9" ry="5" fill="#5e171b" opacity=".34"/>
+  <ellipse cx="828" cy="608" rx="6" ry="4" fill="#5e171b" opacity=".28"/>
 
   <!-- 空气感 + 暗角（惨白走廊要压一下，否则 UI 文字会被吃掉） -->
   <rect x="620" y="250" width="360" height="310" fill="#ffffff" opacity=".18" filter="url(#ward-soft)"/>

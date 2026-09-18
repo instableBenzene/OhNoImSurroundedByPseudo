@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<!-- 野战手术：手术刀与止血钳是底色，洞巾一角是特征色 -->
-<path d="M4 27l8-8"/><path d="M11 18l6-6 4 4-6 6z"/>
-<path d="M15 22l8 5"/><path d="M23 27l3-3"/>
-<path d="M19 4l9 9" stroke="#a77ad1" stroke-width="2.6" stroke-dasharray="2.5 2.5"/>
-<path d="M7 12l6 6" opacity=".55"/>
+<!-- 野战手术：手术刀（上）与止血钳（下）分开摆，洞巾折角是特征色 -->
+<path d="M5 11 L18 4 L21 8 L8 15 Z"/>
+<path d="M8 15 L2 19"/><path d="M12 9 L15 12"/>
+<path d="M6 22 L21 22 M6 22 L2 26 M6 22 L2 18"/>
+<path d="M21 22 L27 17"/><path d="M21 22 L27 27"/>
+<path d="M21 22 L28 22"/>
+<path d="M27 17 L30 15 M27 27 L30 29" stroke="#a77ad1" stroke-width="2.6"/>
 </svg>

@@ -60,4 +60,5 @@ THEME = {
 
 ASSETS = {
     "background": "background.svg",
+    "title": "title.svg",
 }

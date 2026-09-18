@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMid meet">
+  <!-- 夜班病区・大标题：一张病历纸／处方笺，深墨字压在惨白背景上（不然白字会糊） -->
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f8f5"/><stop offset="1" stop-color="#e4e8e3"/>
+    </linearGradient>
+    <clipPath id="paper-clip">
+      <path d="M56 16 H1144 q14 0 12 16 L1128 348 q-1 12 -14 12 H72 q-13 0 -14 -14 L38 32 q-2 -16 18 -16z"/>
+    </clipPath>
+  </defs>
+  <g transform="rotate(-.7 600 210)">
+    <path d="M56 16 H1144 q14 0 12 16 L1128 348 q-1 12 -14 12 H72 q-13 0 -14 -14 L38 32 q-2 -16 18 -16z"
+          fill="url(#paper)" stroke="#b9c4bf" stroke-width="3"/>
+    <!-- 病历纸：抬头线、分栏线、右下角页码格 -->
+    <g clip-path="url(#paper-clip)">
+      <path d="M56 104 H1156" stroke="#8d9c97" stroke-width="2" opacity=".55"/>
+      <path d="M56 116 H1156" stroke="#8d9c97" stroke-width="1.2" opacity=".35"/>
+      <path d="M912 116 V366" stroke="#8d9c97" stroke-width="1.4" opacity=".4"/>
+      <path d="M1030 232 H1140 M1030 264 H1140 M1030 296 H1140 M1030 328 H1140"
+            stroke="#8d9c97" stroke-width="1.6" opacity=".3"/>
+      <g fill="#8d9c97" opacity=".18">
+        <rect x="80" y="132" width="700" height="2"/><rect x="80" y="164" width="640" height="2"/>
+        <rect x="80" y="196" width="700" height="2"/><rect x="80" y="228" width="520" height="2"/>
+      </g>
+      <!-- 旧血：纸角一点渗色（小、暗） -->
+      <path d="M1112 20 q16 8 12 24 q-4 12 -18 8 q-8 -14 6 -32z" fill="#7d1f24" opacity=".28"/>
+    </g>
+    <!-- 主标题：字号按纸宽收（12 字 × (86+4) ≈ 1080 < 1106，不出框） -->
+    <text x="92" y="228" fill="#232c29" font-size="86" letter-spacing="4"
+          font-family="var(--hei, 'Microsoft YaHei', 'PingFang SC', sans-serif)">完蛋，我被伪人包围了！？</text>
+    <!-- 副标题：夜班查房的广播（与 404 呼应） -->
+    <text x="96" y="292" fill="#5c6663" font-size="36" letter-spacing="13"
+          font-family="var(--hei, 'Microsoft YaHei', 'PingFang SC', sans-serif)">夜间查房 · 请勿应答</text>
+    <text x="96" y="334" fill="#8d9c97" font-size="23" letter-spacing="7"
+          font-family="var(--mono, Consolas, monospace)">NIGHT WARD / 4F NOT FOUND</text>
+    <!-- 科室章 -->
+    <g transform="rotate(-9 1010 258)" opacity=".75">
+      <rect x="946" y="228" width="132" height="58" rx="6" fill="none" stroke="#7d1f24" stroke-width="4"/>
+      <text x="964" y="268" fill="#7d1f24" font-size="28" letter-spacing="4"
+            font-family="var(--hei, 'Microsoft YaHei', 'PingFang SC', sans-serif)">夜班病区</text>
+    </g>
+    <line x1="92" y1="252" x2="1064" y2="252" stroke="#7d1f24" stroke-width="3" opacity=".55"/>
+  </g>
+</svg>

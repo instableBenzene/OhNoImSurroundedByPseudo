@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<!-- 帕瑞昔布注射液：预充针（筒身底色，药液是特征色） -->
-<path d="M5 27l7-7"/><path d="M9.5 22.5l4 4 8.5-8.5-4-4z"/>
-<path d="M19 13l6-6"/><path d="M22.5 6.5l3 3"/>
-<path d="M11 21l7-7" stroke="#a77ad1" stroke-width="3.6" opacity=".9"/>
-<path d="M14.5 9.5l3 3" opacity=".6"/>
+<!-- 帕瑞昔布注射液：预充式注射器（横放）：筒身是底色，药液是特征色 -->
+<rect x="8" y="12" width="14" height="8" rx="1.6"/>
+<path d="M8 12 V20"/><path d="M5 10 V22"/>
+<path d="M22 14.5 H26"/><path d="M4 14.5 H1"/>
+<path d="M26 16 H29"/>
+<path d="M11 12 V20" stroke="#a77ad1" stroke-width="5"/>
+<path d="M18 9.4 L22 9.4 M18 22.6 L22 22.6" opacity=".55"/>
 </svg>
