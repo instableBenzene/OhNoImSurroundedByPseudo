@@ -151,6 +151,9 @@ def main() -> int:
     parser.add_argument("pack", help="resourcepacks/ 下的包名")
     parser.add_argument("--out", default="", help="输出目录（默认系统临时目录）")
     parser.add_argument("--edge", default="", help="Edge/Chromium 可执行文件路径")
+    parser.add_argument("--zoom", default="",
+                        help="只渲这几张（base 模式：立绘/零件文件名，逗号分隔），配合 --box 放大看细节")
+    parser.add_argument("--box", type=int, default=96, help="头像/图标格子的像素边长（默认 96）")
     args = parser.parse_args()
 
     edge = args.edge or find_edge()
@@ -166,6 +169,16 @@ def main() -> int:
 
     if is_base:
         sheets = _base_sheets(work)
+        if args.zoom:
+            wanted = {name.strip() for name in args.zoom.split(",") if name.strip()}
+            zoom_paths = []
+            for section in ("characters", "shapes", "features"):
+                for path in sorted((pack / "avatars" / section).glob("*.svg")):
+                    if path.stem in wanted:
+                        shutil.copy(path, work / ("av_" + path.name))
+                        zoom_paths.append(path)
+            if zoom_paths:
+                sheets = {"zoom": _file_sheet(work, zoom_paths, "av_", args.box)}
         for name, (markup, size) in sheets.items():
             png = render(edge, work, name, markup, size)
             print("%-16s %s (%d bytes)" % (name, png, png.stat().st_size if png.exists() else 0))
