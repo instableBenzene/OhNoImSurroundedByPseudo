@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M6.5 6.5A2.5 2.5 0 019 4h16.5v24H9a2.5 2.5 0 01-2.5-2.5z"/><path d="M11.5 4v24"/><path d="M18.5 10.5v7M15 14h7" stroke="#a77ad1" stroke-width="2"/>
+<!-- 书籍（通用兜底）：素面书 + 书签飘带（兜底图不该带某个专业领域的标记） -->
+<rect x="5.6" y="6" width="20.8" height="20" rx="2.2"/>
+<path d="M10 6v20" opacity=".5"/>
+<!-- 第一版书签太宽，渲染出来像一团紫色；收窄成细飘带 -->
+<path d="M20.2 6v7.4l1.8-1.5 1.8 1.5V6z" stroke="#a77ad1" stroke-width="1.9"/>
 </svg>

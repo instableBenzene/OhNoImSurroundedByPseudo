@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M6.5 6.5A2.5 2.5 0 019 4h16.5v24H9a2.5 2.5 0 01-2.5-2.5z"/><path d="M11.5 4v24"/><path d="M18.5 10.5v7M15 14h7" stroke="#a77ad1" stroke-width="2"/>
+<!-- 灾难手册：封面警示三角（特征色） -->
+<rect x="5.6" y="6" width="20.8" height="20" rx="2.2"/>
+<path d="M10 6v20" opacity=".5"/>
+<path d="M17 11.6l5.4 9.2H11.6z" stroke="#a77ad1" stroke-width="2.1"/>
+<path d="M17 15v2.6" stroke="#a77ad1" stroke-width="2"/>
+<circle cx="17" cy="19.4" r=".9" fill="#a77ad1" stroke="none"/>
 </svg>
