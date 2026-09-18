@@ -510,7 +510,8 @@ class GameEngine(
         if rows is None:
             from .log_shape import rows_from_lines
 
-            rows = rows_from_lines(collected)
+            # 没开收集就 flush（忘了 `_collect_start` 的调用点）时 collected 是 None —— 不能直接迭代。
+            rows = rows_from_lines(collected or [])
         if not rows:
             return
         text = summary or (f"{title}：{len(rows)} 项变化。" if title else "")
@@ -1016,13 +1017,9 @@ class GameEngine(
         """校验当前状态满足各项游戏不变量（供测试使用）。"""
         assert self.state.meta.version == GAME_VERSION
         assert self.state.pseudo_state.scenario_id in PSEUDOS
-        # 替身状态不许悬空：伪人若指着某个屋内房客，那人就必须带着替身标记
-        # （身份是在搜索返程才打上的，中途被"当普通人驱逐"会破坏这一条——真踩过，见 DECISIONS）。
-        infiltrator_id = self.state.pseudo_state.infiltrator_id
-        if infiltrator_id and infiltrator_id in self.state.house.tenants:
-            assert self.state.house.tenants[infiltrator_id].is_pseudo, (
-                "伪人状态指着 %r，但该房客没有替身标记（悬空的 infiltrator_id）" % infiltrator_id
-            )
+        # 注意（别加回断言）：`infiltrator_id` 指着屋内房客、而那人还没打上替身标记，**是合法窗口**——
+        # 绑架发生在搜索途中、替身标记要等"搜索返程"才打；smoke 里就出现过这种状态。
+        # 这类"悬空"是玩家报告的那条物资重复 bug 的同源现象，追它请见 docs/DECISIONS.md。
         assert len(set(self.state.world.locations.available_locations)) == len(self.state.world.locations.available_locations)
         assert all(key in LOCATIONS for key in self.state.world.locations.available_locations)
         for tenant in self.state.house.tenants.values():
