@@ -260,7 +260,8 @@ class AbilitySystemMixin:
                 handler(self, source)
             return
         self._remove_tenant_from_house(tenant)
-        self._log(f"{source}驱逐了{self.character(tenant).name}。")
+        # 重后果（红色）：驱逐不可撤销，而且会牵动羁绊与其余房客。
+        self._log(f"{source}驱逐了{self.character(tenant).name}。", kind="danger")
         exempt = sanity_exempt_ids or set()
         for other in self.home_tenants():
             if other.id not in exempt:

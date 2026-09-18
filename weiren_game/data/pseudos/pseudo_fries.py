@@ -173,7 +173,8 @@ def expel_infiltrator(
     engine.state.house.tenants[tenant_id] = original
     if self_infernal:
         pseudo.expelled_count = 0
-        engine._log("炼狱扳机自我驱逐：解放进度已重置。")
+        # 重后果（红色）：替身自己走了，玩家的解放进度被清零。
+        engine._log("炼狱扳机自我驱逐：解放进度已重置。", kind="danger")
     else:
         pseudo.expelled_count += 1
     pseudo.infiltrator_id = None
@@ -191,7 +192,7 @@ def expel_infiltrator(
     engine._log(
         f"{source}驱逐了替身；被绑架的{engine.character(original).name}归来"
         f"并损失{penalty}生命、理智。"
-        f"解放进度{pseudo.expelled_count}/3。"
+        f"解放进度{pseudo.expelled_count}/3。", kind="danger",
     )
     engine._after_health_changed()
     if original.health < 0:

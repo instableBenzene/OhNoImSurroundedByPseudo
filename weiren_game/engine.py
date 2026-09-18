@@ -813,7 +813,8 @@ class GameEngine(
                 handler(self, "替身死亡")
             return
         self._remove_tenant_from_house(tenant)
-        self._log(f"死亡：{self.character(tenant).name}{reason}。")
+        # 重后果（红色）：房客死亡不可逆。
+        self._log(f"死亡：{self.character(tenant).name}{reason}。", kind="danger")
 
     def _notify_tenant_death(self) -> None:
         """房客死亡节点：通知当前伪人场景与角色光环/被动的死亡响应。"""
