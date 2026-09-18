@@ -2053,10 +2053,8 @@ function mdText(s){
   s=parts.map((p,i)=> i%2 ? '<i class="fx">'+p+'</i>' : p).join("");
   // 行首 · 的临时哨兵用 \u0003，避免与加粗占位 \u0001b 互相覆盖（曾把 **加粗** 渲染成「·b…」）。
   s=s.replace(/\n/g,"<br>").replace(/<br>·/g,"\u0003").replace(/·/g,"<br>·").replace(/\u0003/g,"<br>·");
-  // 对话自动换行：“…” 前插入换行（不打断行首）。
-  /* 引号**不再**自动换行：这条原本是为对话设计的，但全库 118 个引号里 113 个是
-     * 物资名/术语（“燧发枪”“沃尔玛购物袋”…），一律断行会把名字劈到下一行。
-     * 要断行请显式写 \n 或 ·（见 docs/STYLE.md §12）。 */
+  // 引号不再自动换行：这条规则原为对话设计，但库里绝大多数引号框的是物资名/术语，
+  // 一律断行会把名字劈到下一行。要断行请显式写 \n 或 ·（见 docs/STYLE.md §12）。
   return s.replace(/\u0001b/g,"<b>").replace(/\u0002/g,"</b>");
 }
 function tagIndexMap(){ return (STATE&&STATE.tagIndex)||(CODEX&&CODEX.tagIndex)||{}; }
