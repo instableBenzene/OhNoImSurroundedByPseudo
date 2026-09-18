@@ -309,6 +309,9 @@ def infernal_trigger(engine: object) -> None:
         "炼狱扳机", "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     )
+    # AOE 收成一条：9 轮 × 至多 3 人本来会刷出几十条逐人播报，现在只播一条汇总 + 可点开的明细。
+    engine._collect_start()
+    rows: list[dict] = []
     if not blocked:
         for repeat in range(9):
             targets = [
@@ -323,7 +326,16 @@ def infernal_trigger(engine: object) -> None:
                     caster=engine.state.pseudo_state,
                     target=target, event=f"fries.trigger.{repeat}",
                 ):
+                    before_health = target.health
                     engine._damage_health(target, 5, "炼狱扳机")
+                    lost = before_health - target.health
+                    if lost > 0:
+                        rows.append({
+                            "label": engine.character(target).name,
+                            "value": "−%g 生命" % lost,
+                            "note": "炼狱扳机",
+                        })
+    engine._collect_flush(f"炼狱扳机：{len(rows)} 次命中。", rows=rows)
     # 突破条件：释放炼狱扳机时屋内房客人数小于 3。
     if len(engine.home_tenants()) < 3:
         if engine._attempt_breakthrough(

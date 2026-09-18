@@ -139,13 +139,16 @@ class ValueSystemMixin:
         return lost
 
     def _restore_health(self, tenant: Tenant, amount: float, source: str = "回复") -> float:
-        """回复生命至上限并清除休克，返回实际回复量。"""
+        """回复生命至上限，返回实际回复量。
+
+        注意：**不再顺手清除休克**。休克只由**内容层明确声明的效果**解除
+        （现存唯一一处是"移除全部状态"）；旧代码"只要回血到 >0 就清休克"是没登记的额外规则，
+        等于让休克形同虚设（玩家报告过）。
+        """
         if amount <= 0 or not tenant.alive:
             return 0.0
         before = tenant.health
         tenant.health = min(tenant.max_health, tenant.health + amount)
-        if tenant.health > 0:
-            tenant.shock = tenant.shock_layers = 0
         restored = tenant.health - before
         self._after_health_changed()
         return restored

@@ -1091,9 +1091,13 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 #logList li.lg-danger{color:var(--danger)}
 /* 【…】术语是整块提示，别让它被折行劈成「【工 / 具】」 */
 .tagref{white-space:nowrap}
-/* 明细折叠：**整行本身就是开关**（不再有「明细 N」按钮），展开后按 谁 / 多少 / 为什么 三列排 */
-#logList li.ld-hit{cursor:pointer}
-#logList li.ld-hit:hover{background:color-mix(in srgb, var(--edge) 45%, transparent)}
+/* 明细折叠：**整行本身就是开关**（不再有「明细 N」按钮），展开后按 谁 / 多少 / 为什么 三列排。
+   做成按钮质感，玩家才知道能点；展开时箭头朝上、再点即收起。 */
+#logList li.ld-hit{cursor:pointer;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:6px;padding:2px 8px;transition:background .12s,border-color .12s}
+#logList li.ld-hit:hover{background:var(--surface-1);border-color:var(--amber)}
+#logList li.ld-hit::after{content:"⌄";margin-left:8px;font-size:11px;color:var(--ink3)}
+#logList li.ld-hit.open::after{content:"⌃"}
 /* 日志 li 是 **grid**（时间 / 正文两列）：明细块必须 `grid-column:1/-1` 跨满整行，
    否则它只占第二格（实测 46px）、三列被挤成**竖排**（真踩过）。 */
 .ld-box{display:block;grid-column:1/-1;width:100%;margin:2px 0 6px 10px;padding-left:8px;border-left:1px solid var(--edge)}
@@ -2377,6 +2381,7 @@ function logToggleLi(ev, i){
   const box=li.querySelector(".ld-box");
   if(!box) return;
   box.hidden=!box.hidden;
+  li.classList.toggle("open", !box.hidden);     /* 箭头朝上 = 已展开，再点即收起 */
   const detail=LOG[i]&&LOG[i][2];
   if(detail) detail.open=!box.hidden;           /* 记回数据：重渲染后仍保持展开 */
 }
