@@ -519,7 +519,10 @@
   .item-tip .it-dur{display:block;color:var(--ink3);font-family:var(--mono);font-size:11px;margin-top:4px}
   .item-tip .it-act{display:block;margin-top:8px;padding-top:6px;border-top:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px}
 
-  .tip-layer{position:fixed;z-index:300;display:none;pointer-events:none;width:320px;background:var(--surface-tip);
+/* 宽度随内容自适应：固定 320px 时，按 · 分行的长文体每行还要再折 2~3 次，
+   看起来就是"一堆莫名换行"（图鉴面板宽、所以正常）。上限 560px，短提示仍然是窄的。 */
+.tip-layer{position:fixed;z-index:300;display:none;pointer-events:none;width:auto;
+    max-width:min(560px,92vw);min-width:200px;background:var(--surface-tip);
     border:1px solid var(--line);padding:10px 12px;box-shadow:var(--shadow-tip);
     font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--ink2)}
   .chip.expire{font-size:10.5px;color:var(--ink3);border-color:var(--line)}
@@ -531,7 +534,11 @@
   .visitor{display:inline-flex;align-items:center;gap:8px;margin:6px 0;padding:4px 9px;border:1px solid var(--line);
     border-radius:4px;cursor:help}
   .visitor:hover{border-color:var(--amber)}
-  .tip-layer b{display:flex;align-items:baseline;gap:6px;font-size:13.5px;color:var(--ink)}
+/* 正文里的 **加粗**（`mdText` 产出 <b>）必须是**行内**的：
+   以前 `.tip-layer b{display:flex}` 把每个加粗数字都变成块级 → 25% / 100% / 5% 全部独占一行，
+   看起来就是"一堆莫名换行"。只有**标题那个直接子级** <b> 才需要 flex（名称 + 品质要并排）。 */
+.tip-layer b{display:inline;font-weight:700}
+.tip-layer>b{display:flex;align-items:baseline;gap:6px;font-size:13.5px;color:var(--ink)}
   .tip-layer .it-q{font-family:var(--mono);font-size:11px;color:var(--ink3)}
   .tip-layer .it-tags{display:block;color:var(--ink3);font-size:11px;margin:2px 0 6px}
   .tip-layer .it-desc{display:block;color:var(--ink)}
@@ -2027,7 +2034,8 @@ function pseudoHoverEnd(){ clearTimeout(_pseudoTimer); hideTip(); }
 function _tipPlace(el,L){ const r=el.getBoundingClientRect();
   /* 宿主已从 DOM 摘掉 / 尺寸为零时不要定位——否则悬浮层会贴到左上角。 */
   if(!el.isConnected || (!r.width && !r.height)){ L.style.display="none"; return; }
-  L.style.left=Math.min(window.innerWidth-360,Math.max(8,r.left))+"px";
+  /* 用**实测宽度**定位（宽度现在随内容变，写死 360 会让宽悬浮层溢出右边界）。 */
+  L.style.left=Math.min(window.innerWidth-L.offsetWidth-20,Math.max(8,r.left))+"px";
   let top=r.bottom+8; if(top+L.offsetHeight>window.innerHeight-8) top=Math.max(8,r.top-L.offsetHeight-8);
   L.style.top=top+"px"; }
 function showPseudoSkills(pd){
