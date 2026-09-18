@@ -254,7 +254,10 @@ class AbilitySystemMixin:
         """驱逐指定房客：视同屋内死亡（仅播报不同），并结算同伴的理智损失。"""
         if not tenant.alive:
             return
-        if tenant.is_pseudo:
+        # 替身身份是在**搜索返程**才打上 `is_pseudo` 的（见 pseudo_fries.captured_return），
+        # 所以判定不能只看 `is_pseudo`：只要伪人状态指着他，就必须走替身分支，
+        # 否则会留下悬空的 `infiltrator_id` / `mission.captured`，被绑架的人也回不来（真踩过）。
+        if tenant.is_pseudo or self.state.pseudo_state.infiltrator_id == tenant.id:
             handler = self._pseudo_handler("expel_infiltrator")
             if handler is not None:
                 handler(self, source)

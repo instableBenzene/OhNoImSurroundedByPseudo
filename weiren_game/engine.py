@@ -1007,6 +1007,13 @@ class GameEngine(
         """校验当前状态满足各项游戏不变量（供测试使用）。"""
         assert self.state.meta.version == GAME_VERSION
         assert self.state.pseudo_state.scenario_id in PSEUDOS
+        # 替身状态不许悬空：伪人若指着某个屋内房客，那人就必须带着替身标记
+        # （身份是在搜索返程才打上的，中途被"当普通人驱逐"会破坏这一条——真踩过，见 DECISIONS）。
+        infiltrator_id = self.state.pseudo_state.infiltrator_id
+        if infiltrator_id and infiltrator_id in self.state.house.tenants:
+            assert self.state.house.tenants[infiltrator_id].is_pseudo, (
+                "伪人状态指着 %r，但该房客没有替身标记（悬空的 infiltrator_id）" % infiltrator_id
+            )
         assert len(set(self.state.world.locations.available_locations)) == len(self.state.world.locations.available_locations)
         assert all(key in LOCATIONS for key in self.state.world.locations.available_locations)
         for tenant in self.state.house.tenants.values():
