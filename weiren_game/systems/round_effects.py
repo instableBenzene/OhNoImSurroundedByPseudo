@@ -25,6 +25,10 @@ class RoundEffectsSystemMixin:
         """结算各房客侵蚀/觉醒情绪对隐藏消沉值的影响，并套用理智区间等修正。"""
         from weiren_game.data import CHARACTER_VALUE_HOOKS
 
+        # 逐人播报会刷屏，且这里**故意不泄露数值**（消沉值对屋主隐藏），
+        # 所以只合并成一句总数，不出明细行。
+        self._collect_start()
+        tenant_count = len(self.home_tenants())
         for tenant in self.home_tenants():
             erosion_conditions = [tenant.condition(key) for key in EROSION_EMOTIONS]
             awakening_conditions = [tenant.condition(key) for key in AWAKENING_EMOTIONS]
@@ -59,6 +63,8 @@ class RoundEffectsSystemMixin:
                 # homeowner.  Keep it deterministic internally without leaking
                 # either the delta or total through the event log.
                 self._log(f"情绪结算：{self.character(tenant).name}的隐藏消沉值发生了变化。")
+
+        self._collect_flush(f"情绪结算：{tenant_count} 名房客的隐藏消沉值发生了变化。")
 
     def _run_house_item_start_hooks(self) -> None:
         """实例回合初·屋主仓库 scope：按 ITEM_HOOKS["turn_start.house"] 扫描。"""
