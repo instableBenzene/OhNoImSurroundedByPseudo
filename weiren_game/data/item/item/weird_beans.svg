@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="16" cy="16" r="7.5"/><path d="M8.5 16l-4.2-3.2v6.4zM23.5 16l4.2-3.2v6.4z" fill="#6b9fd1" stroke="#6b9fd1"/><path d="M12.6 13.4c1.8-1.8 5-1.8 6.8 0" stroke="#6b9fd1" stroke-width="1.6"/>
+<!-- 怪味豆：三颗斜放的豆（其中一颗的斑点是特征色） -->
+<ellipse cx="10.4" cy="13.4" rx="4.6" ry="3.3" transform="rotate(-22 10.4 13.4)"/>
+<ellipse cx="18.6" cy="20.4" rx="4.6" ry="3.3" transform="rotate(-22 18.6 20.4)"/>
+<ellipse cx="22.4" cy="10.4" rx="4.2" ry="3" transform="rotate(-22 22.4 10.4)"/>
+<circle cx="18.6" cy="20.4" r="1.1" fill="#a77ad1" stroke="none"/>
 </svg>

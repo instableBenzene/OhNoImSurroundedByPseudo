@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M8 6.5h16l-1.5 21h-13z"/><path d="M8 6.5c3-2.4 13-2.4 16 0"/><path d="M11.5 14.5h9M11.5 19h9" stroke="#a77ad1" stroke-width="1.8"/>
+<!-- 薯片：袋子 + 两片薯片（薯片是特征色） -->
+<path d="M7.4 9.4h17.2l-1.8 16.4a2.2 2.2 0 0 1-2.2 2H11.4a2.2 2.2 0 0 1-2.2-2z"/>
+<path d="M7.4 9.4l1.6-3.4 3.2 2.2 3.8-3 3.8 3 3.2-2.2 1.6 3.4" opacity=".7"/>
+<path d="M12.4 19.4c1.6-2 4.4-2 6 0" stroke="#a77ad1" stroke-width="2.1"/>
 </svg>

@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="6.5" y="9.5" width="19" height="14" rx="1.5"/><path d="M13 9.5v14M19.5 9.5v14M6.5 16.5h19" stroke="#d6aa45" stroke-width="1.6"/><path d="M8 7h16v2.5H8z"/>
+<!-- 斐济巧克力：整板 + 一侧的锡纸包（包是特征色）。
+     第一版斜放，结果读成封面带丝带的笔记本。 -->
+<rect x="4.6" y="10.6" width="22.8" height="10.8" rx="2"/>
+<path d="M4.6 16h22.8" opacity=".4"/>
+<path d="M13.4 10.6v10.8M17 10.6v10.8" opacity=".35"/>
+<path d="M18.8 10.6h8.6v10.8h-8.6z" fill="#a77ad1" stroke="none" opacity=".85"/>
 </svg>

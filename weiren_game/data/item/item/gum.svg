@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="16" cy="16" r="7.5"/><path d="M8.5 16l-4.2-3.2v6.4zM23.5 16l4.2-3.2v6.4z" fill="#66b875" stroke="#66b875"/><path d="M12.6 13.4c1.8-1.8 5-1.8 6.8 0" stroke="#66b875" stroke-width="1.6"/>
+<!-- 口香糖：扁盒 + 斜着抽出的一片（片是特征色）。第一版抽出来的片太方正，整只像手提箱。 -->
+<rect x="6.6" y="14" width="18.8" height="11.4" rx="1.8"/>
+<path d="M11 14V9.4l4.6-1.4v6" stroke="#a77ad1" stroke-width="2"/>
+<path d="M6.6 17.2h18.8" opacity=".45"/>
 </svg>

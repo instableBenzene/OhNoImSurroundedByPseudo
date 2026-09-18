@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="9.5" y="6" width="13" height="20" rx="2.5"/><path d="M9.5 9.8h13"/><path d="M13 15h6M13 18.5h6" stroke="#66b875" stroke-width="1.8"/><path d="M13 3.5h6v2.5h-6z"/>
+<!-- 可乐：瓶（标签环是特征色） -->
+<path d="M13.4 4.6h5.2v3l2 3v14.8a2.4 2.4 0 0 1-2.4 2.4h-4.4a2.4 2.4 0 0 1-2.4-2.4V10.6l2-3z"/>
+<path d="M11.4 13.6h9.2v6h-9.2z" stroke="#a77ad1" stroke-width="2.1"/>
+<path d="M11.4 25.4h9.2" opacity=".45"/>
 </svg>

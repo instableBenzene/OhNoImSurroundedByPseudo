@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M6.5 26.5l11-11"/><path d="M17.5 15.5c-2.6-.4-4.4-2.4-4.4-5S15 5.5 17.6 5.5c1.8 0 3.4.8 4.4 2"/><path d="M22 7.5c.9 1 1.4 2.3 1.4 3.8" stroke="#a77ad1"/><path d="M6.2 26.8c-2.2.3-3.6 1.7-4.2 3.8" stroke="#a77ad1"/>
+<!-- 撬棍：粗杆 + 顶端弯钩 + 底端分叉扁爪（爪口是特征色）。第一版像手杖，杆太细、爪太小。 -->
+<path d="M6.4 25.6L22.4 9.6" stroke-width="3"/>
+<path d="M22.4 9.6c2.6-2.2 2.4-5.4-.4-7.4"/>
+<path d="M6.4 25.6l-3 1.4M6.4 25.6l-1.2 3.2" stroke="#a77ad1" stroke-width="2.2"/>
 </svg>

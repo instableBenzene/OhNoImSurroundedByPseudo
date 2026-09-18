@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M16 3v5"/><path d="M12.5 8h7l1.5 4v2H11v-2z"/><path d="M11 14h10v7a5 5 0 01-10 0z"/><path d="M12 18h8" stroke="#d86459" stroke-width="1.8"/>
+<!-- 盐酸吗啡注射液：西林瓶 + 抽液的针（针筒内的药液是特征色） -->
+<path d="M6.4 13.4h9.2v12a2.4 2.4 0 0 1-2.4 2.4H8.8a2.4 2.4 0 0 1-2.4-2.4z"/>
+<path d="M8.4 13.4V11h5.2v2.4"/>
+<path d="M11 11V8.6" opacity=".6"/>
+<path d="M19.4 9.4h7.2v4h-7.2z"/>
+<path d="M20.6 13.4h4.8l-.8 5.4h-3.2z" stroke="#a77ad1" stroke-width="1.9"/>
+<path d="M22.8 18.8v6" opacity=".7"/>
 </svg>

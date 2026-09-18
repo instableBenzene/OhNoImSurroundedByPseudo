@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 7h17v18.5h-17z"/><path d="M8 11h10M8 15h10M8 19h6" stroke="#a77ad1" stroke-width="1.6"/><path d="M21.5 10H27v11.5a4 4 0 01-4 4h-1.5"/>
+<!-- 咨询载体（通用兜底）：写字板 + 问号（问号是特征色）。
+     原来和 information_carrier 共用一张折纸图，两个 tag 撞了。 -->
+<rect x="6.4" y="7" width="19.2" height="21" rx="2.2"/>
+<path d="M12.4 7V4.6h7.2V7z"/>
+<path d="M12.8 15a3.2 3.2 0 0 1 6.4 0c0 2-3.2 2.6-3.2 4.6" stroke="#a77ad1" stroke-width="2"/>
+<circle cx="16" cy="23" r="1.1" fill="#a77ad1" stroke="none"/>
 </svg>

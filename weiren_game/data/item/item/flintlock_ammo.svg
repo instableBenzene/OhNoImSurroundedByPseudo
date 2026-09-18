@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M7 13h5v13.5a1.5 1.5 0 01-1.5 1.5h-2A1.5 1.5 0 017 26.5z"/><path d="M7 13c0-3 1.2-5.4 2.5-7C10.8 7.6 12 10 12 13z"/><path d="M14 13h5v13.5a1.5 1.5 0 01-1.5 1.5h-2A1.5 1.5 0 0114 26.5z"/><path d="M14 13c0-3 1.2-5.4 2.5-7C17.8 7.6 19 10 19 13z" stroke="#a77ad1"/><path d="M21 13h5v13.5a1.5 1.5 0 01-1.5 1.5h-2A1.5 1.5 0 0121 26.5z"/><path d="M21 13c0-3 1.2-5.4 2.5-7C24.8 7.6 26 10 26 13z"/>
+<!-- 弹药：弹丸 + 火药壶（壶身是特征色） -->
+<path d="M5.4 24.6h5.6v3.2H5.4z"/>
+<path d="M5.4 24.6c0-2.6 1.2-4.6 2.8-6 1.6 1.4 2.8 3.4 2.8 6z"/>
+<path d="M20.6 14.6h6.8l1.2 4.6v7.4a2.2 2.2 0 0 1-2.2 2.2h-4.8a2.2 2.2 0 0 1-2.2-2.2v-7.4z" stroke="#a77ad1" stroke-width="2.1"/>
+<path d="M22 14.6V12h4v2.6" opacity=".55"/>
 </svg>

@@ -1,3 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M11 5l5 2 5-2 4 3-2 5v14H9V13L7 8z"/><path d="M16 7v20" stroke-opacity=".6"/><path d="M11.5 13h2.4M18.1 13h2.4M11.5 18h2.4M18.1 18h2.4" stroke="#d6aa45" stroke-width="1.8"/>
+<!-- 吉利服：背心 + 两侧与下摆的草叶（草是特征色）。第一版草全立在头顶，像皇冠。 -->
+<path d="M16 8.6l4.8 2.4 4.4-1.2v5.4c0 6.2-3.6 10.8-9.2 12.8-5.6-2-9.2-6.6-9.2-12.8V9.8l4.4 1.2z"/>
+<path d="M7.4 12.6l-3.4-1.2M7.4 17.4l-3.6.6M24.6 12.6l3.4-1.2M24.6 17.4l3.6.6M11.4 23.4l-2.2 3M20.6 23.4l2.2 3" stroke="#a77ad1" stroke-width="1.9"/>
 </svg>

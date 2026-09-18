@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 7h17v18.5h-17z"/><path d="M8 11h10M8 15h10M8 19h6" stroke="#6b9fd1" stroke-width="1.6"/><path d="M21.5 10H27v11.5a4 4 0 01-4 4h-1.5"/>
+<!-- 报纸：摊开的两版（中缝与头条线用特征色） -->
+<path d="M4.6 9.4h10.6v18.2H6.6a2 2 0 0 1-2-2z"/>
+<path d="M15.2 9.4h12.2v16.2a2 2 0 0 1-2 2H15.2z"/>
+<path d="M15.2 9.4v18.2" opacity=".5"/>
+<path d="M7 13.4h5.8M7 20h5.8M18 13.4h6.4" opacity=".5"/>
+<path d="M7 16.4h5.8" stroke="#a77ad1" stroke-width="2"/>
+<path d="M18 17.4h6.4M18 21h6.4" opacity=".5"/>
 </svg>

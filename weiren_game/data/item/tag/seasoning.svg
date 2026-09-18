@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M16 5c4 3.2 7 7.2 7 12a7 7 0 01-14 0c0-4.8 3-8.8 7-12z"/><path d="M16 8v13M12.5 12c1 2.2 1 5.4 0 8.5M19.5 12c-1 2.2-1 5.4 0 8.5" stroke="#6b9fd1" stroke-width="1.6"/><path d="M16 5V2.8"/>
+<!-- 调料（通用兜底）：撒粉罐（罐盖上的孔是特征色）。原来画成蒜头，和 garlic 撞了。 -->
+<path d="M10 13h12l-1 15.4H11z"/>
+<path d="M11.6 13c0-2.6 2-4.6 4.4-4.6s4.4 2 4.4 4.6"/>
+<path d="M12.8 5.4h6.4v3h-6.4z" opacity=".55"/>
+<circle cx="14" cy="9" r=".9" fill="#a77ad1" stroke="none"/><circle cx="16" cy="8.4" r=".9" fill="#a77ad1" stroke="none"/><circle cx="18" cy="9" r=".9" fill="#a77ad1" stroke="none"/>
 </svg>
