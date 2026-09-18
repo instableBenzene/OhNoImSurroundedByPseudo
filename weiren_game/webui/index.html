@@ -1090,6 +1090,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 /* 日志 li 是 **grid**（时间 / 正文两列）：明细块必须 `grid-column:1/-1` 跨满整行，
    否则它只占第二格（实测 46px）、三列被挤成**竖排**（真踩过）。 */
 .ld-box{display:block;grid-column:1/-1;width:100%;margin:2px 0 6px 10px;padding-left:8px;border-left:1px solid var(--edge)}
+.ld-box[hidden]{display:none}
 .ld-row{display:flex;width:100%;gap:10px;align-items:baseline;font-size:11px;line-height:1.75;font-family:var(--mono)}
 .ld-who{flex:0 0 auto;min-width:5.5em;color:var(--ink2)}
 .ld-val{flex:0 0 auto;min-width:6.5em;color:var(--ink-hi)}
@@ -2338,10 +2339,10 @@ function logBodyHtml(m){
   return `<div>${fmt(m)}</div>`;
 }
 function renderLog(smooth){ const box=$("logList"); if(!box) return;
-  box.innerHTML=LOG.map(([t,m,d,k])=>{
+  box.innerHTML=LOG.map(([t,m,d,k],i)=>{
     const has=!!(d&&(d.rows||[]).length);
     const cls=[k?`lg-${esc(k)}`:"",has?"ld-hit":""].filter(Boolean).join(" ");
-    return `<li${cls?` class="${cls}"`:""}${has?` onclick="logToggleLi(event)"`:""}>`
+    return `<li${cls?` class="${cls}"`:""}${has?` onclick="logToggleLi(event,${i})"`:""}>`
       +`<span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`;
   }).join("");
   /* 新消息逐条冒出时平滑滚到底，而不是一口气刷新。 */
@@ -2359,13 +2360,17 @@ function logDetailHtml(d){
     +(r.label?`<span class="ld-who">${esc(r.label)}</span>`:"")
     +(r.value?`<span class="ld-val">${esc(r.value)}</span>`:"")
     +(r.note?`<span class="ld-note">${esc(r.note)}</span>`:"")+`</div>`).join("");
-  return `<div class="ld-box" hidden>${body}</div>`;
+  /* 展开状态记在数据里（d.open）：否则日志每来一条新消息就整段重渲染，展开会被丢掉。 */
+  return `<div class="ld-box"${d.open?"":" hidden"}>${body}</div>`;
 }
-function logToggleLi(ev){
+function logToggleLi(ev, i){
   const li=ev.currentTarget;
   if(ev.target.closest(".ld-box")) return;      /* 点明细内部不收起 */
   const box=li.querySelector(".ld-box");
-  if(box) box.hidden=!box.hidden;
+  if(!box) return;
+  box.hidden=!box.hidden;
+  const detail=LOG[i]&&LOG[i][2];
+  if(detail) detail.open=!box.hidden;           /* 记回数据：重渲染后仍保持展开 */
 }
 function clearLog(){ LOG=[]; renderLog(); }
 /* 导出：当前对局或所选存档的完整日志/动作流程（后端 /api/export）。 */

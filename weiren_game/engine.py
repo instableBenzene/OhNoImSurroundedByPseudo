@@ -779,7 +779,8 @@ class GameEngine(
             raise RuleViolation("仍有命运牌尚未选择或反悔，不能结束回合。")
         self.state.flow.phase = "turn_end"
         self._record_action("end_turn")
-        self._log(f"---------- 第 {self.state.flow.turn} 回合：回合结束 ----------")
+        # 结构行与"回合开始"统一（原来是 `----`，和 `====` 不一致）。
+        self._log(f"\n========== 第 {self.state.flow.turn} 回合：回合结束 ==========")
 
         # 阶段顺序由 lifecycle.END_TURN_PHASES 表声明（当前顺序与重构前一致）。
         from weiren_game.lifecycle import END_TURN_PHASES
