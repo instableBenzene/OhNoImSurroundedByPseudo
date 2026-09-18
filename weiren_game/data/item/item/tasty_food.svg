@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 22c0-6.8 5-12 11.5-12s11.5 5.2 11.5 12v1.5h-23z"/><path d="M11 11.5c-1.1 2.6-1.1 5.4 0 8M16 10.5c-1.1 2.6-1.1 5.8 0 8.5M21 11.5c-1.1 2.6-1.1 5.4 0 8" stroke="#6b9fd1" stroke-width="1.8"/>
+<!-- 美味：带骨的肉。第一版骨头又细又短，整只读成"放大镜"；
+     加粗加长骨头、肉缩小并偏向一侧，才像鸡腿。 -->
+<ellipse cx="11.8" cy="21.2" rx="6.4" ry="5.4"/>
+<path d="M16.4 16.6L24.2 8.8" stroke-width="3.6"/>
+<circle cx="25.4" cy="7.6" r="2.6"/><circle cx="23.2" cy="9.8" r="2.6"/>
+<path d="M6.8 18.6a5 5 0 0 1 4-3.4" stroke="#a77ad1" stroke-width="2.1"/>
 </svg>

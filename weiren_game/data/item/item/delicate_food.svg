@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 22c0-6.8 5-12 11.5-12s11.5 5.2 11.5 12v1.5h-23z"/><path d="M11 11.5c-1.1 2.6-1.1 5.4 0 8M16 10.5c-1.1 2.6-1.1 5.8 0 8.5M21 11.5c-1.1 2.6-1.1 5.4 0 8" stroke="#a77ad1" stroke-width="1.8"/>
+<!-- 精致食物：纸杯蛋糕。第一版做成"圆顶 + 提钮"，和 quality_food 的餐罩又撞了；
+     改成"填色的波浪奶油 + 有褶的纸杯"，靠轮廓和填色两条都拉开距离。 -->
+<path d="M8.6 18.4h14.8l-2 8.4a2.4 2.4 0 0 1-2.3 1.8h-6.2a2.4 2.4 0 0 1-2.3-1.8z"/>
+<path d="M12.6 21l-.8 4.8M16 21v4.8M19.4 21l.8 4.8" opacity=".5"/>
+<path d="M9.4 19c-1.6-3.4-.4-6.4 2.2-7.2 1.2-.4 2.4 0 3.3.9.5-2 2-3.4 3.8-3.4 2.3 0 4 2.2 4 4.8 0 1.5-.5 2.9-1.4 3.9z" fill="#d7ddd2" stroke="none"/>
+<circle cx="16.4" cy="7.4" r="2.3" stroke="#a77ad1"/>
 </svg>

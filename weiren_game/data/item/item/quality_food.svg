@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 22c0-6.8 5-12 11.5-12s11.5 5.2 11.5 12v1.5h-23z"/><path d="M11 11.5c-1.1 2.6-1.1 5.4 0 8M16 10.5c-1.1 2.6-1.1 5.8 0 8.5M21 11.5c-1.1 2.6-1.1 5.4 0 8" stroke="#d6aa45" stroke-width="1.8"/>
+<!-- 优质食品：盖着餐罩的餐盘（罩顶的提钮是特征色） -->
+<path d="M6 24.6h20"/>
+<path d="M8.2 23.4c0-6.8 3.5-11.4 7.8-11.4s7.8 4.6 7.8 11.4z"/>
+<circle cx="16" cy="9.4" r="2.3" stroke="#a77ad1"/>
+<path d="M9.6 27h12.8" opacity=".55"/>
 </svg>

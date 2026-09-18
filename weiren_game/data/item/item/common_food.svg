@@ -1,3 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4.5 22c0-6.8 5-12 11.5-12s11.5 5.2 11.5 12v1.5h-23z"/><path d="M11 11.5c-1.1 2.6-1.1 5.4 0 8M16 10.5c-1.1 2.6-1.1 5.8 0 8.5M21 11.5c-1.1 2.6-1.1 5.4 0 8" stroke="#66b875" stroke-width="1.8"/>
+<!-- 干粮：一条面包（割口是特征色） -->
+<path d="M4 21c0-5.2 5.2-9.4 12-9.4S28 15.8 28 21v2.2a2.4 2.4 0 0 1-2.4 2.4H6.4A2.4 2.4 0 0 1 4 23.2z"/>
+<path d="M10.5 16.6l3.2 3.2M16.8 14.6l3.2 3.2" stroke="#a77ad1" stroke-width="2.2"/>
 </svg>
