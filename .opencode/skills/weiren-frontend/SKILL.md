@@ -3,6 +3,10 @@ name: weiren-frontend
 description: Use when changing the OhNoImSurroundedByPseudo local web UI ("完蛋，我被伪人包围了！？", weiren_game/webui/index.html) or its material layer — page layout and interaction (launcher / create / saves / settings / codex / in-game boards / dialogs / Esc menu), resource packs, base 材质 tokens, colors and fonts, shadows and cut-out title, icon sets (generic symbols / item icons / location & information icons), avatars and their parts, cover & title assets, or adding a new "material knob" or asset kind. Also covers how to verify a frontend change (node --check + headless CDP probe) and the frontend-specific pitfalls.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # weiren-frontend —— 前端与材质
 
 纯 Python 引擎 + 本地 Web UI。**前端只描述结构**（谁在哪、多大、什么层次），

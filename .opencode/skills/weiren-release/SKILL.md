@@ -3,6 +3,10 @@ name: weiren-release
 description: Use before shipping/releasing OhNoImSurroundedByPseudo — "投放 / 发布前检查 / release check / 上线自检". Runs the full pre-release verification: separation audits, unit tests, smoke, content validation, and browser playtest.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 发布前自检
 
 按顺序执行并报告结果；任一失败先修复。

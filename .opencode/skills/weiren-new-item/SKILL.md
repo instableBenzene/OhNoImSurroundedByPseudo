@@ -3,6 +3,10 @@ name: weiren-new-item
 description: Use when adding items/物资 to OhNoImSurroundedByPseudo — "加物品 / 新增物资 / 做一个道具 / 新 tag / 物资描述 / item". Covers the item file skeleton, I(...) fields, tags and Chinese labels, on_use effects, item hooks, codex text, art, and verification.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 新增一件物资
 
 先读 `.opencode/skills/weiren-dev/SKILL.md`（两条分离、声明式规格）与 `docs/ADD_CONTENT.md`。

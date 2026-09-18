@@ -3,6 +3,10 @@ name: weiren-new-information
 description: Use when adding information/信息 or global events/事件 to OhNoImSurroundedByPseudo — "加信息 / 新信息 / 做事件 / 全局事件 / information". Covers InformationTemplate fields, placeholders and kinds, location modifiers, state effects, global event registration/keys, and verification.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 新增信息模板 / 全局事件
 
 先读 `.opencode/skills/weiren-dev/SKILL.md` 与 `docs/ADD_CONTENT.md`；效果细则见 `docs/ARCH.md`。

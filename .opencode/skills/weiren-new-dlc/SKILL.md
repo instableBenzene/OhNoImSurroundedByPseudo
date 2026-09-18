@@ -3,6 +3,10 @@ name: weiren-new-dlc
 description: Use when packaging content as a DLC pack for OhNoImSurroundedByPseudo — "写 DLC / 内容包 / 打包角色 / dlc pack". Covers directory layout, dlc.json, content dirs, codex contributions, hot install/uninstall, and verification.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 编写一个 DLC 内容包
 
 先读 `docs/ADD_CONTENT.md`（DLC 一节）、`dlc/README.md`、`dlc/_template/`。

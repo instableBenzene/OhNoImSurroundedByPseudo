@@ -3,6 +3,10 @@ name: weiren-new-character
 description: Use when adding a new tenant/character to the OhNoImSurroundedByPseudo game — "加角色 / 新增房客 / 做一个角色 / new character". Covers scaffolding with tools/new_character.py, filling persona/tags/abilities, optional content registries, avatar/icon, and verification.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 新增一名房客
 
 先读 `AGENTS.md` 与 `.opencode/skills/weiren-dev/SKILL.md`（两条分离、声明式规格）。

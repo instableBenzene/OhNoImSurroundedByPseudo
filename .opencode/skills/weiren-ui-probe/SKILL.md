@@ -3,6 +3,10 @@ name: weiren-ui-probe
 description: Use when verifying the web UI in a headless browser — frontend changes, UI bug repro, or producing before/after evidence. 触发词："验一下前端/界面""无头实测""CDP""改前改后对照". Random playthroughs belong to tools/browser_playtest.mjs; targeted checks belong here.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 前端实测（定向探针）
 
 > **改前端必须实机验**（`node --check` + 无头浏览器）。结论要能复述：**哪一局/哪一步/看到什么**。

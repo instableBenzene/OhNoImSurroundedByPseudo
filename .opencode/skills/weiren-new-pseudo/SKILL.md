@@ -3,6 +3,10 @@ name: weiren-new-pseudo
 description: Use when adding a pseudo/伪人 (impostor scenario) to OhNoImSurroundedByPseudo — "加伪人 / 新伪人 / 做一个伪人 / pseudo / 潜伏机制". Covers the pseudo module skeleton, PseudoDefinition fields, HANDLERS vocabulary, State/marks, human-form exclusion, codex skills, and verification.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 新增一类伪人
 
 先读 `.opencode/skills/weiren-dev/SKILL.md` 与 `docs/ADD_CONTENT.md`；机制细则见 `docs/GUIDE.md`。

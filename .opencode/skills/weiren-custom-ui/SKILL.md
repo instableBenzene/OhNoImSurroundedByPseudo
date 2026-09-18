@@ -3,6 +3,10 @@ name: weiren-custom-ui
 description: Use when a character needs its own state or its own panel/floating window — 触发场景："园艺达人要打开一块田""这个技能要点进去选人""加一个可拖拽的专属浮窗""专属状态要进存档". Contracts live in docs/GUIDE.md §14.11 and docs/STYLE.md §10; this page is the procedure and the pitfalls.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # 做专属状态 / 专属界面
 
 > 契约先读：`docs/GUIDE.md` **§14.11**（`CONTAINERS` / `PANEL` / `opens_panel` / `confirm`）；

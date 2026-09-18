@@ -3,6 +3,10 @@ name: weiren-dev
 description: Use when working in the OhNoImSurroundedByPseudo repository ("完蛋，我被伪人包围了！？") — adding or editing characters / items / pseudos / locations / information / bonds, writing or loading DLC packs, touching the web UI or codex, refactoring, or preparing a release. Covers data/system separation, frontend/backend separation, pluggable content, verification, audits, and the project art style.
 ---
 
+> **动手前先读**：`AGENTS.md` §7「已知坑」——尤其是**别打转**那六条
+> （别猜锚点 / 别手写 `\u` 码点 / 中文别进 here-string / 注释不豁免分离度检查 /
+> 提交前显式读退出码 / 探针先自证），以及 `docs/PRINCIPLES.md` §15「先怀疑探针」。
+
 # weiren-dev —— 本仓库开发规范
 
 纯 Python 标准库的生存策略游戏（核心 + 基础内容包 + DLC + 本地 Web UI）。
