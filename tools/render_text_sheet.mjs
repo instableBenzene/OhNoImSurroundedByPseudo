@@ -60,6 +60,15 @@ await sleep(2500);
 
 const render = `(() => {
   const items = ${JSON.stringify(TEXTS)};
+  // 给一个标签表：正文里的【…】只有在标签表里才会变成 span（游戏里就是这样）。
+  // 少了这一步，复核页会把术语渲染成裸文本、折行位置也和游戏不一致（曾经骗过我一轮）。
+  const labels = new Set();
+  items.forEach((r) => {
+    (String(r.text).match(/【[^】]{1,20}】/g) || []).forEach((t) => labels.add(t.slice(1, -1)));
+  });
+  const idx = {};
+  labels.forEach((label) => { idx[label] = []; });
+  STATE = Object.assign({ tagIndex: idx }, STATE || {});
   const host = document.createElement("div");
   // relative + z-index：留在正常流里（长图能整张截），又压过启动器那层 fixed 覆盖。
   host.style.cssText = "position:relative;z-index:99999;background:#0f1314;color:#e6ebe8;" +

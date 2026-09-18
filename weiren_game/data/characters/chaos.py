@@ -13,7 +13,7 @@ register_status_definition(StatusDefinition(
     "pure_self", "纯真的自我", "other", shown=frozenset({"icon", "description"}),
     source_id="passive:chaos.self_lock",
     permanent=True,
- description="守住「我还是我」这一点执念，不被情绪推着走。"))
+ description="守住“我还是我”这一点执念，不被情绪推着走。"))
 register_status_definition(StatusDefinition(
     "chaos_carry", "混沌携带量", "other", shown=frozenset(),
     source_id="passive:chaos.self_lock",

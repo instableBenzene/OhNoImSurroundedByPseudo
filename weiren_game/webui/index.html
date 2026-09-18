@@ -1082,6 +1082,8 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
    颜色是冗余提示，不是主要表达手段；`--warn/--danger` 都是锁定 token，换包不会变色。 */
 #logList li.lg-warn{color:var(--warn)}
 #logList li.lg-danger{color:var(--danger)}
+/* 【…】术语是整块提示，别让它被折行劈成「【工 / 具】」 */
+.tagref{white-space:nowrap}
 </style>
 </head>
 <body>
