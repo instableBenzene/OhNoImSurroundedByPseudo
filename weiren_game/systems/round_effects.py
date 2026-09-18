@@ -215,12 +215,38 @@ class RoundEffectsSystemMixin:
             f"回合末结算：{tenant_count} 名房客的理智与生命变化。", rows=rows)
 
     def _settle_buff_debuff_effects(self) -> None:
-        """回合末依次结算创伤、紊乱及各情绪的自行演化。"""
+        """回合末依次结算创伤、紊乱及各情绪的自行演化。
+
+        这一段同样逐人掉血/掉理智——和"基础消耗"那段一样收起明细、只播一条汇总，
+        否则玩家日志会被几十条逐人明细淹没。
+        """
+        self._collect_start()
+        rows: list[dict] = []
+        tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
-            self._apply_status_end(tenant, tenant.trauma, physical=True, label="创伤")
-            self._apply_status_end(tenant, tenant.disorder, physical=False, label="紊乱")
+            name = self.character(tenant).name
+            for label, status, physical in (
+                ("创伤", tenant.trauma, True),
+                ("紊乱", tenant.disorder, False),
+            ):
+                health_before, sanity_before = tenant.health, tenant.sanity
+                self._apply_status_end(tenant, status, physical=physical, label=label)
+                lost_health = health_before - tenant.health
+                lost_sanity = sanity_before - tenant.sanity
+                if lost_health > 0:
+                    rows.append({"label": name, "value": "−%g 生命" % lost_health, "note": label})
+                if lost_sanity > 0:
+                    rows.append({"label": name, "value": "−%g 理智" % lost_sanity, "note": label})
             for key, label in {**EROSION_EMOTIONS, **AWAKENING_EMOTIONS}.items():
+                health_before, sanity_before = tenant.health, tenant.sanity
                 self._apply_emotion_end(tenant, tenant.condition(key), label)
+                lost_health = health_before - tenant.health
+                lost_sanity = sanity_before - tenant.sanity
+                if lost_health > 0:
+                    rows.append({"label": name, "value": "−%g 生命" % lost_health, "note": label})
+                if lost_sanity > 0:
+                    rows.append({"label": name, "value": "−%g 理智" % lost_sanity, "note": label})
+        self._collect_flush(f"回合末状态结算：{tenant_count} 名房客的创伤与紊乱。", rows=rows)
 
     def _decay_conditions(self) -> None:
         """回合末公共衰减：所有状态层数 -1，归零移除。
