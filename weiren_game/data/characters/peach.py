@@ -11,7 +11,7 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 CHARACTER = CharacterDefinition(
     "peach", 12, "青桃", "助人为乐的小道士，带着糯米与符纸。",
     "gentle", "keen", 3, ("道士", "16-18岁", "女性", "神秘学研究者"),
-    (A("slow_guard", "持之以缓", "当房客的理智值从 ≥50 跌破 50 时，将其理智拉回 50，并在本回合结束前使其理智不低于 50；该效果每局仅触发一次。需屋内有青桃。"),
+    (A("slow_guard", "持之以缓", "需屋内有青桃。\n房客理智从 **≥50** 跌破 **50** 时：拉回 **50**，并在本回合结束前使其不低于 **50**。\n*每局仅触发一次。*"),
      A("justice_execution", "正义执行", "当伪人即将突破时，避免这次突破，且该伪人接下来两个回合不会来访。触发后该能力失效。")),
 )
 
