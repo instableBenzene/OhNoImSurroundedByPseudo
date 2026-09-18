@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="5.5" y="9" width="21" height="18" rx="3"/><path d="M16 13.5v9M11.5 18h9" stroke="#d6aa45" stroke-width="2.8"/><path d="M9 9V6.5h14V9" />
+<!-- 流星计划：档案夹 + 流星轨迹（轨迹是特征色；"计划"本来就该是文件） -->
+<path d="M4.4 8.4h9.2l2 3.2h12v13.8a2.6 2.6 0 0 1-2.6 2.6H7a2.6 2.6 0 0 1-2.6-2.6z"/>
+<path d="M22.6 12.6c1.6 3.2 1.6 6.6 0 9.8" stroke="#a77ad1" stroke-width="2" stroke-dasharray="2.6 2.4"/>
+<path d="M9 18h8M9 22h6" opacity=".5"/>
 </svg>

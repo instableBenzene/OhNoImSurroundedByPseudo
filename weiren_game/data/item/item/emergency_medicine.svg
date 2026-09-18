@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="5.5" y="9" width="21" height="18" rx="3"/><path d="M16 13.5v9M11.5 18h9" stroke="#a77ad1" stroke-width="2.8"/><path d="M9 9V6.5h14V9" />
+<!-- 急救药：安瓿（小圆头 + 细颈 + 窄身）。第一版颈太宽，读成宽口药瓶、还和家用药撞脸；
+     拉长细颈、收窄瓶身，才像"掰开就用"的安瓿。 -->
+<circle cx="16" cy="3.8" r="1.9"/>
+<path d="M16 5.7v3"/>
+<path d="M11.6 8.7h8.8l1 3.7v12.4a2.8 2.8 0 0 1-2.8 2.8h-5.2a2.8 2.8 0 0 1-2.8-2.8V12.4z"/>
+<path d="M10.8 18.6h10.4" stroke="#a77ad1" stroke-width="3.2"/>
+<path d="M13.6 24.4h4.8" opacity=".5"/>
 </svg>

@@ -108,15 +108,26 @@ def main() -> int:
     shared = groups(found)
     print("材质资产 %d 个（含 %d 个符号）；同图多用的组：%d" % (
         len(found), len(symbols()), len(shared)))
+    todo = 0
+    must_split = 0
     for members in shared:
         spaces = {label.split(":")[1].split("/")[0] if label.startswith("file:") else "symbol"
                   for label in members}
         cross = "跨类" if len(spaces) > 1 or any(m.startswith("symbol") for m in members) else "同类"
-        print("  [%s] %s" % (cross, "  ==  ".join(members)))
+        has_tag = any("/tag/" in m for m in members)
+        has_item = any("/item/item/" in m for m in members)
+        if has_tag and has_item:
+            kind = "待补全"
+            todo += 1
+        else:
+            kind = "必须拆"
+            must_split += 1
+        print("  [%s/%s] %s" % (cross, kind, "  ==  ".join(members)))
         if args.list:
             source, sig = found[members[0]]
             print("        %s" % sig[:160])
-    return 1 if shared else 0
+    print("小结：待补全（靠 tag 兜底）%d 组，必须拆 %d 组" % (todo, must_split))
+    return 1 if must_split else 0
 
 
 if __name__ == "__main__":

@@ -1,3 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="5.5" y="9" width="21" height="18" rx="3"/><path d="M16 13.5v9M11.5 18h9" stroke="#66b875" stroke-width="2.8"/><path d="M9 9V6.5h14V9" />
+<!-- 家用药：药瓶 + 贴纸标签（标签是特征色） -->
+<rect x="10" y="9.6" width="12" height="18.4" rx="2.4"/>
+<path d="M13.2 9.6V7h5.6v2.6"/>
+<path d="M11.4 4.4h9.2"/>
+<rect x="10" y="16.4" width="12" height="6.4" fill="#a77ad1" stroke="none" opacity=".9"/>
 </svg>

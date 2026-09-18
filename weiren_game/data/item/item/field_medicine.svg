@@ -1,3 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="5.5" y="9" width="21" height="18" rx="3"/><path d="M16 13.5v9M11.5 18h9" stroke="#6b9fd1" stroke-width="2.8"/><path d="M9 9V6.5h14V9" />
+<!-- 野战药：行军扁壶（背带是特征色） -->
+<path d="M13.4 6h5.2v3c0 .8.4 1.4 1 1.8 2.4 1.6 4 4.3 4 7.3v7.3A2.6 2.6 0 0 1 21 28H11a2.6 2.6 0 0 1-2.6-2.6v-7.3c0-3 1.6-5.7 4-7.3.6-.4 1-1 1-1.8z"/>
+<path d="M9 20h14" opacity=".55"/>
+<path d="M19.6 6.6c2.6 1.6 4.4 4.4 4.8 7.6" stroke="#a77ad1" stroke-width="2"/>
 </svg>
