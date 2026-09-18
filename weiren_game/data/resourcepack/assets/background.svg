@@ -23,31 +23,31 @@
   <circle cx="760" cy="720" r="470" fill="url(#glow)"/>
   <circle cx="1010" cy="668" r="86" fill="#ffd18c" opacity=".12"/>
   <circle cx="1010" cy="668" r="58" fill="#ffd18c" opacity=".85"/>
-  <g fill="#0a1216" opacity=".5">
-    <ellipse cx="330" cy="270" rx="300" ry="24"/>
-    <ellipse cx="940" cy="205" rx="360" ry="20"/>
-    <ellipse cx="1240" cy="320" rx="260" ry="18"/>
+  <g fill="#0a1216" opacity=".46">
+    <circle cx="196" cy="276" r="40"/><circle cx="256" cy="262" r="48"/><circle cx="326" cy="268" r="44"/><circle cx="396" cy="258" r="50"/><circle cx="452" cy="274" r="36"/><rect x="180" y="274" width="290" height="20" rx="10"/>
+    <circle cx="790" cy="214" r="36"/><circle cx="845" cy="200" r="44"/><circle cx="912" cy="206" r="40"/><circle cx="975" cy="196" r="46"/><circle cx="1040" cy="210" r="34"/><circle cx="1090" cy="220" r="26"/><rect x="775" y="212" width="330" height="18" rx="9"/>
+    <circle cx="1150" cy="326" r="32"/><circle cx="1205" cy="314" r="40"/><circle cx="1265" cy="320" r="36"/><circle cx="1320" cy="310" r="42"/><circle cx="1372" cy="324" r="30"/><rect x="1135" y="322" width="250" height="16" rx="8"/>
   </g>
   <path d="M0 630 Q 220 560 470 616 T 940 606 T 1440 636 L1440 900 L0 900Z" fill="#0d1a1c"/>
   <path d="M0 700 Q 300 656 640 690 T 1120 676 T 1440 702 L1440 900 L0 900Z" fill="#091313"/>
   <g fill="#060d0e">
-    <use href="#hh2" x="150" y="686"/>
-    <use href="#hh1" x="250" y="690"/>
-    <use href="#hh3" x="360" y="682"/>
-    <use href="#hh1" x="470" y="692"/>
+    <use href="#hh2" transform="translate(150,686) scale(1.06)"/>
+    <use href="#hh1" transform="translate(250,690) scale(0.94)"/>
+    <use href="#hh3" transform="translate(360,682) scale(1.08)"/>
+    <use href="#hh1" transform="translate(470,692) scale(0.98)"/>
     <g transform="translate(560,600)">
       <path d="M-16 44 L22 12 L60 44 Z"/>
       <rect x="-10" y="44" width="64" height="104"/>
       <rect x="34" y="24" width="6" height="20"/>
       <circle class="win c" cx="22" cy="78" r="11"/>
     </g>
-    <use href="#hh3" x="680" y="684"/>
-    <use href="#hh2" x="800" y="690"/>
-    <use href="#hh1" x="900" y="688"/>
-    <use href="#hh2" x="1010" y="692"/>
-    <use href="#hh1" x="1120" y="686"/>
-    <use href="#hh3" x="1230" y="690"/>
-    <use href="#hh2" x="1330" y="688"/>
+    <use href="#hh3" transform="translate(680,684) scale(1.04)"/>
+    <use href="#hh2" transform="translate(800,690) scale(0.92)"/>
+    <use href="#hh1" transform="translate(900,688) scale(1.06)"/>
+    <use href="#hh2" transform="translate(1010,692) scale(0.96)"/>
+    <use href="#hh1" transform="translate(1120,686) scale(1.02)"/>
+    <use href="#hh3" transform="translate(1230,690) scale(0.94)"/>
+    <use href="#hh2" transform="translate(1330,688) scale(1.06)"/>
   </g>
   <g class="eyes" fill="#ffb454"><circle cx="1264" cy="744" r="3.4"/><circle cx="1277" cy="744" r="3.4"/></g>
   <g fill="#08110f">
