@@ -94,7 +94,10 @@ def _file_sheet(work: pathlib.Path, paths: list[pathlib.Path], prefix: str,
         markup = (work / (prefix + path.name)).read_text(encoding="utf-8")
         markup = markup.replace("<svg ", "<svg style='width:%dpx;height:%dpx;color:#dfe8e6' " % (box, box), 1)
         cells.append("<div class='cell'>%s<div class='cap'>%s</div></div>" % (markup, path.stem))
-    size = (1180, 260 + (box + 60) * max(1, len(cells) // 10))
+    # 每行放得下几张随格子宽度变（1180 宽、间距 18、内边距 24）：宁可多留一行，别把图截掉。
+    per_row = max(1, (1180 - 48) // (box + 38))
+    rows = (len(cells) + per_row - 1) // per_row
+    size = (1180, 300 + (box + 60) * rows)
     return page("<div class='sheet'>" + "".join(cells) + "</div>"), size
 
 
