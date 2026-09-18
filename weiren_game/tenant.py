@@ -231,7 +231,7 @@ class TenantState:
 
     @reason.setter
     def reason(self, value: Condition) -> None:
-        """整体替换理智情绪状态。"""
+        """整体替换清醒情绪状态。"""
         self.conditions["reason"] = value
 
     @property

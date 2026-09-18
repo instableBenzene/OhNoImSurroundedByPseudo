@@ -157,7 +157,10 @@ EMOTION_DEFINITIONS: dict[str, EmotionDefinition] = {
     "happiness": EmotionDefinition("happiness", "快乐", "mental", kind="awakening",
         description="难得的轻松，嘴角不由自主地翘起来。"),
     # 少见情绪：仍然归属侵蚀/觉醒两族，只是出现概率低。
-    "reason": EmotionDefinition("reason", "理智", "mental", kind="awakening", rarity="rare",
+    # 显示名是「清醒」：这条情绪与**理智值**（0~100 那个数值）不是一回事，
+    # 旧名「理智」会让人以为"有理智就能满足它"（玩家真这么误解过）。
+    # id 保持 `reason`（存档与代码引用它，改名会断老存档）。
+    "reason": EmotionDefinition("reason", "清醒", "mental", kind="awakening", rarity="rare",
         description="在疯涨的情绪里，保住一条清醒的缝隙。"),
     "madness": EmotionDefinition("madness", "癫狂", "mental", kind="erosion", rarity="rare",
         description="理智的堤坝出现裂口，某些声音开始说话。"),

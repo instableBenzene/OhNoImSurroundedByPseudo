@@ -30,22 +30,22 @@ CHARACTER = CharacterDefinition(
     "chaos", 15, "混", "思维跳脱，精神状态时常在正反之间横跳。",
     "dynamic", "dynamic", 1, ("无业游民", "25-30岁", "精神疾病"),
     # 注意：判据读的是**情绪「理智」的层数**（`tenant.reason.layers`）——它是**情绪**，不是理智**值**；
-    # "理智值很高" 和 "攒够 10 层理智情绪" 是两件事（玩家真这么误解过：以为有理智就能解锁）。
+    # "理智值很高" 和 "攒够 10 层清醒情绪" 是两件事（玩家真这么误解过：以为有理智就能解锁）。
     (A("chaotic_personality", "混沌的性格／纯真的自我",
        "· 回合开始时，主性格与副性格分别在**八个性格**中随机切换；可携带物资数在 **1~4** 之间随机。"
-       "· **理智情绪 ≥10 层**时，可以**固定**自己的主副性格（主性格权重变为 **2.0**），可携带物资数固定为 **4**。"),
-     A("reason_madness", "情绪显现-理智／癫狂",
-       "混在屋内时，屋主可以看到所有房客的**理智情绪与癫狂情绪**的强度、层数（强度固定为 **1**）：\n"
+       "· **清醒情绪 ≥10 层**时，可以**固定**自己的主副性格（主性格权重变为 **2.0**），可携带物资数固定为 **4**。"),
+     A("reason_madness", "情绪显现-清醒／癫狂",
+       "混在屋内时，屋主可以看到所有房客的**清醒情绪与癫狂情绪**的强度、层数（强度固定为 **1**）：\n"
        "· 理智：回合末消耗理智 **−5**。\n"
        "· 癫狂：回合末消耗理智 **+10**；层数 **≥10** 时，回合开始消耗所有额外癫狂，转化为同层数的创伤与紊乱。"),
-     A("chaotic_thought", "混沌的思想", "· 回合开始时，屋内有 1 名房客满足下列任一条件，混的**理智情绪 +1 层**：生命值 **≤60**、理智值 **≤60**、消沉值 **≥25**。"),
+     A("chaotic_thought", "混沌的思想", "· 回合开始时，屋内有 1 名房客满足下列任一条件，混的**清醒情绪 +1 层**：生命值 **≤60**、理智值 **≤60**、消沉值 **≥25**。"),
      A("chaotic_atmosphere", "混沌的氛围", "混在屋内时，若有房客理智值≤0，将立刻将理智值恢复至50并使其癫狂层数+5。")),
     (A("permission_transfer", "权限转让", "**首次**发动时，混消耗 **1 层理智**、换来 **1 层癫狂**；此后不再消耗。发动时二选一：\n· **代你出手**：一名房客付出 **10 生命**与 **10 理智**，使用其主动能力（可无视回合、对局限制）。\n· **收走**一名房客身上的一道伤、或一团乱（层数 **−1**、强度 **−1**）。", "tenant", chips=("每回合 1 次",), options=(("imitate","代我出手","i-hand","让对方用它的主动能力出手"),("trauma","收走那道伤","i-trauma","创伤层数-1、强度-1"),("disorder","收走那点乱","i-disorder","紊乱层数-1、强度-1")), nested_option="imitate", per_turn=True),),
 )
 
 # ---------------------------------------------------------------- modifier
 def reason_madness_available(engine: EngineProtocol, *, at_turn_end: bool = False) -> bool:
-    """判断「情绪显现-理智／癫狂」是否正在生效（任一屋内混通过被动判定）。
+    """判断「情绪显现-清醒／癫狂」是否正在生效（任一屋内混通过被动判定）。
 
     回合开始与回合末使用不同的被动事件 ID。
     使用处：round_effects 的回合开始/回合末总调度。
@@ -129,7 +129,7 @@ def chaotic_thought(engine: EngineProtocol, tenant: object) -> None:
 def convert_excess_madness(engine: EngineProtocol, tenant: object, *, emotions_active: bool) -> None:
     """回合开始把房客超过 1 层的癫狂转化为等量创伤与紊乱。
 
-    「情绪显现-理智／癫狂」生效（emotions_active）且层数达到 10 时才触发；
+    「情绪显现-清醒／癫狂」生效（emotions_active）且层数达到 10 时才触发；
     转化保留基础 1 层癫狂，强度固定为 1。
     使用处：round_effects._start_of_turn_effects 的房客遍历。
     """
@@ -147,7 +147,7 @@ def convert_excess_madness(engine: EngineProtocol, tenant: object, *, emotions_a
 def end_turn_sanity_modifier(
     engine: EngineProtocol, tenant: object, cost: float, *, emotions_active: bool
 ) -> float:
-    """回合末理智修正：理智情绪-5、癫狂情绪+10（情绪显现生效时）。
+    """回合末理智修正：清醒情绪-5、癫狂情绪+10（情绪显现生效时）。
 
     使用处：round_effects._settle_base_end_effects 的理智消耗计算。
     """
@@ -184,14 +184,14 @@ def rescue_sanity(engine: EngineProtocol, tenant: object) -> None:
 
 
 def lock_personality(engine: EngineProtocol, actor: object) -> None:
-    """混消耗 10 层理智情绪，固定当前性格与携带量（纯真的自我）。
+    """混消耗 10 层清醒情绪，固定当前性格与携带量（纯真的自我）。
 
     使用处：personality_system.lock_personality。
     """
     from weiren_game.exceptions import RuleViolation
 
     if actor.character_id != "chaos" or actor.reason.layers < 10:
-        raise RuleViolation("混需要至少10层理智情绪才能固定自我。")
+        raise RuleViolation("混需要至少10层清醒情绪才能固定自我。")
     actor.set_status("pure_self", intensity=1, layers=99)
     actor.set_status("chaos_carry", intensity=4, layers=99)
     engine._log("混固定了本回合的性格：主性格权重变为2.0，携带量固定为4。")
@@ -222,7 +222,7 @@ def use_permission_transfer(
     # 前置的「消耗理智获得癫狂」只在第一次发动时支付一次（外置启动代价）。
     if not actor.condition("permission_shift").active:
         if actor.reason.layers < 1:
-            raise RuleViolation("首次发动权限转让需要1层理智情绪。")
+            raise RuleViolation("首次发动权限转让需要1层清醒情绪。")
         actor.reason.layers -= 1
         actor.reason.clamp()
         actor.madness.intensity = 1
@@ -303,7 +303,7 @@ TURN_START = turn_start
 
 
 def _chaos_emotion_visible(context: object) -> object:
-    """情绪显现-理智／癫狂（闸门 provider）：屋内有混时，理智/癫狂对屋主可见。"""
+    """情绪显现-清醒／癫狂（闸门 provider）：屋内有混时，理智/癫狂对屋主可见。"""
     if not isinstance(context, dict):
         return
     engine = context.get("engine")
@@ -361,7 +361,7 @@ AVATAR = "i-av3"
 
 
 def can_lock_personality(engine: object, tenant: object) -> bool:
-    """是否可在**理智情绪达 10 层**时固定性格与携带量（供系统通用询问）。"""
+    """是否可在**清醒情绪达 10 层**时固定性格与携带量（供系统通用询问）。"""
     return (
         tenant.character_id == "chaos"
         and not tenant.condition("pure_self").active
@@ -386,9 +386,9 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
                 '4.5 4.5 0 0 0 0 9"/><circle cx="12" cy="7.5" r="1.1"/>'
                 '<circle cx="12" cy="16.5" r="1.1"/>'),
         "label": "纯真的自我" if pure else "混沌",
-        # 未解锁时把**进度**写出来：混乱值 ≠ 理智值，写清是"理智情绪层数"才不会再误解。
+        # 未解锁时把**进度**写出来：混乱值 ≠ 理智值，写清是"清醒情绪层数"才不会再误解。
         "hint": ("纯真的自我：方向已定。" if pure
-                 else "混沌：理智情绪 %d/10 层可固定方向与速度。" % tenant.reason.layers),
+                 else "混沌：清醒情绪 %d/10 层可固定方向与速度。" % tenant.reason.layers),
         "spin": "cw" if pure else "random",
     }]
 

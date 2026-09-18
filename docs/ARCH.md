@@ -117,7 +117,7 @@ gate(是否进入判定)  ×  chance(基础 + 修正 → resolve)  ×  roll(结�
 
 | gate 键 | path | source 举例 | 现状 | 备注 |
 | --- | --- | --- | --- | --- |
-| `madness.active` | `癫狂` · `生效` | `("角色","混","情绪显现-理智／癫狂")` | `NODE_HOOKS["madness.available"]`（`chaos.reason_madness_available`） | 即"混的『情绪显现-理智/癫狂』被动是否生效"（癫狂的额外效果与超量转化为创伤/紊乱是否运行）。**是否 gate 化待定** |
+| `madness.active` | `癫狂` · `生效` | `("角色","混","情绪显现-清醒／癫狂")` | `NODE_HOOKS["madness.available"]`（`chaos.reason_madness_available`） | 即"混的『情绪显现-清醒/癫狂』被动是否生效"（癫狂的额外效果与超量转化为创伤/紊乱是否运行）。**是否 gate 化待定** |
 
 ### 5.4 现有注册方核对表（迁移时逐个照抄，一个不漏）
 
@@ -164,7 +164,7 @@ gate(是否进入判定)  ×  chance(基础 + 修正 → resolve)  ×  roll(结�
 - **`information.verify.allowed`**
   - `厄瑞玻斯` 太阳逆位（`information.false_lock` 3 回合）
 - **`madness.active`**（待定）
-  - `混`（`chaos.reason_madness_available`，「情绪显现-理智／癫狂」）
+  - `混`（`chaos.reason_madness_available`，「情绪显现-清醒／癫狂」）
 
 ### 5.5 全量注册表（自动生成，避免遗漏）
 
