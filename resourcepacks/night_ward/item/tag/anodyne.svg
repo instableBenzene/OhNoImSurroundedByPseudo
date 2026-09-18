@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 镇痛药：注射器（筒身底色，药液是特征色） -->
+<path d="M9 21 L21 9"/><path d="M7 25 L11 21"/><path d="M4 28 L8 24"/>
+<rect x="13" y="3" width="7" height="7" rx="1" transform="rotate(45 16.5 6.5)"/>
+<path d="M10.5 19.5 L18.5 11.5" stroke="#a77ad1" stroke-width="4.4" opacity=".9"/>
+<path d="M22 8 L28 2"/><path d="M25.5 4.5 L29.5 8.5"/>
+</svg>

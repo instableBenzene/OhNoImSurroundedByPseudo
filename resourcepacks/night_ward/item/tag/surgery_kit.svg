@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 手术器械：手术刀 + 止血钳（器械底色，刃口是特征色） -->
+<path d="M4 26 L14 16"/><path d="M13 15 L19 9 L23 13 L17 19 Z"/>
+<path d="M17 19 L22 24"/><path d="M22 24 L26 28"/><path d="M26 28 L28 26"/>
+<path d="M13 15 L17 19" stroke="#a77ad1" stroke-width="3.2"/>
+<path d="M20 6 L26 12"/>
+</svg>

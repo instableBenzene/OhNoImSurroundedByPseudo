@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 药箱：箱体底色，十字是特征色（医院语汇的识别符号） -->
+<rect x="4" y="11" width="24" height="17" rx="2.5"/>
+<path d="M12 11 V8.5 A1.5 1.5 0 0 1 13.5 7 h5 A1.5 1.5 0 0 1 20 8.5 V11"/>
+<path d="M16 15.5 V23.5" stroke="#a77ad1" stroke-width="3.4"/>
+<path d="M12 19.5 H20" stroke="#a77ad1" stroke-width="3.4"/>
+</svg>

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- 夜班病区：走廊一点透视（消失点 800,430）。层序由远到近，每层一句注释。 -->
+  <defs>
+    <linearGradient id="ward-air" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1416"/><stop offset="1" stop-color="#05090a"/>
+    </linearGradient>
+    <radialGradient id="ward-vignette" cx="0.5" cy="0.56" r="0.74">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".58"/>
+    </radialGradient>
+    <filter id="ward-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="ward-lamp" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <!-- 楼层牌用的等宽字形（画成路径，不依赖任何字体） -->
+    <g id="dg-0" fill="none"><path d="M1 0 H7 V15 H1 Z"/></g>
+    <g id="dg-1" fill="none"><path d="M4 0 V15 M4 0 L0 4"/></g>
+    <g id="dg-2" fill="none"><path d="M0 0 H8 V7 H0 V15 H8"/></g>
+    <g id="dg-3" fill="none"><path d="M0 0 H8 V15 H0 M0 7.5 H8"/></g>
+    <g id="dg-4" fill="none"><path d="M6 0 L0 9 H8 M6 0 V15"/></g>
+    <g id="dg-5" fill="none"><path d="M8 0 H0 V7 H8 V15 H0"/></g>
+    <g id="dg-f" fill="none"><path d="M8 0 H0 V15 M0 7 H6"/></g>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#ward-air)"/>
+
+  <!-- 壳：天花板 / 地面 / 左右墙 / 尽头墙 -->
+  <polygon points="0,0 1600,0 980,250 620,250" fill="#080d0e"/>
+  <polygon points="0,900 1600,900 980,560 620,560" fill="#0a1011"/>
+  <polygon points="0,0 620,250 620,560 0,900" fill="#0d1415"/>
+  <polygon points="1600,0 980,250 980,560 1600,900" fill="#0c1314"/>
+  <rect x="620" y="250" width="360" height="310" fill="#0b1213"/>
+
+  <!-- 墙裙：下半瓷砖比上半亮半档；缝线极低对比（"太空、太干净"） -->
+  <polygon points="0,520 620,450 620,560 0,900" fill="#101a1a"/>
+  <polygon points="1600,520 980,450 980,560 1600,900" fill="#0f1919"/>
+  <g stroke="#162122" stroke-width="1.4" opacity=".85" fill="none">
+    <path d="M0 520 L620 450 M0 640 L620 520 M0 760 L620 590"/>
+    <path d="M1600 520 L980 450 M1600 640 L980 520 M1600 760 L980 590"/>
+    <path d="M120 900 L226 250 M300 900 L323 250 M520 900 L440 250 M700 900 L547 250"/>
+    <path d="M1480 900 L1374 250 M1300 900 L1277 250 M1080 900 L1160 250 M900 900 L1053 250"/>
+  </g>
+  <!-- 一块后补的瓷砖（色差半档）：恐怖来自修补痕迹，不是血 -->
+  <polygon points="300,510 420,488 420,536 300,562" fill="#12201f"/>
+  <polygon points="300,510 420,488 420,536 300,562" fill="none" stroke="#1b2b2a" stroke-width="1.2"/>
+
+  <!-- 扶手（带一段残胶） + 踢脚拖拽痕 -->
+  <polygon points="0,470 620,415 620,431 0,488" fill="#0a1112"/>
+  <path d="M0 469 L620 414" stroke="#26383c" stroke-width="2"/>
+  <path d="M150 466 L232 459" stroke="#8d9c99" stroke-width="3" opacity=".28"/>
+  <polygon points="1600,470 980,415 980,431 1600,488" fill="#0a1112"/>
+  <path d="M1600 469 L980 414" stroke="#26383c" stroke-width="2"/>
+  <path d="M60 862 L340 742" stroke="#05090a" stroke-width="9" opacity=".55"/>
+
+  <!-- 顶灯：格栅灯管 ×3（最近那盏在闪，class 由资源包的 css 提供） -->
+  <g>
+    <polygon points="700,254 900,254 906,266 694,266" fill="#0b1112"/>
+    <polygon points="706,258 894,258 900,264 700,264" fill="#dff3ee" opacity=".7"/>
+    <polygon points="540,150 1060,150 1080,176 520,176" fill="#0b1112"/>
+    <polygon points="556,158 1044,158 1056,170 544,170" fill="#dff3ee" opacity=".78"/>
+    <polygon points="300,14 1300,14 1340,58 260,58" fill="#0b1112"/>
+    <polygon class="ward-flicker" points="320,26 1280,26 1300,46 300,46" fill="#e8f7f2" opacity=".9"/>
+    <polygon points="300,14 1300,14 1340,58 260,58" fill="#bfe6df" opacity=".22" filter="url(#ward-lamp)"/>
+  </g>
+  <!-- 灯下墙面的硬边光斑（荧光灯的光是方的，不是柔和渐变） -->
+  <g fill="#d6efe8" opacity=".055">
+    <polygon points="60,120 420,196 420,318 60,252"/>
+    <polygon points="1540,120 1180,196 1180,318 1540,252"/>
+    <polygon points="20,330 300,376 300,470 20,430"/>
+  </g>
+
+  <!-- 左墙细节：通风口（格栅后是纯黑） + 呼叫铃（常亮） -->
+  <g>
+    <rect x="140" y="180" width="124" height="72" fill="#05090a" stroke="#1b2a2c" stroke-width="3"/>
+    <path d="M146 196 H258 M146 212 H258 M146 228 H258 M146 242 H258" stroke="#16232a" stroke-width="2"/>
+    <rect x="300" y="392" width="28" height="36" rx="4" fill="#12201d" stroke="#2b4a44" stroke-width="2.4"/>
+    <circle cx="314" cy="405" r="5" fill="#3fb59a"/>
+    <circle cx="314" cy="405" r="13" fill="#3fb59a" opacity=".45" filter="url(#ward-soft)"/>
+  </g>
+
+  <!-- 右墙：歪掉的挂钟 -->
+  <g transform="rotate(-7 1360 300)">
+    <circle cx="1360" cy="300" r="46" fill="#0b1213" stroke="#26383c" stroke-width="3"/>
+    <path d="M1360 300 V272" stroke="#8d9c99" stroke-width="3"/>
+    <path d="M1360 300 L1338 318" stroke="#8d9c99" stroke-width="3"/>
+    <circle cx="1360" cy="300" r="3" fill="#8d9c99"/>
+  </g>
+
+  <!-- 右墙：楼层指示牌 1F / 2F / 3F /（4 被擦掉）/ 5F -->
+  <g>
+    <polygon points="1140,250 1248,236 1256,432 1148,448" fill="#cdd8d6" opacity=".82"/>
+    <g stroke="#0b1213" stroke-width="3" stroke-linecap="square">
+      <use href="#dg-1" x="1166" y="272"/><use href="#dg-f" x="1182" y="272"/>
+      <use href="#dg-2" x="1166" y="308"/><use href="#dg-f" x="1182" y="308"/>
+      <use href="#dg-3" x="1166" y="344"/><use href="#dg-f" x="1182" y="344"/>
+      <use href="#dg-5" x="1166" y="416"/><use href="#dg-f" x="1182" y="416"/>
+    </g>
+    <!-- 4F 那一行只剩擦拭痕 -->
+    <path d="M1160 372 L1196 366 L1194 390 L1158 396 Z" fill="#b9c6c4" opacity=".75"/>
+    <path d="M1152 384 L1204 376" stroke="#8d9c99" stroke-width="2" opacity=".5"/>
+  </g>
+
+  <!-- 尽头墙：门（门后纯黑）+ 门牌 404 + 门缝冷光 -->
+  <g>
+    <rect x="730" y="318" width="140" height="242" fill="#050809" stroke="#1b2a2c" stroke-width="3"/>
+    <path d="M760 318 V560 M840 318 V560" stroke="#121c1e" stroke-width="2"/>
+    <rect x="762" y="342" width="76" height="30" fill="#cdd8d6" opacity=".9"/>
+    <g stroke="#0b1213" stroke-width="3.4" stroke-linecap="square">
+      <use href="#dg-4" x="770" y="350"/><use href="#dg-0" x="784" y="350"/><use href="#dg-4" x="798" y="350"/>
+      <use href="#dg-0" x="812" y="350"/>
+    </g>
+    <rect x="736" y="550" width="128" height="10" fill="#3fb59a" opacity=".6"/>
+    <rect x="736" y="550" width="128" height="22" fill="#3fb59a" opacity=".28" filter="url(#ward-soft)"/>
+    <rect x="848" y="430" width="10" height="42" rx="3" fill="#26383c"/>
+  </g>
+
+  <!-- 空气感 + 暗角 -->
+  <rect x="620" y="250" width="360" height="310" fill="#bfe6df" opacity=".06" filter="url(#ward-soft)"/>
+  <rect width="1600" height="900" fill="url(#ward-vignette)"/>
+</svg>
