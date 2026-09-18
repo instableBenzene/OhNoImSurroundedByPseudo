@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M11 8h10v3H11z"/><rect x="5" y="11" width="22" height="16" rx="2.5"/><path d="M16 15.5v7M12.5 19h7" stroke="#a77ad1" stroke-width="2.6"/>
+<!-- 手术箱（通用兜底）：器械盘 + 摊在盘上的两件器械 -->
+<rect x="3.5" y="18" width="25" height="9" rx="2"/>
+<path d="M7 18v-2.4M25 18v-2.4" opacity=".6"/>
+<path d="M8 18l6.5-7.5"/>
+<path d="M13 9l3.4 3.4"/>
+<path d="M18.5 18l6-6"/>
+<path d="M21.5 18h5" stroke="#a77ad1" stroke-width="2.4"/>
 </svg>

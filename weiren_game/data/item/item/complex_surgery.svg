@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M11 8h10v3H11z"/><rect x="5" y="11" width="22" height="16" rx="2.5"/><path d="M16 15.5v7M12.5 19h7" stroke="#a77ad1" stroke-width="2.6"/>
+<!-- 复杂手术：手术剪 + 缝合针（区别于野战手术的器械卷） -->
+<!-- 第一版的缝合针太小、像飘着；改成一段明显的弯针 + 短线尾 -->
+<circle cx="8.4" cy="25" r="3.4"/><circle cx="15.6" cy="25" r="3.4"/>
+<path d="M10 22.6L21.6 11M13.6 25.4L25.2 13.8"/>
+<path d="M23.4 7.6a6 6 0 0 1 3.4 5" stroke="#a77ad1" stroke-width="2.3"/>
+<path d="M26.8 12.6c1.6 2.4 2.4 5 2.4 7.6" stroke="#a77ad1" stroke-width="1.6" stroke-dasharray="2.2 2.2"/>
 </svg>

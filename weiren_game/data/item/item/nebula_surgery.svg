@@ -1,3 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path d="M11 8h10v3H11z"/><rect x="5" y="11" width="22" height="16" rx="2.5"/><path d="M16 15.5v7M12.5 19h7" stroke="#d86459" stroke-width="2.6"/>
+<!-- 星云手术：菱形刃手术刀 + 星芒 -->
+<path d="M4.5 27.5l9-9"/>
+<path d="M12 17.5l6-6 4.5 4.5-6 6z"/>
+<!-- 第一版在右下角有一道 .55 透明度的"拖影"，渲染出来像脏点，去掉 -->
+<path d="M24.4 5.4l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" stroke="#a77ad1" stroke-width="1.8"/>
+<path d="M23.6 26.4l4.4-4.4" stroke="#a77ad1" stroke-width="2"/>
 </svg>
