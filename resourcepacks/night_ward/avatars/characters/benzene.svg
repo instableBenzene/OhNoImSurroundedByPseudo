@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#dde3d8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<!-- 夜班病区・苯环：夜班医生形态（苍白皮肤、白大褂、额镜、口罩），袖口两处旧血 -->
+<path d="M7 63c1-13 11-19 25-19s24 6 25 19" fill="#c8d3ce"/>
+<path d="M24.5 45.5c2.4 4.2 5 6.2 7.5 6.2s5.1-2 7.5-6.2" stroke="#8f9c97" stroke-width="2.4"/>
+<path d="M32 51.5V63" stroke="#8f9c97" stroke-width="2.4"/>
+<path d="M11.5 55.5l4.2 2.6" stroke="#7d1f24" stroke-width="2.6"/>
+<path d="M50.5 52.4l3.2-1.8" stroke="#7d1f24" stroke-width="2.2"/>
+<path d="M28 33h8v12h-8z" fill="#2a3431"/>
+<circle cx="32" cy="24" r="13.5" fill="#cdd8d3"/>
+<path d="M19 22c1-8.5 6.5-12.5 13-12.5S44 13.5 45 22c-3-3.6-6.6-4.8-10-4.8-3.6 0-6.2 2.2-9.4 3.6-2 .9-4.6 1.2-6.6 1.2z" fill="#3a4247" stroke="none"/>
+<circle cx="32" cy="14.6" r="3.4" fill="#e6efe9" stroke="#7f97a6" stroke-width="2"/>
+<circle cx="27.4" cy="25" r="3.3" stroke="#7f97a6" stroke-width="2"/>
+<circle cx="36.6" cy="25" r="3.3" stroke="#7f97a6" stroke-width="2"/>
+<path d="M30.7 25h2.6" stroke="#7f97a6" stroke-width="2"/>
+<circle cx="27.4" cy="25" r="1.6" fill="#25302c" stroke="none"/>
+<circle cx="36.6" cy="25" r="1.6" fill="#25302c" stroke="none"/>
+<path d="M23.5 28.6h17c0 5.6-3.6 8.6-8.5 8.6s-8.5-3-8.5-8.6z" fill="#e6efe9" stroke="#9fb0aa" stroke-width="2"/>
+<path d="M23.6 29.6L18.4 27.2M40.4 29.6l5.2-2.4" stroke="#9fb0aa" stroke-width="2"/>
+</svg>
