@@ -177,8 +177,14 @@ def main() -> int:
                     if path.stem in wanted:
                         shutil.copy(path, work / ("av_" + path.name))
                         zoom_paths.append(path)
+            for section in ("item", "tag"):
+                for path in sorted((pack / "item" / section).glob("*.svg")):
+                    if path.stem in wanted:
+                        shutil.copy(path, work / ("ic_" + path.name))
+                        zoom_paths.append(path)
             if zoom_paths:
-                sheets = {"zoom": _file_sheet(work, zoom_paths, "av_", args.box)}
+                prefix = "av_" if zoom_paths[0].parent.name in ("characters", "shapes", "features") else "ic_"
+                sheets = {"zoom": _file_sheet(work, zoom_paths, prefix, args.box)}
         for name, (markup, size) in sheets.items():
             png = render(edge, work, name, markup, size)
             print("%-16s %s (%d bytes)" % (name, png, png.stat().st_size if png.exists() else 0))
