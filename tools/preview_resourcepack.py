@@ -113,7 +113,7 @@ def main() -> int:
         sheets["bgplain"] = (page(body), (1600, 900))
         if "title" in assets:
             body += ("<img class='bg' src='%s' style='object-fit:contain;"
-                     "object-position:50% 12%%;height:46%%'>" % assets["title"])
+                     "object-position:50%% 12%%;height:46%%'>" % assets["title"])
         sheets["bg"] = (page(body), (1600, 900))
 
     items = sorted(path.stem for path in (pack / "item" / "item").glob("*.svg"))
