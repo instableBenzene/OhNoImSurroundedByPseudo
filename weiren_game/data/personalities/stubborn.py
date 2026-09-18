@@ -77,7 +77,7 @@ def active_tiers(level: int) -> list[int]:
 
 
 def tier_at(level: int) -> int:
-    """固执不在通用“达到即激活”的档位体系内。"""
+    """固执不在通用「达到即激活」的档位体系内。"""
     return 0
 
 

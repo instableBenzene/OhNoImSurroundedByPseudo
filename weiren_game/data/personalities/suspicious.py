@@ -36,7 +36,7 @@ def health_protection(
     *,
     consume: bool,
 ) -> tuple[float, float]:
-    """多疑在生命/理智“消耗”时获得小幅减伤。"""
+    """多疑在生命/理智「消耗」时获得小幅减伤。"""
     if consume and engine._is_personality(tenant, "suspicious"):
         return .05, 0.0
     return 0.0, 0.0

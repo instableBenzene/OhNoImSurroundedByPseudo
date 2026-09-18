@@ -1,6 +1,6 @@
 """房客档案：厄瑞玻斯（7 号）。
 
-厄瑞玻斯掌握“命运抽牌”能力，其专属 22 张命运牌一并保存在本文件。
+厄瑞玻斯掌握「命运抽牌」能力，其专属 22 张命运牌一并保存在本文件。
 """
 
 from ..types import A, CharacterDefinition, MarkDefinition
@@ -391,7 +391,7 @@ def resolve_fate(
 
 
 # ---------------------------------------------------------------- fate skills
-# 每张命运牌是一个“技能”（正/逆位在函数内分支）；命运抽牌是调用它们的固定技能。
+# 每张命运牌是一个「技能」（正/逆位在函数内分支）；命运抽牌是调用它们的固定技能。
 
 def _card_0(engine: EngineProtocol, upright: bool, target_id: str | None) -> None:
     """愚者：正位回溯守卫；逆位额外伪人到访。"""
@@ -409,7 +409,7 @@ def _card_0(engine: EngineProtocol, upright: bool, target_id: str | None) -> Non
             engine.state.flow.turn + 1,
         )
     else:
-        engine._log("本局伪人没有到访行为，愚人逆位的“额外到访”未生效。")
+        engine._log("本局伪人没有到访行为，愚人逆位的「额外到访」未生效。")
 
 
 def _card_1(engine: EngineProtocol, upright: bool, target_id: str | None) -> None:

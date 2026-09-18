@@ -47,7 +47,7 @@ def use_medical(
             f"目标没有{('创伤' if item.medical_target == 'trauma' else '紊乱')}。"
         )
     base_success, cost = treatment_params(item, target)
-    # 目标已在药物可处理范围内且未被低生命惩罚时，本次治疗为“必定成功”。
+    # 目标已在药物可处理范围内且未被低生命惩罚时，本次治疗为「必定成功」。
     guaranteed = base_success >= 1.0 and tenant.health > 50
     if guaranteed:
         success = 1.0

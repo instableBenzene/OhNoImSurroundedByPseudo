@@ -1,6 +1,6 @@
 """房客档案：澪叁贰玖（11 号，警觉印记机制）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from ..types import A, B, CharacterDefinition, CostEffectLink, MarkDefinition, T
@@ -203,7 +203,7 @@ def start_of_turn(engine: EngineProtocol, tenant: object) -> None:
 
 
 def on_pseudo_visit(engine: EngineProtocol, tenant: object) -> None:
-    """伪人来访时获得警觉印记并记下“已见过伪人”。
+    """伪人来访时获得警觉印记并记下「已见过伪人」。
 
     使用处：pseudo_system._resolve_pseudo_visit 的房客遍历。
     """
@@ -295,7 +295,7 @@ MARKS = (
         bar_tiers=((1, "可发动", "danger"), (3, "满", "warn")),
         triggers=("pseudo.visit", "turn_start.instances"),
         hooks=(on_pseudo_visit,),
-     description="对“伪人”的警觉层层叠加，眼睛越来越毒。"),
+     description="对「伪人」的警觉层层叠加，眼睛越来越毒。"),
 )
 
 

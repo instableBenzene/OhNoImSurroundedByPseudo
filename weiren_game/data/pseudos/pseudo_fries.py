@@ -19,7 +19,7 @@ DEFINITION = PseudoDefinition(
     enters_house=False,
     mark_field="exposure",
     mark_label="暴露值",
-    # 暴露值即“暴露印记-薯条”：由理智溢出体系转化而来，禁止被外界改写。
+    # 暴露值即「暴露印记-薯条」：由理智溢出体系转化而来，禁止被外界改写。
     mark_externally_locked=True,
 )
 
@@ -37,7 +37,7 @@ class FriesState:
     cumulative_exposure: float = 0.0
     exposure_five_milestone: int = 0
     exposure_ten_milestone: int = 0
-    # 仅用于“每累计 5/10 层产生指认”的计数池：不含「虚假信息被识破」的回敬暴露，
+    # 仅用于「每累计 5/10 层产生指认」的计数池：不含「虚假信息被识破」的回敬暴露，
     # 否则「识破→+15→再生 3 条假指认→再被识破」会自我放大（见 add_exposure 注释）。
     milestone_pool: float = 0.0
     performance_count: int = 0
@@ -294,7 +294,7 @@ def settle_end(engine: object) -> None:
         return
     if pseudo.infiltration_turns >= 5 or pseudo.total_infiltration_turns >= 10:
         engine._attempt_breakthrough(
-            "薯条的替身已潜伏足够久，“藏身”突破完成。"
+            "薯条的替身已潜伏足够久，「藏身」突破完成。"
         )
 
 
@@ -304,7 +304,7 @@ def infernal_trigger(engine: object) -> None:
 
     pseudo = engine.state.pseudo_state
     engine._observe_pseudo_skill("trigger")
-    engine._log("替身暴露值达到25，发动“炼狱扳机”！")
+    engine._log("替身暴露值达到25，发动「炼狱扳机」！")
     blocked = engine._skill_respond_skill(
         "炼狱扳机", "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
@@ -327,7 +327,7 @@ def infernal_trigger(engine: object) -> None:
     # 突破条件：释放炼狱扳机时屋内房客人数小于 3。
     if len(engine.home_tenants()) < 3:
         if engine._attempt_breakthrough(
-            "炼狱扳机引爆时屋内房客不足三人，薯条完成“黑手”突破。"
+            "炼狱扳机引爆时屋内房客不足三人，薯条完成「黑手」突破。"
         ):
             return
     expel_infiltrator(engine, "炼狱扳机自我驱逐", self_infernal=True)
@@ -353,7 +353,7 @@ def blocks_search_dispatch(engine: object, tenant: object) -> bool:
     pseudo = engine.state.pseudo_state
     if pseudo.infiltrator_id != tenant.id or not tenant.is_pseudo:
         return False
-    engine._log("派遣替身外出搜索令薯条发动“炼狱扳机”。")
+    engine._log("派遣替身外出搜索令薯条发动「炼狱扳机」。")
     infernal_trigger(engine)
     return True
 
@@ -434,11 +434,11 @@ def ability_fail_resolved(
 def sanity_overflow_share(
     engine: object, tenant: object, overflow: float
 ) -> None:
-    """理智溢出转化：与比格小星同属“溢出转化”体系的一次性版本。
+    """理智溢出转化：与比格小星同属「溢出转化」体系的一次性版本。
 
     比格小星把回复理智超过 100 的部分按 100% 转为【星之印记】；
     替身则把同样的溢出部分按 50% 累积，在该回合末结算为【暴露印记-薯条】
-    （对外描述仍是“暴露值”）。
+    （对外描述仍是「暴露值」）。
     """
     if tenant.is_pseudo and tenant.pseudo_source == "fries" and overflow:
         engine.state.pseudo_state.scenario().overflow[tenant.id] = (
@@ -447,11 +447,11 @@ def sanity_overflow_share(
         )
 
 
-# 薯条专属信息效果：就近声明“伪装表演”信息的核验/待验证结算。
+# 薯条专属信息效果：就近声明「伪装表演」信息的核验/待验证结算。
 def resolve_performance_information(
     engine: object, info: object, targets: list[object]
 ) -> None:
-    """核验“伪装表演”：确认为真时生成指认，并把目标侵蚀-5/-5。"""
+    """核验「伪装表演」：确认为真时生成指认，并把目标侵蚀-5/-5。"""
     if info.status == "confirmed":
         create_accusation(engine, True)
         for target in targets:
@@ -461,7 +461,7 @@ def resolve_performance_information(
 def pending_performance_information(
     engine: object, info: object, targets: list[object]
 ) -> None:
-    """待验证的“伪装表演”：降低暴露，并使目标侵蚀+1/+1。"""
+    """待验证的「伪装表演」：降低暴露，并使目标侵蚀+1/+1。"""
     from weiren_game.lifecycle import AbilityLaunch
 
     engine.state.pseudo_state.exposure = max(

@@ -14,7 +14,7 @@ INFORMATION_TEMPLATES = {
     "moment_peace": InformationTemplate("moment_peace", "片刻的宁静", "state", "A帮助B处理伤口。", "A、B回合末侵蚀情绪-1/-1。", "A回复15理智；B回复5生命、10理智并获得宽慰2/3。", "无。"),
     "supply_dispute": InformationTemplate("supply_dispute", "物资分配争端", "state", "A和B因罐头分配争吵。", "A、B回合末理智消耗+3。", "A、B立即消耗10理智。", "A、B各回复15理智并获得信任2/3。"),
     "courier_absent": InformationTemplate("courier_absent", "驿站老板旷工事件", "location_modifier", "县快递驿站无人看管。", location_id="courier_station"),
-    "double_eleven": InformationTemplate("double_eleven", "“双11”驿站爆仓", "location_modifier", "贵重快递被放在无人照看的篮子里。", location_id="courier_station"),
+    "double_eleven": InformationTemplate("double_eleven", "「双11」驿站爆仓", "location_modifier", "贵重快递被放在无人照看的篮子里。", location_id="courier_station"),
     "medical_samples": InformationTemplate("medical_samples", "集采药物样品推广", "location_modifier", "医院展示柜有高级试用品。", location_id="county_hospital"),
     "er_disturbance": InformationTemplate("er_disturbance", "急诊科夜间医闹", "location_modifier", "急诊清创室和药房防线空虚。", location_id="county_hospital"),
     "clerk_gaming": InformationTemplate("clerk_gaming", "夜班店员沉迷游戏", "location_modifier", "便利店店员沉迷手游。", location_id="convenience_store"),
@@ -125,7 +125,7 @@ def _pending_supply_dispute(
         engine._consume_sanity(target, 3, info.title)
 
 
-# 状态类信息模板：声明“核验结算”与“待验证持续影响”两类效果函数。
+# 状态类信息模板：声明「核验结算」与「待验证持续影响」两类效果函数。
 INFORMATION_STATE_EFFECTS: dict[str, dict[str, object]] = {
     "good_talk": {
         "resolve": _resolve_good_talk,

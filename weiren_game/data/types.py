@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Term:
-    """技能里的一个资源条目；side 决定它是“cost”还是“effect”。
+    """技能里的一个资源条目；side 决定它是「cost」还是「effect」。
 
     即使两者都写 sanity，语义也由 side 区分：
     - side="cost"：发动前置代价（发动前要支付）；
@@ -19,7 +19,7 @@ class Term:
     修饰词：
     - optional=True：可选项。cost 表示玩家可放弃该项；effect 表示可选择
       是否结算。强制发动时可选视为必选。
-    - maximum=True：“至多”。cost 表示至多支付 N（实际可少付）；effect
+    - maximum=True：「至多」。cost 表示至多支付 N（实际可少付）；effect
       表示效果至多作用 N（如回复至多 N）。强制时取最大档。
 
     payer：actor=发动者，target=被作用方/被强制方。
@@ -54,7 +54,7 @@ class CostExpr:
     """cost 侧的逻辑表达式节点。
 
     - op="and"：全部子项都必须支付（默认）；
-    - op="or"：任意一个子项可支付即可（如洋葱“1 共情印记 或 15 理智”）。
+    - op="or"：任意一个子项可支付即可（如洋葱「1 共情印记 或 15 理智」）。
     refs 的每一项可以是字符串（Branch 内 cost Term 的 tag）或嵌套 CostExpr。
     """
 
@@ -72,7 +72,7 @@ class Branch:
       替代代价（side 仍为 cost、payer 常为 target）；
     - max_on_force：被强制发动时优先选择该分支。
     - links：cost 与 effect 的关联表（多对多，非一一对应）。links 只描述
-      “哪几笔代价引发哪几条效果”，不要求 1:1；没有 links 时表示效果由
+      「哪几笔代价引发哪几条效果」，不要求 1:1；没有 links 时表示效果由
       角色模块函数直接实现。
     - cost_expr：cost 侧的逻辑组合；None 表示把全部 cost Term 按 AND 处理。
     """
@@ -142,18 +142,18 @@ class CharacterDefinition:
 
     @property
     def active_name(self) -> str | None:
-        """以“／”连接全部主动能力名称，无则返回 None。"""
+        """以「／」连接全部主动能力名称，无则返回 None。"""
         return "／".join(a.name for a in self.actives) or None
 
     @property
     def active_description(self) -> str | None:
-        """以“；”连接全部主动能力描述，无则返回 None。"""
+        """以「；」连接全部主动能力描述，无则返回 None。"""
         return "；".join(a.description for a in self.actives) or None
 
 
 @dataclass(frozen=True)
 class MarkDefinition:
-    """角色专属“印记”的静态定义（存放于该角色的档案文件）。
+    """角色专属「印记」的静态定义（存放于该角色的档案文件）。
 
     - ``acquisition``：获得条件（文字描述；具体触发在角色技能/机制处实现）；
     - ``minimum`` / ``maximum``：层数上下限（maximum 为 None 表示无上限）；
@@ -163,7 +163,7 @@ class MarkDefinition:
     id: str
     label: str
     acquisition: str
-    # 风味描述（面向屋主的“这是什么感觉”，与机制无关）。
+    # 风味描述（面向屋主的「这是什么感觉」，与机制无关）。
     description: str = ""
     minimum: int = 0
     maximum: int | None = None
@@ -177,7 +177,7 @@ class MarkDefinition:
     # 由哪些 lifecycle 节点驱动获得/变化，以及对应实现函数（贴角色文件）。
     triggers: tuple[str, ...] = ()
     hooks: tuple[object, ...] = ()
-    # True 时该印记是“特殊牌库”等内部结构，禁止被外界直接改写。
+    # True 时该印记是「特殊牌库」等内部结构，禁止被外界直接改写。
     externally_locked: bool = False
 
 
@@ -300,7 +300,7 @@ class PseudoDefinition:
     breakthrough: str
     liberation: str
     enters_house: bool = True
-    # 场景状态中充当“印记”的字段名（无则留空），供外界统一改写。
+    # 场景状态中充当「印记」的字段名（无则留空），供外界统一改写。
     mark_field: str = ""
     # 该印记对外的称呼（内部结算名与外部描述可能不同）。
     mark_label: str = ""

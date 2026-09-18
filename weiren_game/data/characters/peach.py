@@ -1,6 +1,6 @@
 """房客档案：清桃（12 号，正义执行／持之以恒）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from ..types import A, CharacterDefinition
@@ -64,7 +64,7 @@ def slow_guard_floor(
     )
     tenant.set_status("peach_slow_guard_used", intensity=1, layers=99)
     engine._log(
-        f"青桃的“持之以恒”保护了{engine.character(tenant).name}："
+        f"青桃的「持之以恒」保护了{engine.character(tenant).name}："
         f"理智被拉回50且到下一回合结束前不低于50。"
     )
     return 50.0
@@ -88,7 +88,7 @@ def justice_execution_guard(engine: EngineProtocol) -> bool:
     ):
         ability.disabled = True
         engine._suppress_pseudo(2, ("visit",))
-        engine._log("青桃发动“正义执行”，阻止突破；伪人被压制两回合。")
+        engine._log("青桃发动「正义执行」，阻止突破；伪人被压制两回合。")
         return True
     return False
 

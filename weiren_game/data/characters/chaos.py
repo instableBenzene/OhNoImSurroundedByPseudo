@@ -1,6 +1,6 @@
 """房客档案：混（15 号，混沌性格与理智／癫狂机制）。
 
-本文件按“定义 / 修饰器 / 技能函数”三节组织，混的专属逻辑（性格/携带量
+本文件按「定义 / 修饰器 / 技能函数」三节组织，混的专属逻辑（性格/携带量
 随机切换、癫狂转化、混沌的思想、混沌的氛围、权限转让、回合末理智修正、
 锁定自我）全部集中在此；系统只保留调用点。
 """
@@ -13,7 +13,7 @@ register_status_definition(StatusDefinition(
     "pure_self", "纯真的自我", "other", shown=frozenset({"icon", "description"}),
     source_id="passive:chaos.self_lock",
     permanent=True,
- description="守住“我还是我”这一点执念，不被情绪推着走。"))
+ description="守住「我还是我」这一点执念，不被情绪推着走。"))
 register_status_definition(StatusDefinition(
     "chaos_carry", "混沌携带量", "other", shown=frozenset(),
     source_id="passive:chaos.self_lock",
@@ -38,7 +38,7 @@ CHARACTER = CharacterDefinition(
 
 # ---------------------------------------------------------------- modifier
 def reason_madness_available(engine: EngineProtocol, *, at_turn_end: bool = False) -> bool:
-    """判断“情绪显现-理智／癫狂”是否正在生效（任一屋内混通过被动判定）。
+    """判断「情绪显现-理智／癫狂」是否正在生效（任一屋内混通过被动判定）。
 
     回合开始与回合末使用不同的被动事件 ID。
     使用处：round_effects 的回合开始/回合末总调度。
@@ -122,7 +122,7 @@ def chaotic_thought(engine: EngineProtocol, tenant: object) -> None:
 def convert_excess_madness(engine: EngineProtocol, tenant: object, *, emotions_active: bool) -> None:
     """回合开始把房客超过 1 层的癫狂转化为等量创伤与紊乱。
 
-    “情绪显现-理智／癫狂”生效（emotions_active）且层数达到 10 时才触发；
+    「情绪显现-理智／癫狂」生效（emotions_active）且层数达到 10 时才触发；
     转化保留基础 1 层癫狂，强度固定为 1。
     使用处：round_effects._start_of_turn_effects 的房客遍历。
     """
@@ -205,14 +205,14 @@ def use_permission_transfer(
 
     - **首次**发动：混消耗 1 层理智并获得 1 层癫狂（启动；存入 `permission_shift`）；
       启动之后两种效果都不再消耗，只受每回合 1 次的频次约束。
-    - （外）模仿：目标以“10 生命 + 10 理智”的替代代价被强制发动技能，冷却保持目标原状；
+    - （外）模仿：目标以「10 生命 + 10 理智」的替代代价被强制发动技能，冷却保持目标原状；
     - （内）治疗：目标创伤或紊乱强度/层数各-1。
     使用处：ability_system.use_ability 的混分发分支。
     """
     from weiren_game.exceptions import RuleViolation
 
     target = engine._require_home_tenant(target_id)
-    # 前置的“消耗理智获得癫狂”只在第一次发动时支付一次（外置启动代价）。
+    # 前置的「消耗理智获得癫狂」只在第一次发动时支付一次（外置启动代价）。
     if not actor.condition("permission_shift").active:
         if actor.reason.layers < 1:
             raise RuleViolation("首次发动权限转让需要1层理智情绪。")
@@ -257,7 +257,7 @@ def use_permission_transfer(
                 state.cooldown_until = saved_cooldowns.get(
                     state.ability_id, state.cooldown_until
                 )
-        engine._log(f"混通过“权限转让”调用了{engine.character(target).name}的“{copied.name}”。")
+        engine._log(f"混通过「权限转让」调用了{engine.character(target).name}的「{copied.name}」。")
         return result
     else:
         chosen = target.trauma if option != "disorder" else target.disorder

@@ -1,6 +1,6 @@
 """房客档案：比格小星（2 号）。"""
 
-# 按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+# 按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 
 from ..types import A, CharacterDefinition, MarkDefinition
 from weiren_game.types import EngineProtocol
@@ -9,7 +9,7 @@ from weiren_game.types import EngineProtocol
 CHARACTER = CharacterDefinition(
     "bigstar", 2, "比格小星", "看起来呆呆的社牛学生，最喜欢吃松饼。",
     "cheerful", "gentle", 3, ("大学生", "留学生", "日语掌握者", "18-24岁", "未知的性别", "星星"),
-    (A("hell_gift", "地狱的赠礼", "比格小星未被禁用时，房客外出搜索可能获得“可爱的玩偶”（紫色）【工具】【工艺品】【消耗品】：\n· 仅可用于比格小星，使用后回复 **25 理智**。\n*一个“快乐恶魂”玩偶，比格小星总喜欢带着她，为她拍不同的照片。*"),
+    (A("hell_gift", "地狱的赠礼", "比格小星未被禁用时，房客外出搜索可能获得「可爱的玩偶」（紫色）【工具】【工艺品】【消耗品】：\n· 仅可用于比格小星，使用后回复 **25 理智**。\n*一个「快乐恶魂」玩偶，比格小星总喜欢带着她，为她拍不同的照片。*"),
      A("everyone_star", "大家的星星", "· 比格小星回复理智时，**超过 100 的部分**转化为等量【星之印记-比格小星】。\n· 回合开始时，消耗**至多 10 个**印记，为当前理智最低的 **1 名**房客回复等量 **×0.5** 的理智。")),
 )
 
@@ -42,7 +42,7 @@ def use_star_doll(engine: EngineProtocol, tenant: object, item: object) -> None:
 def collect_star_overflow(engine: EngineProtocol, tenant: object, overflow: float) -> bool:
     """大家的星星：理智回复溢出时累计为星之印记。
 
-    与伪人薯条的“暴露值”同属“理智溢出转化”体系：小星按 100% 转为星之印记，
+    与伪人薯条的「暴露值」同属「理智溢出转化」体系：小星按 100% 转为星之印记，
     薯条的替身按 50% 转为暴露印记（对外称暴露值）。
 
     使用处：value_system._restore_sanity 的溢出结算段。

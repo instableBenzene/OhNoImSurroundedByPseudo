@@ -49,7 +49,7 @@ class OnionState:
 
 
 def visit(engine: object) -> None:
-    """洋葱到访：按烦躁占比判定“狂喜的邀约”突破。"""
+    """洋葱到访：按烦躁占比判定「狂喜的邀约」突破。"""
     pseudo = engine.state.pseudo_state
     irritated = sum(1 for t in engine.home_tenants() if t.irritation.active)
     total = max(1, len(engine.home_tenants()))
@@ -69,7 +69,7 @@ def visit(engine: object) -> None:
 
 
 def cast_whisper(engine: object) -> None:
-    """发动洋葱“不可名状的低语”：向 ceil(印记/4) 名房客施加烦躁并推进解放。"""
+    """发动洋葱「不可名状的低语」：向 ceil(印记/4) 名房客施加烦躁并推进解放。"""
     import math
 
     pseudo = engine.state.pseudo_state
@@ -111,7 +111,7 @@ def cast_whisper(engine: object) -> None:
         0 if health_lost else pseudo.safe_health_whispers + 1
     )
     pseudo.resolving_skill = False
-    engine._log("洋葱发动“不可名状的低语”。")
+    engine._log("洋葱发动「不可名状的低语」。")
     engine._log(
         f"理智的裂隙：连续无烦躁{pseudo.safe_irritation_whispers}/2，"
         f"连续无生命损失{pseudo.safe_health_whispers}/4。"
@@ -159,7 +159,7 @@ def start_passive(engine: object) -> None:
 
 
 def attack_searcher(engine: object, mission: object, tenant: object) -> None:
-    """搜索袭击：洋葱“潮汐的诱惑”（烦躁层数与低生命伤害）。"""
+    """搜索袭击：洋葱「潮汐的诱惑」（烦躁层数与低生命伤害）。"""
     engine._observe_pseudo_skill("tide")
     already = tenant.irritation.active
     engine._apply_emotion(tenant, "irritation", 0, 1, "潮汐的诱惑")
@@ -243,7 +243,7 @@ def on_emotion_increase(engine: object, tenant: object, key: str) -> None:
     pseudo = engine.state.pseudo_state
     if key != "irritation" or engine._pseudo_actions_suppressed():
         return
-    # 烦躁打断“理智的裂隙”：有人获得烦躁即重置无烦躁安全进度。
+    # 烦躁打断「理智的裂隙」：有人获得烦躁即重置无烦躁安全进度。
     pseudo.safe_irritation_whispers = 0
 
 

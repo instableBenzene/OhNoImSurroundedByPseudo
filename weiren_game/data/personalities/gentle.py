@@ -15,7 +15,7 @@ def scheduled_extra_interval(engine: EngineProtocol) -> int | None:
 
 
 def active_supply(engine: EngineProtocol) -> bool:
-    """温和羁绊激活时，名册为空的来访会转为“计入接纳”的补给。"""
+    """温和羁绊激活时，名册为空的来访会转为「计入接纳」的补给。"""
     return engine._bond_tier("gentle") >= 3
 
 

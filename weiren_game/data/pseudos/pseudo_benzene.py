@@ -29,7 +29,7 @@ class BenzeneState:
     curse_count: int = 0
     # 两次来访之间的死亡数（突破判定用；来访时清零）
     deaths_since_last_visit: int = 0
-    # “早交班”解放进度：连续无人休克 / 连续无人死亡
+    # 「早交班」解放进度：连续无人休克 / 连续无人死亡
     safe_no_shock_streak: int = 0
     safe_no_death_streak: int = 0
     death_since_last_curse: bool = False
@@ -87,7 +87,7 @@ def maybe_curse(engine: object) -> bool:
 
 
 def visit(engine: object) -> None:
-    """苯环到访：按屋内人数判定“夜间查房”突破，或按恐惧印记决定是否诅咒。
+    """苯环到访：按屋内人数判定「夜间查房」突破，或按恐惧印记决定是否诅咒。
 
     使用处：pseudo_system._resolve_pseudo_visit 的苯环分发。
     """
@@ -116,7 +116,7 @@ def visit(engine: object) -> None:
 
 
 def cast_curse(engine: object) -> None:
-    """发动苯环“希波克拉底诅咒”：消耗恐惧印记伤害房客，推进解放。
+    """发动苯环「希波克拉底诅咒」：消耗恐惧印记伤害房客，推进解放。
 
     使用处：pseudo_system 的到访与强制主动能力分发。
     """
@@ -127,7 +127,7 @@ def cast_curse(engine: object) -> None:
     pseudo.fear_marks = 0
     pseudo.curse_count += 1
     engine._observe_pseudo_skill("curse")
-    engine._log(f"苯环发动“希波克拉底诅咒”，消耗{spent}层恐惧印记。")
+    engine._log(f"苯环发动「希波克拉底诅咒」，消耗{spent}层恐惧印记。")
     blocked = engine._skill_respond_skill(
         "希波克拉底诅咒", "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
@@ -180,7 +180,7 @@ def cast_curse(engine: object) -> None:
         pseudo.safe_no_death_streak += 1
     pseudo.death_since_last_curse = False
     engine._log(
-        f"“早交班”进度：连续无休克{pseudo.safe_no_shock_streak}/5，"
+        f"「早交班」进度：连续无休克{pseudo.safe_no_shock_streak}/5，"
         f"连续无死亡{pseudo.safe_no_death_streak}/7。"
     )
     if pseudo.safe_no_shock_streak >= 5 or pseudo.safe_no_death_streak >= 7:
@@ -192,7 +192,7 @@ def cast_curse(engine: object) -> None:
 
 
 def attack_searcher(engine: object, mission: object, tenant: object) -> None:
-    """搜索袭击：苯环“精湛刀艺”（创伤+2/+2 与 15 生命伤害）。"""
+    """搜索袭击：苯环「精湛刀艺」（创伤+2/+2 与 15 生命伤害）。"""
     engine._observe_pseudo_skill("precision")
     engine._worsen_condition(tenant, tenant.trauma, 2, "精湛刀艺")
     engine._extend_condition(tenant, tenant.trauma, 2, "精湛刀艺")
@@ -210,7 +210,7 @@ def visitor_mark(engine: object) -> None:
 
 
 def tenant_death(engine: object) -> None:
-    """苯环场景：房客死亡累计“区间死亡数”并打断“早交班”进度。"""
+    """苯环场景：房客死亡累计「区间死亡数」并打断「早交班」进度。"""
     if engine.state.pseudo_state.revealed:
         engine.state.pseudo_state.deaths_since_last_visit += 1
         engine.state.pseudo_state.death_since_last_curse = True

@@ -1,6 +1,6 @@
 """房客档案：苯环（4 号，孤独喧闹／重症监护，也是伪人苯环的人类形态）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from ..types import A, CharacterDefinition
@@ -19,7 +19,7 @@ CHARACTER = CharacterDefinition(
 def use_emergency_treatment(engine: EngineProtocol, target_id: str | None, option: object) -> None:
     """紧急处置：移除目标创伤或紊乱，目标按强度×层数消耗理智。
 
-    “强度×层数”的理智消耗属于技能 effect，不是前置 cost，因此本技能不声明
+    「强度×层数」的理智消耗属于技能 effect，不是前置 cost，因此本技能不声明
     cost 分支；该扣除由效果函数直接结算。
     使用处：ability_system.use_ability 的苯环分发分支。
     """

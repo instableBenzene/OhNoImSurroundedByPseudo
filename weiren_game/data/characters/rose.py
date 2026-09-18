@@ -1,6 +1,6 @@
 """房客档案：罗兹（13 号，恶魔印记机制）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from ..types import A, CharacterDefinition, MarkDefinition, T

@@ -1,6 +1,6 @@
 """房客档案：葱头（5 号，共情与情绪剥离；也是伪人洋葱的人类形态）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from ..types import A, CharacterDefinition, MarkDefinition, T
@@ -41,7 +41,7 @@ def calm_irritation(engine: EngineProtocol, target: object) -> bool:
             engine._skill_outcome(onion, "onion.calm", success)
             if success:
                 engine._gain_mark(onion, "empathy", 1)
-                engine._log(f"洋葱以“平静”帮助{engine.character(target).name}免疫了烦躁。")
+                engine._log(f"洋葱以「平静」帮助{engine.character(target).name}免疫了烦躁。")
                 return True
     return False
 
@@ -178,7 +178,7 @@ MARKS = (
     MarkDefinition(
         id="empathy",
         label="共情印记-洋葱",
-        acquisition="洋葱触发“平静”免疫烦躁时获得 1 层。",
+        acquisition="洋葱触发「平静」免疫烦躁时获得 1 层。",
         minimum=0,
         maximum=3,
         # 1 = 够付一次「平静」；3 = 大招代价。

@@ -231,7 +231,7 @@ ON_GAIN_INFO_SPECS: dict[str, dict[str, object]] = {
 
 
 def item_gain_info_spec(item_id: str) -> dict[str, object] | None:
-    """返回“获得时兑换信息”的规格；普通物品返回 None。"""
+    """返回「获得时兑换信息」的规格；普通物品返回 None。"""
     return ON_GAIN_INFO_SPECS.get(item_id)
 
 

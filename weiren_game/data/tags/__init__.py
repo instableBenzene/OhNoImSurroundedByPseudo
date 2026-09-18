@@ -1,7 +1,7 @@
 """Tag 行为模块：物品通用机制按 tag 存放。
 
-主程序只做“读取物品 tag → 到本注册表找到同名 tag 模块 → 运行其中声明的
-方法/修饰器”。标准 tag（food/medicine_kit/surgery_kit…）由原版内容自带，
+主程序只做「读取物品 tag → 到本注册表找到同名 tag 模块 → 运行其中声明的
+方法/修饰器」。标准 tag（food/medicine_kit/surgery_kit…）由原版内容自带，
 将来 DLC 加同类物品可复用；DLC 也可用 :func:`register_tag_module` 注册新 tag
 行为。
 """

@@ -145,7 +145,7 @@ HOOKS = {
 }
 
 
-# BLS 被动：在“医疗成功率”调用点提供 +10 固定加算（供 _medical 收集）。
+# BLS 被动：在「医疗成功率」调用点提供 +10 固定加算（供 _medical 收集）。
 from weiren_game.modifier_rules import register_modifier_provider, spec
 
 

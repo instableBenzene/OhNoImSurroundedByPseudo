@@ -1,6 +1,6 @@
 """房客档案：沙白（24 号）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件，
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件，
 系统侧只保留调用点。
 """
 
@@ -36,7 +36,7 @@ def initial_setup(engine: EngineProtocol, tenant: object) -> None:
 def sanity_reduce_multiplier(
     engine: EngineProtocol, tenant: object, *, change_type: str
 ) -> float:
-    """感知迟钝：仅沙白的“消耗”型理智削减减半（被动一次判定）。
+    """感知迟钝：仅沙白的「消耗」型理智削减减半（被动一次判定）。
 
     使用处：value_system._reduce_sanity 经 CHARACTER_VALUE_HOOKS 查表调用。
     """

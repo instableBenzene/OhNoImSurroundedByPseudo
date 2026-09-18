@@ -10,7 +10,7 @@ def health_protection(
     *,
     consume: bool,
 ) -> tuple[float, float]:
-    """孤僻在生命/理智“消耗”时的减伤，以及孤僻羁绊的额外减伤。"""
+    """孤僻在生命/理智「消耗」时的减伤，以及孤僻羁绊的额外减伤。"""
     loner = engine._is_personality(tenant, "loner")
     reduction = .20 if (consume and loner) else 0.0
     loner_level = engine.bond_levels().get("loner", 0)
@@ -75,7 +75,7 @@ def active_tiers(level: int) -> list[int]:
 
 
 def tier_at(level: int) -> int:
-    """孤僻不在通用“达到即激活”的档位体系内。"""
+    """孤僻不在通用「达到即激活」的档位体系内。"""
     return 0
 
 

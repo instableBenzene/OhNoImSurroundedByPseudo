@@ -1,6 +1,6 @@
 """房客档案：堤谧特（17 号，绝对无声）。
 
-按“定义 / 修饰器 / 技能函数”组织；角色专属逻辑集中在本文件。
+按「定义 / 修饰器 / 技能函数」组织；角色专属逻辑集中在本文件。
 """
 
 from weiren_game.probability import resolve
@@ -35,7 +35,7 @@ def resists_pseudo_active(
     chance = resolve(value - success_penalty, guarantee)
     if engine._rng(f"{event_id}.demit.resist").random() < chance:
         engine._skill_outcome(tenant, f"{event_id}.demit", True)
-        engine._log(f"堤谧特的“默默无声”使其免受{engine.state.pseudo_state.name}影响。")
+        engine._log(f"堤谧特的「默默无声」使其免受{engine.state.pseudo_state.name}影响。")
         return True
     engine._skill_outcome(tenant, f"{event_id}.demit", False)
     return False
