@@ -75,24 +75,29 @@ def _parts(argument: str) -> tuple[str, int, bool]:
 
     注意：f-string 的 `{}` 是**写在引号里**的，所以引号状态里也要数花括号深度
     （只在引号外数，会把 `{item.name}` 整段当正文——这正是 v1 那一批假阳性的来源）。
+    另外：**关键字参数的字面量不算正文**（`kind="warn"`、`shown=False` 这类），
+    否则会把 `warn` 拼进句子、误报"缺句号"（v3 之后的真实假阳性）。
     """
     sentence: list[str] = []
     braces = 0
     depth = 0
     quote = ""
     last_literal = False
+    last_significant = ""
+    skip_literal = False
     i = 0
     while i < len(argument):
         ch = argument[i]
         if quote:
             if ch == "\\":
-                if depth == 0:
+                if depth == 0 and not skip_literal:
                     sentence.append(argument[i + 1] if i + 1 < len(argument) else "")
                     last_literal = True
                 i += 2
                 continue
             if ch == quote:
                 quote = ""
+                skip_literal = False
                 i += 1
                 continue
             if ch == "{":
@@ -106,13 +111,15 @@ def _parts(argument: str) -> tuple[str, int, bool]:
                 depth = max(0, depth - 1)
                 i += 1
                 continue
-            if depth == 0:
+            if depth == 0 and not skip_literal:
                 sentence.append(ch)
                 last_literal = True
             i += 1
             continue
         if ch in "\"'":
             quote = ch
+            # 紧跟在 `=` 后面的是关键字参数值，整段跳过。
+            skip_literal = last_significant == "="
             i += 1
             continue
         if ch in OPEN:
@@ -122,6 +129,8 @@ def _parts(argument: str) -> tuple[str, int, bool]:
         elif ch in CLOSE:
             depth = max(0, depth - 1)
         # 字符串外的字符（f 前缀、换行、缩进、+ 号）都不是正文，不进句子
+        if ch not in " \t\r\n":
+            last_significant = ch
         i += 1
     return "".join(sentence).strip(), braces, last_literal
 
