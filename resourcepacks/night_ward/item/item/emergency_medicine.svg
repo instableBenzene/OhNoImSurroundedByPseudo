@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 急救药：注射器与安瓿是底色，药液是特征色 -->
+<path d="M4 27l6-6"/><path d="M8 22l4 4 9-9-4-4z"/>
+<path d="M20 12l5-5"/><path d="M23 6l4 4"/>
+<path d="M10 23l7-7" stroke="#a77ad1" stroke-width="4.2" opacity=".9"/>
+<rect x="3" y="23" width="5" height="6" rx="1.2" transform="rotate(-45 5.5 26)"/>
+</svg>

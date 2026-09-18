@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 家用药：瓶身是底色，液面与刻度是特征色 -->
+<rect x="9.5" y="9" width="13" height="19" rx="2.5"/>
+<path d="M13 9V6.5h6V9"/><path d="M11.5 4.5h9"/>
+<path d="M9.5 20h13" stroke="#a77ad1" stroke-width="3.4"/>
+<path d="M13 14h6M13 24h6" opacity=".6"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 星云手术：异星器械是底色，刃口是特征色 -->
+<path d="M8 28c2-8 6-12 14-16"/><path d="M14 24c4-4 10-5 14-2"/>
+<path d="M20 10l6 6-3 3-6-6z"/>
+<path d="M21 9l3-3" stroke="#a77ad1" stroke-width="2.8"/>
+<path d="M9 6l1.6 3.4L14 11l-3.4 1.6L9 16l-1.6-3.4L4 11l3.4-1.6z" stroke="#a77ad1" stroke-width="1.8"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 急救车：车身与抽屉是底色，十字是特征色 -->
+<rect x="4.5" y="6" width="23" height="17" rx="2.5"/>
+<path d="M4.5 12h23 M9 6v6 M23 6v6"/>
+<path d="M16 16.5v5M13.5 19h5" stroke="#a77ad1" stroke-width="2.6"/>
+<circle cx="9.5" cy="27" r="2.4"/><circle cx="22.5" cy="27" r="2.4"/>
+<path d="M27 10h2" opacity=".7"/>
+</svg>

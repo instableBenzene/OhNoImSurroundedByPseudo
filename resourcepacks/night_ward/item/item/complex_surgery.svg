@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 复杂手术：手术剪与拉钩是底色，缝合环是特征色 -->
+<circle cx="9.5" cy="24" r="3.4"/><circle cx="16.5" cy="24" r="3.4"/>
+<path d="M11.5 21L24 6"/><path d="M14.5 21L26 8"/>
+<path d="M25 7l3-3"/>
+<circle cx="10.5" cy="10" r="4.6" stroke="#a77ad1" stroke-width="2.4"/>
+<path d="M4 16h6" opacity=".6"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 缝合包：持针器与弯针是底色，缝合线是特征色 -->
+<path d="M6 26l9-9"/><path d="M13 17l4-4"/><path d="M11 15l4 4"/>
+<path d="M18 13a5 5 0 0 1 7 7"/>
+<path d="M17 12l2 2"/><path d="M26 21l-2-2"/>
+<path d="M20 20c-4 2-7 5-9 9" stroke="#a77ad1" stroke-width="2" stroke-dasharray="3 3"/>
+</svg>

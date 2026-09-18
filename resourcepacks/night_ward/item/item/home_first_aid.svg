@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#d7ddd2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<!-- 家用急救箱：箱体是底色，十字与搭扣是特征色 -->
+<rect x="4.5" y="10" width="23" height="16" rx="2.5"/>
+<path d="M12 10V8.2A1.2 1.2 0 0 1 13.2 7h5.6A1.2 1.2 0 0 1 20 8.2V10"/>
+<path d="M16 13.5v8.5M12.5 17.7h7" stroke="#a77ad1" stroke-width="3.2"/>
+<path d="M10 10v16M22 10v16" opacity=".5"/>
+</svg>
