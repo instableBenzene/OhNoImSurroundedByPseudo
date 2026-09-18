@@ -3143,7 +3143,10 @@ function fateProceed(){
   maybePending();
 }
 async function fateSettle(){
-  const value={index:FATE.index};
+/* 需要选人的牌（如厄瑞波斯·死神正位）没选人就结算的话，后端只回一句"未找到该房客"；
+   这里先挡住，文案取内容层下发的 target.prompt，前端不另造措辞。 */
+if(fateNeedsTarget()&&!FATE.targetId){ toast(((FATE.pi||{}).target||{}).prompt||"请先选择一名房客","err"); return; }
+const value={index:FATE.index};
   if(FATE.orientation) value.orientation=FATE.orientation;
   if(FATE.itemId) value.item_id=FATE.itemId;
   if(FATE.targetId) value.target_id=FATE.targetId;
