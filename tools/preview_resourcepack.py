@@ -72,17 +72,20 @@ def render(edge: str, work: pathlib.Path, name: str, markup: str, size: tuple[in
     return png
 
 
-def _symbol_sheet(work: pathlib.Path, symbols: dict[str, str]) -> tuple[str, tuple[int, int]]:
-    """把 `SYMBOLS`（`i-*` 贴图零件）铺成联络表：24×24 viewBox，放大到 72px 看轮廓。"""
+def _symbol_sheet(work: pathlib.Path, symbols: dict[str, str],
+                  box: int = 72) -> tuple[str, tuple[int, int]]:
+    """把 `SYMBOLS`（`i-*` 贴图零件 / 内容层符号）铺成联络表：24×24 viewBox，按 box 放大看轮廓。"""
     cells = []
     for name in sorted(symbols):
         markup = "%s" % symbols[name]
         cells.append(
-            "<div class='cell'><svg viewBox='0 0 24 24' style='width:72px;height:72px;color:#dfe8e6'"
+            "<div class='cell'><svg viewBox='0 0 24 24' style='width:%dpx;height:%dpx;color:#dfe8e6'"
             " fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round'"
-            " stroke-linejoin='round'>%s</svg><div class='cap'>%s</div></div>" % (markup, name)
+            " stroke-linejoin='round'>%s</svg><div class='cap'>%s</div></div>" % (box, box, markup, name)
         )
-    size = (1180, 240 + 120 * (len(cells) // 13))
+    per_row = max(1, (1180 - 48) // (box + 38))
+    rows = (len(cells) + per_row - 1) // per_row
+    size = (1180, 300 + (box + 60) * rows)
     return page("<div class='sheet'>" + "".join(cells) + "</div>"), size
 
 
@@ -124,7 +127,7 @@ def _base_sheets(work: pathlib.Path) -> dict[str, tuple[str, tuple[int, int]]]:
             "symbols_base", data / "resourcepack" / "symbols_base.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        sheets["symbols"] = _symbol_sheet(work, module.SYMBOLS)
+        sheets["symbols"] = _symbol_sheet(work, module.SYMBOLS, args.box)
     except Exception as exc:  # noqa: BLE001 - 缺这份表就跳过
         print("symbols skipped:", exc)
 
@@ -157,6 +160,8 @@ def main() -> int:
     parser.add_argument("--zoom", default="",
                         help="只渲这几张（base 模式：立绘/零件文件名，逗号分隔），配合 --box 放大看细节")
     parser.add_argument("--box", type=int, default=96, help="头像/图标格子的像素边长（默认 96）")
+    parser.add_argument("--symbols", default="",
+                        help="额外渲一个符号模块（如 weiren_game/data/characters/erebus_fate_symbols.py）")
     args = parser.parse_args()
 
     edge = args.edge or find_edge()
@@ -172,6 +177,17 @@ def main() -> int:
 
     if is_base:
         sheets = _base_sheets(work)
+        if args.symbols:
+            import importlib.util
+
+            spec = importlib.util.spec_from_file_location(
+                "symbols_preview", ROOT / args.symbols)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            for attr in dir(module):
+                table = getattr(module, attr)
+                if attr.isupper() and isinstance(table, dict) and table:
+                    sheets["sym_" + attr.lower()] = _symbol_sheet(work, table, args.box)
         if args.zoom:
             wanted = {name.strip() for name in args.zoom.split(",") if name.strip()}
             zoom_paths = []

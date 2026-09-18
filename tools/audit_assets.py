@@ -71,6 +71,25 @@ def collect() -> dict[str, tuple[str, str]]:
             found["file:" + rel] = (rel, signature(path.read_text(encoding="utf-8", errors="replace")))
     for name, markup in symbols().items():
         found["symbol:" + name] = (str(SYMBOLS_FILE.relative_to(ROOT)), signature(str(markup)))
+    # 内容层自带的符号（如厄瑞玻斯 22 张命运牌）也按同一规矩查：
+    # 它们不占资源包贴图零件，但"一个图形只服务一处"照样适用。
+    import importlib.util
+
+    for base in (ROOT / "weiren_game" / "data", ROOT / "dlc"):
+        if not base.exists():
+            continue
+        for path in sorted(base.rglob("*_symbols.py")):
+            spec = importlib.util.spec_from_file_location("symbols_" + path.stem, path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            rel = str(path.relative_to(ROOT)).replace("\\", "/")
+            for attr in dir(module):
+                table = getattr(module, attr)
+                if not (attr.isupper() and isinstance(table, dict)):
+                    continue
+                for key, markup in table.items():
+                    if isinstance(markup, str):
+                        found["symbol:%s:%s" % (path.stem, key)] = (rel, signature(markup))
     return found
 
 
