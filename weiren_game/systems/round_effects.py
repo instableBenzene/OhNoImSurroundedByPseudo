@@ -166,6 +166,7 @@ class RoundEffectsSystemMixin:
 
         # 这一段会逐人播报理智/生命变化；收起明细，只在最后播一条汇总（玩家可点开看）。
         self._collect_start()
+        rows: list[dict] = []
         tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
             definition = self.character(tenant)
@@ -185,16 +186,33 @@ class RoundEffectsSystemMixin:
                 "sanityConsume", sanity_cost,
                 ("回合末消耗", tenant.character_id), {"tenant": tenant},
             )
+            sanity_before = tenant.sanity
             self._consume_sanity(tenant, max(0, sanity_cost), "回合末消耗")
+            sanity_lost = sanity_before - tenant.sanity
+            if sanity_lost > 0:
+                rows.append({
+                    "label": definition.name,
+                    "value": "−%g 理智" % sanity_lost,
+                    "note": "回合末消耗",
+                })
 
             if tenant.health >= 70:
+                health_before = tenant.health
                 self._loss_health(tenant, 3 + (2 if tenant.health >= 90 else 0), "高生命值自然流失")
+                health_lost = health_before - tenant.health
+                if health_lost > 0:
+                    rows.append({
+                        "label": definition.name,
+                        "value": "−%g 生命" % health_lost,
+                        "note": "高生命值自然流失",
+                    })
             from weiren_game.data.personalities import BOND_END_HEALTH_HOOKS
 
             for _personality_id, end_health_hook in BOND_END_HEALTH_HOOKS.items():
                 end_health_hook(self, tenant)
 
-        self._collect_flush(f"回合末结算：{tenant_count} 名房客的理智与生命变化。")
+        self._collect_flush(
+            f"回合末结算：{tenant_count} 名房客的理智与生命变化。", rows=rows)
 
     def _settle_buff_debuff_effects(self) -> None:
         """回合末依次结算创伤、紊乱及各情绪的自行演化。"""

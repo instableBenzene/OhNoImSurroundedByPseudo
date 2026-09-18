@@ -495,12 +495,19 @@ class GameEngine(
         """开始收集可见播报（配合 `_collect_flush`）：块内不逐条播，仍逐条进完整日志。"""
         self._log_collector = []
 
-    def _collect_flush(self, summary: str, *, detail: dict | None = None) -> None:
-        """把收集到的播报合并成**一条**汇总播出（明细挂在其下，前端可折叠）。"""
+    def _collect_flush(self, summary: str, *, detail: dict | None = None,
+                       rows: list[dict] | None = None) -> None:
+        """把收集到的播报合并成**一条**汇总播出。
+
+        明细优先用调用方给的 `rows`（**结构化三列**：`label` 谁 / `value` 多少 / `note` 为什么）；
+        没给就把收集到的逐条原文塞进去当兜底（那是旧行为，能结构化就别用）。
+        """
         collected, self._log_collector = self._log_collector, None
-        if not collected:
+        payload = detail or ({"rows": rows} if rows
+                             else ({"rows": collected} if collected else None))
+        if not payload or not payload.get("rows"):
             return
-        self._show_message(summary, detail or {"rows": collected})
+        self._show_message(summary, payload)
 
     def _log(self, message: str, *, shown: bool = True, detail: dict | None = None,
              kind: str = "") -> None:

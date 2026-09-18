@@ -1084,6 +1084,16 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 #logList li.lg-danger{color:var(--danger)}
 /* 【…】术语是整块提示，别让它被折行劈成「【工 / 具】」 */
 .tagref{white-space:nowrap}
+/* 明细折叠：**整行本身就是开关**（不再有「明细 N」按钮），展开后按 谁 / 多少 / 为什么 三列排 */
+#logList li.ld-hit{cursor:pointer}
+#logList li.ld-hit:hover{background:color-mix(in srgb, var(--edge) 45%, transparent)}
+/* 日志 li 是 **grid**（时间 / 正文两列）：明细块必须 `grid-column:1/-1` 跨满整行，
+   否则它只占第二格（实测 46px）、三列被挤成**竖排**（真踩过）。 */
+.ld-box{display:block;grid-column:1/-1;width:100%;margin:2px 0 6px 10px;padding-left:8px;border-left:1px solid var(--edge)}
+.ld-row{display:flex;width:100%;gap:10px;align-items:baseline;font-size:11px;line-height:1.75;font-family:var(--mono)}
+.ld-who{flex:0 0 auto;min-width:5.5em;color:var(--ink2)}
+.ld-val{flex:0 0 auto;min-width:6.5em;color:var(--ink-hi)}
+.ld-note{flex:1 1 auto;color:var(--ink3)}
 </style>
 </head>
 <body>
@@ -2328,26 +2338,35 @@ function logBodyHtml(m){
   return `<div>${fmt(m)}</div>`;
 }
 function renderLog(smooth){ const box=$("logList"); if(!box) return;
-  box.innerHTML=LOG.map(([t,m,d,k])=>`<li${k?` class="lg-${esc(k)}"`:""}><span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`).join("");
+  box.innerHTML=LOG.map(([t,m,d,k])=>{
+    const has=!!(d&&(d.rows||[]).length);
+    const cls=[k?`lg-${esc(k)}`:"",has?"ld-hit":""].filter(Boolean).join(" ");
+    return `<li${cls?` class="${cls}"`:""}${has?` onclick="logToggleLi(event)"`:""}>`
+      +`<span class="t">${t}</span>${logBodyHtml(m)}${logDetailHtml(d)}</li>`;
+  }).join("");
   /* 新消息逐条冒出时平滑滚到底，而不是一口气刷新。 */
   const scroller=box.closest(".body")||box;
   if(smooth){ try{ scroller.scrollTo({top:scroller.scrollHeight,behavior:"smooth"}); }
     catch(e){ scroller.scrollTop=scroller.scrollHeight; } }
   else scroller.scrollTop=scroller.scrollHeight;
 }
-/* 明细折叠：默认只留一行汇总，点「明细 N」在下面铺出逐条（谁 / 多少 / 说明）。 */
+/* 明细折叠：汇总**就是那一行本身**——整行可点，点开在下面铺出三列（谁 / 多少 / 为什么）。
+   不要「明细 N」按钮：玩家点的是信息本身，不是旁边的按钮。 */
 function logDetailHtml(d){
   const rows=((d&&d.rows)||[]).filter(r=>r&&(r.label||r.value));
   if(!rows.length) return "";
-  const body=rows.map(r=>`<div class="mono" style="font-size:11px;line-height:1.6">`
-    +(r.label?`<span class="dim">${esc(r.label)}</span>`:"")
-    +(r.value?` &nbsp;${esc(r.value)}`:"")
-    +(r.note?` &nbsp;<span class="dim">${esc(r.note)}</span>`:"")+`</div>`).join("");
-  return `<button class="btn ld-toggle" style="margin-left:6px;padding:1px 6px;font-size:10px"`
-    +` onclick="logToggle(this)">明细 ${rows.length}</button>`
-    +`<div class="ld-box" hidden style="margin:4px 0 6px 10px;border-left:1px solid var(--edge);padding-left:8px">${body}</div>`;
+  const body=rows.map(r=>`<div class="ld-row">`
+    +(r.label?`<span class="ld-who">${esc(r.label)}</span>`:"")
+    +(r.value?`<span class="ld-val">${esc(r.value)}</span>`:"")
+    +(r.note?`<span class="ld-note">${esc(r.note)}</span>`:"")+`</div>`).join("");
+  return `<div class="ld-box" hidden>${body}</div>`;
 }
-function logToggle(btn){ const box=btn.nextElementSibling; if(box) box.hidden=!box.hidden; }
+function logToggleLi(ev){
+  const li=ev.currentTarget;
+  if(ev.target.closest(".ld-box")) return;      /* 点明细内部不收起 */
+  const box=li.querySelector(".ld-box");
+  if(box) box.hidden=!box.hidden;
+}
 function clearLog(){ LOG=[]; renderLog(); }
 /* 导出：当前对局或所选存档的完整日志/动作流程（后端 /api/export）。 */
 function downloadUrl(url){
