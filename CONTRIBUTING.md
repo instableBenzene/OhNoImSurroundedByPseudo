@@ -7,10 +7,14 @@
 | `dlc/` | 内容包：角色、性格、伪人、物品、地点、地图、信息模板、图鉴分节…… | 照 `dlc/README.md` + `dlc/_template/` 复制一份改；字段见 `docs/ADD_CONTENT.md` |
 | `resourcepacks/` | 资源包：**只改外观**（配色 token、字体、贴图、素材位） | 见 `docs/STYLE.md` §9 与 `AGENTS.md` §6「外观与材质」 |
 
-**其余一切是自留区**：`weiren_game/`（核心与内置内容）、`tools/`、`tests/`、`docs/`、`design/`、
-`.github/`、`.opencode/`，以及根目录的入口脚本与配置。这些文件只由仓库作者维护；
+**其余一切是自留区**：**主程序**（`weiren_game/` 的核心系统）与 **base 内置内容**
+（`weiren_game/data/`）、以及 `tools/`、`tests/`、`docs/`、`design/`、`.github/`、`.opencode/`
+和根目录的入口脚本与配置。这些文件**只由仓库作者与其授权的 AI 创作工具**维护；
 改动自留区的 PR 会被 `ownership-guard` 自动打回（规则见 `.github/workflows/ownership-guard.yml`，
 本地可跑 `python tools/audit_ownership.py --base origin/main` 自查）。
+
+（作者的 AI 创作工具若用自己的账号提 PR，可把登录名登记到仓库变量 `WEIREN_TRUSTED_ACTORS`
+（Settings → Secrets and variables → Actions → Variables，逗号分隔），守卫会放行。）
 
 ## 提内容包（推荐路径）
 

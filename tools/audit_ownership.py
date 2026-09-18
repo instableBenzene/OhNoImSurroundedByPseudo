@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 
@@ -60,11 +61,21 @@ def main(argv: list[str] | None = None) -> int:
         "--trusted", default="",
         help="作者关联（OWNER/MEMBER/COLLABORATOR）：命中则跳过检查",
     )
+    parser.add_argument("--actor", default="", help="PR 发起者的 GitHub 登录名")
+    parser.add_argument(
+        "--trusted-actors", default="",
+        help="额外授权的账号（逗号分隔；缺省读环境变量 WEIREN_TRUSTED_ACTORS）",
+    )
     parser.add_argument("--quiet", action="store_true", help="只在违规时输出")
     args = parser.parse_args(argv)
 
     if args.trusted.strip().upper() in TRUSTED_ASSOCIATIONS:
         print(f"归属检查跳过：{args.trusted} 是作者/协作者，自留区的改动属正当行为。")
+        return 0
+    allowlisted = args.trusted_actors or os.environ.get("WEIREN_TRUSTED_ACTORS", "")
+    allowed = {name.strip().lower() for name in allowlisted.split(",") if name.strip()}
+    if args.actor.strip().lower() in allowed:
+        print(f"归属检查跳过：{args.actor} 是作者授权的创作工具。")
         return 0
 
     files = list(args.files) if args.files else changed_files(args.base)

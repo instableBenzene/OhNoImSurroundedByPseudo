@@ -18,5 +18,7 @@ jobs:
       - name: 只允许改动 dlc/ 与 resourcepacks/
         env:
           AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          ACTOR: ${{ github.event.pull_request.user.login }}
+          WEIREN_TRUSTED_ACTORS: ${{ vars.WEIREN_TRUSTED_ACTORS }}
           BASE_REF: ${{ github.base_ref }}
-        run: python3 tools/audit_ownership.py --base "origin/${BASE_REF}" --trusted "${AUTHOR_ASSOCIATION}"
+        run: python3 tools/audit_ownership.py --base "origin/${BASE_REF}" --trusted "${AUTHOR_ASSOCIATION}" --actor "${ACTOR}"
