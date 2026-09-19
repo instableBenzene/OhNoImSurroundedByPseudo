@@ -41,17 +41,30 @@ def bare_engine(seed: str) -> GameEngine:
 
 
 class RoundFlowTests(unittest.TestCase):
-    def test_chaos_pure_ego_locks_at_turn_start(self) -> None:
-        """混的「纯真的自我」在回合初实例节点自动固定（曾报：13 层也不触发）。"""
+    def test_chaos_pure_ego_picks_personalities(self) -> None:
+        """混的「纯真的自我」：清醒 ≥10 层时玩家发动并**自选**主/副性格。
+
+        曾报：存档里攒到 13 层也触发不了——旧版只有终端 CLI 有入口，网页端够不着。
+        """
         engine = bare_engine("chaos-pure-ego")
         chaos = engine._add_tenant("chaos")
         chaos.reason.intensity = 1
+        chaos.reason.layers = 9
+        with self.assertRaises(RuleViolation):
+            engine.use_ability(chaos.id, ability_id="pure_ego")     # 不足 10 层：不给发动
+
         chaos.reason.layers = 10
+        engine.use_ability(chaos.id, ability_id="pure_ego")
+        self.assertEqual(len(engine.pending_view()["options"]), 8)  # ① 选主性格
+        engine.resolve_view(3)
+        self.assertEqual(len(engine.pending_view()["options"]), 8)  # ② 选副性格
+        engine.resolve_view(5)
 
-        engine._settle_tenant_instance_start()
-
+        self.assertEqual(len(chaos.personalities), 2)
         self.assertEqual(chaos.condition("pure_self").layers, 99)
         self.assertEqual(chaos.condition("chaos_carry").layers, 99)
+        self.assertFalse(chaos.condition("pure_self_picking").active)
+        self.assertIsNone(engine.pending_view())
 
     def test_door_rule_and_global_events(self) -> None:
         engine = GameEngine.new_game("door-rule")

@@ -25,6 +25,13 @@ register_status_definition(StatusDefinition(
     source_id="ability:permission_transfer@chaos",
     permanent=True,
     description=TEXT["status.permission_shift.description"]))
+# 「正在自选自我」的临时标记：`layers` 即步骤（1=选主性格，2=选副性格）。
+# `auto_decay=False`——它不该被回合末的通用衰减动到（选到一半下线也不会被清）。
+register_status_definition(StatusDefinition(
+    "pure_self_picking", TEXT["status.pure_self_picking.label"], "other", shown=frozenset(),
+    source_id="ability:pure_ego@chaos",
+    auto_decay=False,
+    description=TEXT["status.pure_self_picking.description"]))
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
@@ -38,7 +45,9 @@ CHARACTER = CharacterDefinition(
        TEXT["ability.reason_madness.description"]),
      A("chaotic_thought", TEXT["ability.chaotic_thought.name"], TEXT["ability.chaotic_thought.description"]),
      A("chaotic_atmosphere", TEXT["ability.chaotic_atmosphere.name"], TEXT["ability.chaotic_atmosphere.description"])),
-    (A("permission_transfer", TEXT["ability.permission_transfer.name"], TEXT["ability.permission_transfer.description"], "tenant", chips=(TEXT["ability.permission_transfer.chip.0"],), options=(("imitate",TEXT["ability.permission_transfer.option.0"],"i-hand",TEXT["data.characters.chaos.module.1"]),("trauma",TEXT["ability.permission_transfer.option.1"],"i-trauma",TEXT["data.characters.chaos.module.2"]),("disorder",TEXT["ability.permission_transfer.option.2"],"i-disorder",TEXT["data.characters.chaos.module.3"])), nested_option="imitate", per_turn=True),),
+    (A("permission_transfer", TEXT["ability.permission_transfer.name"], TEXT["ability.permission_transfer.description"], "tenant", chips=(TEXT["ability.permission_transfer.chip.0"],), options=(("imitate",TEXT["ability.permission_transfer.option.0"],"i-hand",TEXT["data.characters.chaos.module.1"]),("trauma",TEXT["ability.permission_transfer.option.1"],"i-trauma",TEXT["data.characters.chaos.module.2"]),("disorder",TEXT["ability.permission_transfer.option.2"],"i-disorder",TEXT["data.characters.chaos.module.3"])), nested_option="imitate", per_turn=True),
+     A("pure_ego", TEXT["ability.pure_ego.name"], TEXT["ability.pure_ego.description"], "none",
+       chips=(TEXT["ability.pure_ego.chip.0"], TEXT["ability.pure_ego.chip.1"]))),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -72,7 +81,7 @@ def roll_personality_and_carry(engine: EngineProtocol, tenant: object) -> None:
 
     使用处：round_effects 回合初实例节点经 TURN_START_HOOKS 查表调用。
     """
-    if tenant.condition("pure_self").active:
+    if tenant.condition("pure_self").active or tenant.condition("pure_self_picking").active:
         return
     available = engine._passive_available(tenant, "chaos.chaotic_personality")
     engine._skill_outcome(tenant, "chaos.chaotic_personality", available)
@@ -180,19 +189,111 @@ def rescue_sanity(engine: EngineProtocol, tenant: object) -> None:
     engine._log(TEXT["data.characters.chaos.rescue_sanity.1"].format(p1=engine.character(tenant).name))
 
 
-def pure_ego_personality(engine: EngineProtocol, tenant: object) -> None:
-    """纯真的自我：清醒情绪达 10 层时**自动**固定性格与携带量（混的私有机制）。
+def _personality_keys() -> list[str]:
+    """可自选的正式性格键（固定顺序 → 界面顺序稳定、存档可复现）。"""
+    from weiren_game.data import PERSONALITIES
 
-    使用处：`round_effects._settle_tenant_instance_start` 的回合初实例节点
-    （经 `TURN_START_HOOKS` 查表，见本模块 `TURN_START`）。核心不认识这条机制。
-    """
-    if tenant.character_id != "chaos":
+    return sorted(PERSONALITIES)
+
+
+def _picking_chaos(engine: object) -> object | None:
+    """正在「确定自我」的屋内混；没有则返回 None。"""
+    for tenant in engine.home_tenants():
+        if tenant.character_id == "chaos" and tenant.condition("pure_self_picking").active:
+            return tenant
+    return None
+
+
+def requirements_pure_ego(engine: object, actor: object, *, bypass: bool) -> str | None:
+    """纯真的自我：清醒情绪 ≥10 层、且尚未确定过自我。"""
+    if bypass:
+        return None
+    if actor.condition("pure_self").active:
+        return TEXT["ability.pure_ego.requirement.1"]
+    if actor.reason.layers < 10:
+        return TEXT["ability.pure_ego.requirement.0"]
+    return None
+
+
+def _take_personality(engine: object, tenant: object, key: str) -> None:
+    """吃下一次选择：第一步暂存主性格，第二步落定主/副性格并固定自我。"""
+    from weiren_game.data import PERSONALITY_LABELS
+
+    step = tenant.condition("pure_self_picking").layers
+    if step <= 1:
+        tenant.personalities = {key: 1.0}          # 暂存主性格（下一步再补副性格）
+        tenant.condition("pure_self_picking").layers = 2
         return
-    if tenant.condition("pure_self").active or tenant.reason.layers < 10:
-        return
+    primary = next(iter(tenant.personalities), key)
+    tenant.personalities = {primary: 1.0, key: 1.0}
     tenant.set_status("pure_self", intensity=1, layers=99)
     tenant.set_status("chaos_carry", intensity=4, layers=99)
-    engine._log(TEXT["data.characters.chaos.pure_ego_personality.1"])
+    tenant.clear_status("pure_self_picking")
+    engine._pending_interaction = None
+    engine._log(TEXT["ability.pure_ego.done"].format(
+        p1=PERSONALITY_LABELS[primary], p2=PERSONALITY_LABELS[key]))
+
+
+def use_pure_ego(engine: object, actor: object) -> None:
+    """发动「纯真的自我」：进入两步自选（主性格 → 副性格）。
+
+    - 图形界面：`PENDING_VIEW` 下发视图，玩家点选后经 `resolve_view` 回来；
+    - 终端：`engine.ui` 交互（`resolve_interaction`），与前端无关。
+    使用处：ability_system.use_ability 的混分发分支。
+    """
+    actor.set_status("pure_self_picking", intensity=1, layers=1)
+    engine._pending_interaction = resolve_interaction
+    engine._record_action("pure_ego", tenant=actor.id)
+
+
+def build_pure_ego_view(engine: object) -> dict | None:
+    """自选主/副性格的通用待处理视图（内容自描述：标题 / 提示 / 选项）。"""
+    from weiren_game.data import PERSONALITY_LABELS
+
+    tenant = _picking_chaos(engine)
+    if tenant is None:
+        return None
+    primary = tenant.condition("pure_self_picking").layers <= 1
+    return {
+        "title": TEXT["ability.pure_ego.title"],
+        "prompt": TEXT["ability.pure_ego.prompt.primary" if primary
+                       else "ability.pure_ego.prompt.secondary"],
+        "options": [PERSONALITY_LABELS[key] for key in _personality_keys()],
+    }
+
+
+def resolve_pure_ego_view(engine: object, value: object) -> None:
+    """视图回传所选**下标**（前端约定：`resolveView(index)`）。"""
+    from weiren_game.exceptions import RuleViolation
+
+    tenant = _picking_chaos(engine)
+    if tenant is None:
+        return
+    keys = _personality_keys()
+    index = int(value) if isinstance(value, (int, str)) and str(value).lstrip("-").isdigit() else -1
+    if not 0 <= index < len(keys):
+        raise RuleViolation(TEXT["ability.pure_ego.requirement.1"])
+    _take_personality(engine, tenant, keys[index])
+
+
+def resolve_interaction(engine: object) -> None:
+    """终端里的同一套自选流程（经 `engine.ui` 协议，与前端无关）。"""
+    from weiren_game.data import PERSONALITY_LABELS
+
+    tenant = _picking_chaos(engine)
+    if tenant is None:
+        return
+    ui = engine.ui
+    while tenant.condition("pure_self_picking").active:
+        primary = tenant.condition("pure_self_picking").layers <= 1
+        picked = ui.choose(
+            TEXT["ability.pure_ego.prompt.primary" if primary
+                 else "ability.pure_ego.prompt.secondary"],
+            [(key, PERSONALITY_LABELS[key]) for key in _personality_keys()],
+        )
+        if picked is None:
+            return
+        _take_personality(engine, tenant, picked)
 
 
 def use_permission_transfer(
@@ -287,17 +388,17 @@ ACTIVE_DISPATCH = {
             secondary_amount=secondary_amount,
         )
     ),
+    "pure_ego": lambda engine, actor, **kwargs: use_pure_ego(engine, actor),
 }
 
 
 def turn_start(engine: EngineProtocol, tenant: object) -> None:
-    """回合初实例钩子：先累计清醒层数，再看是否该固定自我，最后切换性格。
+    """回合初实例钩子：累计清醒层数，未确定自我时随机切换性格。
 
-    顺序有意如此——`chaotic_thought` 会在回合初给混加清醒层数，**先加再看**，
-    层数刚好在本回合达到 10 时当回合就锁定（曾出现"13 层却没锁"的报告）。
+    「纯真的自我」现在由玩家发动（主动技 `pure_ego`）——本钩子只负责随机的部分，
+    顺便保证层数刚好在本回合涨到 10 时，玩家当回合就能发动。
     """
     chaotic_thought(engine, tenant)
-    pure_ego_personality(engine, tenant)
     roll_personality_and_carry(engine, tenant)
 
 
@@ -385,3 +486,10 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
 
 
 DETAIL_SLOT = detail_slot
+
+# 终端前端：自选自我的交互（`use_pure_ego` 把它挂到 `engine._pending_interaction`，
+# 由 `cli.use_ability` 调用；走 `engine.ui` 协议，与图形前端无关）。
+INTERACTIONS = {"pure_ego": resolve_interaction}
+
+# 图形前端：同一件事的声明式视图（两步：主性格 → 副性格）。
+PENDING_VIEW = (build_pure_ego_view, resolve_pure_ego_view)
