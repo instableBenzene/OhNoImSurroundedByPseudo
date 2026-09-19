@@ -42,29 +42,38 @@ def bare_engine(seed: str) -> GameEngine:
 
 class RoundFlowTests(unittest.TestCase):
     def test_chaos_pure_ego_picks_personalities(self) -> None:
-        """混的「纯真的自我」：清醒 ≥10 层时玩家发动并**自选**主/副性格。
+        """混的「纯真的自我」：清醒 ≥10 层时**回合初**弹出选择（8 选 1 → 7 选 1）。
 
         曾报：存档里攒到 13 层也触发不了——旧版只有终端 CLI 有入口，网页端够不着。
+        选定后**不可逆**：清醒掉回去也不回到混沌。
         """
         engine = bare_engine("chaos-pure-ego")
         chaos = engine._add_tenant("chaos")
         chaos.reason.intensity = 1
         chaos.reason.layers = 9
-        with self.assertRaises(RuleViolation):
-            engine.use_ability(chaos.id, ability_id="pure_ego")     # 不足 10 层：不给发动
+        engine._settle_tenant_instance_start()
+        self.assertIsNone(engine._pending_choice)                  # 不足 10 层：不问
 
         chaos.reason.layers = 10
-        engine.use_ability(chaos.id, ability_id="pure_ego")
-        self.assertEqual(len(engine.pending_view()["options"]), 8)  # ① 选主性格
-        engine.resolve_view(3)
-        self.assertEqual(len(engine.pending_view()["options"]), 8)  # ② 选副性格
-        engine.resolve_view(5)
+        engine._settle_tenant_instance_start()
+        first = list(engine._pending_choice["options"])
+        self.assertEqual(len(first), 8)                             # ① 8 选 1（主性格）
+        engine.choose_discover(first[2])
+        second = list(engine._pending_choice["options"])
+        self.assertEqual(len(second), 7)                            # ② 7 选 1（副性格）
+        self.assertNotIn(first[2], second)
+        engine.choose_discover(second[0])
 
-        self.assertEqual(len(chaos.personalities), 2)
+        self.assertEqual(set(chaos.personalities), {first[2], second[0]})
         self.assertEqual(chaos.condition("pure_self").layers, 99)
         self.assertEqual(chaos.condition("chaos_carry").layers, 99)
         self.assertFalse(chaos.condition("pure_self_picking").active)
-        self.assertIsNone(engine.pending_view())
+        self.assertIsNone(engine._pending_choice)
+
+        chaos.reason.layers = 0                                     # 不可逆：不再问、也不回退
+        engine._settle_tenant_instance_start()
+        self.assertIsNone(engine._pending_choice)
+        self.assertEqual(chaos.condition("pure_self").layers, 99)
 
     def test_door_rule_and_global_events(self) -> None:
         engine = GameEngine.new_game("door-rule")

@@ -450,12 +450,53 @@ def accuse(engine: GameEngine) -> None:
 HELP = TEXT["cli.module.1"].strip()
 
 
+def _option_label(engine: GameEngine, value: object) -> str:
+    """待选项的展示名：性格 / 角色 / 物资按注册表取，取不到就原样。"""
+    if isinstance(value, str):
+        if value in PERSONALITY_LABELS:
+            return PERSONALITY_LABELS[value]
+        character = CHARACTERS.get(value)
+        if character is not None:
+            return character.name
+        item = ITEMS.get(value)
+        if item is not None:
+            return item.name
+    return str(value)
+
+
+def _resolve_pending_choice(engine: GameEngine) -> None:
+    """走完待选（开局选人 / discover / 内容发起的选择）。
+
+    与网页端**同一条通道**（`engine._pending_choice` → `choose_discover`）；
+    终端此前完全没接它，等于内容发起的待选在 CLI 里走不下去
+    （抽牌、自选性格这类流程都由它交给玩家）。
+    """
+    while engine._pending_choice is not None:
+        pending = engine._pending_choice
+        options = list(pending.get("options", ()))
+        if not options:
+            engine._clear_pending_choice()
+            return
+        print("\n" + str(pending.get("prompt") or TEXT["cli.pending.1"]))
+        for index, value in enumerate(options, 1):
+            print("  %d. %s" % (index, _option_label(engine, value)))
+        pick = _choose(TEXT["cli.pending.2"], list(range(1, len(options) + 1)))
+        if pick is None:
+            return
+        if pending.get("kind") == "start_choice":
+            engine.commit_start_choice(options[pick - 1])
+        else:
+            engine.choose_discover(options[pick - 1])
+        _print_messages(engine)
+
+
 def run(engine: GameEngine, save_path: Path) -> int:
     """运行终端主循环直至胜负分晓，返回进程退出码。"""
     _print_messages(engine)
     print(TEXT["cli.run.1"])
     print(TEXT["cli.run.2"])
     while not engine.state.flow.game_over:
+        _resolve_pending_choice(engine)
         if engine.state.flow.phase != "action":
             engine.resume_to_action()
             _print_messages(engine)

@@ -11,14 +11,20 @@
 （`system.lock_personality` + `cli.py` 的 `lock`），`web_ui.py` 与 `index.html` **零入口**；
 而且**零测试**。上一轮已把它改成内容层私有机制，但这轮按作者要求补完语义：
 
-**语义改动（作者定）**：稿写「清醒 ≥10 层时可以**固定**主副性格」，实际要的是**自选**——
-    1. 新增主动技 `pure_ego`「纯真的自我」（清醒 ≥10 层可用、每局 1 次）；
-    2. 发动后进入**两步自选**（主性格 → 副性格），落定 `pure_self` + `chaos_carry(4)`；
-    3. 中间态用一条内容状态 `pure_self_picking`（`layers` = 步骤，`auto_decay=False`）承载，
-       主性格暂存在 `tenant.personalities` 里；**随机切换在自选期间暂停**。
+**语义（作者定）**：稿写「清醒 ≥10 层时可以**固定**主副性格」，实际要的是**自选**，而且——
+    1. **回合初自动弹**（不是玩家点技能），够 10 层就问；
+    2. **复用 discover 那套待选卡片**：第一次 **8 选 1** 选主性格、第二次 **7 选 1** 选副性格
+       （`engine.discover(keys, count=len(keys))` 挂 `_pending_choice`，`_pending_resume` 接回内容）；
+    3. **一旦确定不可逆**：`pure_self` 是 `permanent` 状态，清醒掉回 0 也不退回混沌。
+    中间步骤记在内容状态 `pure_self_picking.layers`（1/2），主性格暂存在 `tenant.personalities`；
+    **自选期间随机切换暂停**。
 
-**两端入口照厄瑞玻斯的既有模式**：`PENDING_VIEW`（图形界面视图）＋ `engine._pending_interaction`
-（终端经 `engine.ui` 交互）——这次没有只做一端。
+   > 我第一次做成了「主动技 + `PENDING_VIEW` 两步选择」——**方向错了**：作者记得的界面就是
+   > discover 那套（后端 `web_ui` 里本来就有 `kind:"personality"` 的选项投影与 `i-b-*` 图标），
+   > 且应该是**回合初自动**而不是玩家点技能。
+
+**顺带修掉的入口缺口**：`cli.py` **从来没有处理过 `_pending_choice`**（连开局的 discover 选人都走不下去，
+只有冒烟脚本自己 `choose_discover`）。已补一个通用的 `_resolve_pending_choice`，两条前端从此同槽。
 
 **这一类 bug 的共性与对策（值得记住）**：
 
@@ -29,11 +35,11 @@
 - **便宜的自检**：`tools/dump_core.py --refs` 已经能给"只被 `cli.*` 引用 / 只被 `web_ui.*` 引用"
   的差集——把它当信号读，这类 bug 会自己浮出来。
 
-**验证**：探针走通两步自选（8 项 → 主性格 → 8 项 → 副性格 → `pure_self` 99、`chaos_carry` 99、
-`pure_self_picking` 清空、`pending_view` 归 None）；`build_state` 里能看到
-`pending.interaction`（纯真的自我/8 项）与房客卡的 `abilities` 含 `pure_ego`（主动）；
-回归用例钉住"<10 层不可发动 / ≥10 层两步自选后固定"；单测 76 项、四个审计、冒烟全绿；
-设计稿「附录 A」已同步（含删掉 `_apply_chance` 那条）。记账见 `docs/BALANCE.md`。
+**验证**：探针走通——回合初（`_settle_tenant_instance_start`）自动挂待选 8 项
+（`build_state` 里是 `kind:"personality"` 的性格卡片）→ 选 1 → 再挂 7 项 → 选 1 →
+`personalities` 落定、`pure_self` 99、`chaos_carry` 99、待选清空；把清醒打回 0 再跑回合初，
+**不再问、也不回退**。回归用例钉住"<10 层不问 / 8→7 两步 / 不可逆"；单测 75 项、四个审计、
+冒烟全绿；设计稿「附录 A」已同步（含删掉 `_apply_chance` 那条）。记账见 `docs/BALANCE.md`。
 
 ## 引用面盘点（第四轮）：`EngineProtocol` 从 24 条补齐到 81 条，并做成机检
 
