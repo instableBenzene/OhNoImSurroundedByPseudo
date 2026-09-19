@@ -291,10 +291,14 @@ ACTIVE_DISPATCH = {
 
 
 def turn_start(engine: EngineProtocol, tenant: object) -> None:
-    """回合初实例钩子：先看是否该固定自我，再切换性格与累计思想。"""
+    """回合初实例钩子：先累计清醒层数，再看是否该固定自我，最后切换性格。
+
+    顺序有意如此——`chaotic_thought` 会在回合初给混加清醒层数，**先加再看**，
+    层数刚好在本回合达到 10 时当回合就锁定（曾出现"13 层却没锁"的报告）。
+    """
+    chaotic_thought(engine, tenant)
     pure_ego_personality(engine, tenant)
     roll_personality_and_carry(engine, tenant)
-    chaotic_thought(engine, tenant)
 
 
 TURN_START = turn_start

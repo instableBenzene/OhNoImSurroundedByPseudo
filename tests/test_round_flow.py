@@ -41,6 +41,18 @@ def bare_engine(seed: str) -> GameEngine:
 
 
 class RoundFlowTests(unittest.TestCase):
+    def test_chaos_pure_ego_locks_at_turn_start(self) -> None:
+        """混的「纯真的自我」在回合初实例节点自动固定（曾报：13 层也不触发）。"""
+        engine = bare_engine("chaos-pure-ego")
+        chaos = engine._add_tenant("chaos")
+        chaos.reason.intensity = 1
+        chaos.reason.layers = 10
+
+        engine._settle_tenant_instance_start()
+
+        self.assertEqual(chaos.condition("pure_self").layers, 99)
+        self.assertEqual(chaos.condition("chaos_carry").layers, 99)
+
     def test_door_rule_and_global_events(self) -> None:
         engine = GameEngine.new_game("door-rule")
         engine.start_turn()
