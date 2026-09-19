@@ -7,6 +7,7 @@ import pkgutil
 from pathlib import Path
 
 from ..types import CharacterDefinition
+from weiren_game.data.lang import TEXT
 
 # 自动发现：目录下每个暴露 CHARACTER 的模块都会登记，无需手写清单。
 CHARACTER_MODULES: dict[str, object] = {}
@@ -43,7 +44,7 @@ def register_character(character: CharacterDefinition, *, replace: bool = False)
     """
     if character.tenant_id in CHARACTERS:
         if not replace:
-            raise ValueError(f"角色 ID 重复：{character.tenant_id}")
+            raise ValueError(TEXT["data.characters.__init__.register_character.1"].format(p1=character.tenant_id))
     CHARACTERS[character.tenant_id] = character
 
 
@@ -306,8 +307,8 @@ def _encounter_penalty_modifier(context: object):
     value = hook(engine, tenant)
     if value:
         yield (
-            spec("chance").path("遭遇").flat(-float(value))
-            .source("归属", tenant.character_id)
+            spec("chance").path("encounter").flat(-float(value))
+            .source("origin", tenant.character_id)
         )
 
 

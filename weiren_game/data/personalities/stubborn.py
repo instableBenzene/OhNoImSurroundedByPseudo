@@ -62,8 +62,8 @@ def _stubborn_carry_modifier(context: object):
     if level not in {4, 7, 10}:
         return
     yield (
-        spec("search").path("携带").flat(float({4: 1, 7: 2, 10: 4}[level]))
-        .source("性格", "固执")
+        spec("search").path("carry").flat(float({4: 1, 7: 2, 10: 4}[level]))
+        .source("personality", "stubborn")
     )
 
 
@@ -100,7 +100,7 @@ def _stubborn_turn_modifier(context: object):
     if rng is None:
         return
     if engine._is_personality(tenant, "stubborn"):
-        yield spec("search").path("回合").flat(rng.randint(2, 4)).source("性格", "固执")
+        yield spec("search").path("turn").flat(rng.randint(2, 4)).source("personality", "stubborn")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regs

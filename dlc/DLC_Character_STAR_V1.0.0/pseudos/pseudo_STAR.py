@@ -9,6 +9,8 @@ from dataclasses import dataclass
 
 from weiren_game.data.types import PseudoDefinition
 from weiren_game.lifecycle import AbilityLaunch
+from weiren_game.data.lang import pack_text_from_file
+TEXT = pack_text_from_file(__file__)
 
 
 # ---------------------------------------------------------------- 可调数值
@@ -35,13 +37,13 @@ ENCOUNTER_ADD_LAYERS = 1     # 搜索遭遇：给搜索者的层数
 ENCOUNTER_LOOT_LOSS_CHANCE = 0.50  # 搜索遭遇：丢失 1 件携带物资的概率
 
 # 文案（计算机故障语汇：注入 / 泄漏 / 堆栈 / 执行 / 回滚）
-NAME_PSEUDO = "无法收敛的漏洞体-STAR"
-NAME_BREAKTHROUGH = "任意代码执行"
-NAME_LIBERATION = "强制回滚"
-NAME_SHOT = "恐吓射击"
-NAME_VISIT = "提示词污染"
-NAME_SEARCH = "上下文泄漏"
-MARK_LABEL = "异常堆栈-漏洞体"
+NAME_PSEUDO = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_PSEUDO"]
+NAME_BREAKTHROUGH = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_BREAKTHROUGH"]
+NAME_LIBERATION = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_LIBERATION"]
+NAME_SHOT = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_SHOT"]
+NAME_VISIT = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_VISIT"]
+NAME_SEARCH = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.NAME_SEARCH"]
+MARK_LABEL = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.MARK_LABEL"]
 # ⚠️ 本模块的**玩家可见文案不得引用人类形态的任何机制**
 # （复合生化电池 / 流星信标 / 掩护射击 / 压制射击……）。
 # 原因：**同一原型的人类与伪人在同一局里不会同时出现**——这是本体机制，
@@ -70,11 +72,9 @@ DEFINITION = PseudoDefinition(
     #
     # 引号写法见 docs/STYLE.md §12：指称具体存在（物资名 / 技能名 / 状态名 / 机制名）用「」；
     # 对话与引语才用「「…」」。（旧版的 `mdText` 会在弯引号前硬插换行，那条规则已删。）
-    "轮廓比常人更整齐，动作没有多余的停顿，开口的间隔像被校准过。",
-    f"来访时屋内最高焦虑强度≥{BREAKTHROUGH_LINE}。",
-    f"连续{SAFE_VISITS_NEEDED}次到访，最高焦虑强度依次低于"
-    f"{SAFE_BASE_LINE}/{SAFE_BASE_LINE - 1}/{SAFE_MIN_LINE}；"
-    f"期间最高焦虑强度≥{INTERRUPT_LINE}则进度重置。",
+    TEXT["pseudo.pseudo_STAR.description"],
+    TEXT["pseudo.pseudo_STAR.breakthrough"].format(p1=BREAKTHROUGH_LINE),
+    TEXT["pseudo.pseudo_STAR.liberation"].format(p1=SAFE_VISITS_NEEDED, p2=SAFE_BASE_LINE, p3=SAFE_BASE_LINE - 1, p4=SAFE_MIN_LINE, p5=INTERRUPT_LINE),
     mark_field="seed",
     mark_label=MARK_LABEL,
 )
@@ -146,29 +146,29 @@ def visit(engine: object) -> None:
     _, value = _peak(engine)
     if value >= BREAKTHROUGH_LINE:
         if engine._attempt_breakthrough(
-            f"屋内焦虑失控（峰值 {value}/{BREAKTHROUGH_LINE}），伪人完成突破。"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.visit.1"].format(p1=value, p2=BREAKTHROUGH_LINE)
         ):
             return
 
     line = _safe_line(state.streak)
     if value >= INTERRUPT_LINE:
         state.streak = 0
-        engine._log(f"焦虑峰值 {value} 越过中断线 {INTERRUPT_LINE}，解放进度重置。")
+        engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.visit.2"].format(p1=value, p2=INTERRUPT_LINE))
         return
     if value < line:
         state.streak += 1
         state.total_safe_visits += 1
         engine._log(
-            f"峰值 {value} 低于安全线 {line}，解放进度 {state.streak}/{SAFE_VISITS_NEEDED}。"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.visit.3"].format(p1=value, p2=line, p3=state.streak, p4=SAFE_VISITS_NEEDED)
         )
         if state.streak >= SAFE_VISITS_NEEDED:
             pseudo.liberated = True
             engine._finish(
                 True,
-                "焦虑始终没有失控，伪人的漏洞被彻底摸清；它归于平静，得到解放。",
+                TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.visit.4"],
             )
         return
-    engine._log(f"峰值 {value} 未达安全线 {line}，本次到访不推进解放进度。")
+    engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.visit.5"].format(p1=value, p2=line))
 
 
 def _apply_visit_anxiety(engine: object) -> None:
@@ -183,8 +183,7 @@ def _apply_visit_anxiety(engine: object) -> None:
     for tenant in targets:
         if _add_anxiety(engine, tenant, VISIT_LOW_INTENSITY, VISIT_LOW_LAYERS):
             engine._log(
-                f"{engine.character(tenant).name}的焦虑被推高"
-                f"（+{VISIT_LOW_INTENSITY}/+{VISIT_LOW_LAYERS}）。"
+                TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR._apply_visit_anxiety.1"].format(p1=engine.character(tenant).name, p2=VISIT_LOW_INTENSITY, p3=VISIT_LOW_LAYERS)
             )
 
 
@@ -210,8 +209,7 @@ def _maybe_shoot(engine: object) -> None:
     _add_anxiety(engine, target, SHOT_ADD_INTENSITY, 0)
     _block_visitors(engine)
     engine._log(
-        f"门外传来一声枪响；{engine.character(target).name}的焦虑骤然升高"
-        f"（+{SHOT_ADD_INTENSITY}），一时不会有人敢来敲门。"
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR._maybe_shoot.1"].format(p1=engine.character(target).name, p2=SHOT_ADD_INTENSITY)
     )
 
 
@@ -243,11 +241,10 @@ def attack_searcher(engine: object, mission: object, tenant: object) -> None:
         f"{_EVENT}.loot", tenant.id
     ).random() < ENCOUNTER_LOOT_LOSS_CHANCE:
         mission.rewards.pop()
-        loss = "，并震落了携带的物资"
+        loss = TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.attack_searcher.1"]
     engine.defer_search_report(
         mission,
-        f"伪人袭击：{engine.character(tenant).name}在暗处听见一声枪响，心神不宁"
-        f"（焦虑 +{ENCOUNTER_ADD_INTENSITY}）{loss}。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.attack_searcher.2"].format(p1=engine.character(tenant).name, p2=ENCOUNTER_ADD_INTENSITY, p3=loss),
     )
 
 
@@ -267,8 +264,7 @@ def progress_text(engine: object) -> str:
     state = _seed(engine)
     _, value = _peak(engine)
     return (
-        f"焦虑峰值{value}，解放进度{state.streak}/{SAFE_VISITS_NEEDED}"
-        f"（安全线{_safe_line(state.streak)}）"
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.progress_text.1"].format(p1=value, p2=state.streak, p3=SAFE_VISITS_NEEDED, p4=_safe_line(state.streak))
     )
 
 
@@ -283,36 +279,29 @@ def card_info(engine: object) -> dict:
     _, value = _peak(engine)
     return {
         "liberation": (
-            f"{NAME_LIBERATION}：连续达标 {state.streak}/{SAFE_VISITS_NEEDED}"
-            f"（安全线 {_safe_line(state.streak)}）"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.1"].format(p1=NAME_LIBERATION, p2=state.streak, p3=SAFE_VISITS_NEEDED, p4=_safe_line(state.streak))
         ),
         "breakthrough": (
-            f"{NAME_BREAKTHROUGH}：焦虑峰值 {value}/{BREAKTHROUGH_LINE}"
-            f"（已到访 {int(getattr(pseudo, 'visit_count', 0))} 次）"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.2"].format(p1=NAME_BREAKTHROUGH, p2=value, p3=BREAKTHROUGH_LINE, p4=int(getattr(pseudo, 'visit_count', 0)))
         ),
         "mark_need": int(INTERRUPT_LINE),
         "skills": [
             {
                 "name": NAME_SHOT,
-                "text": f"到访时峰值 ≥{SHOT_TRIGGER_INTENSITY} 即发动："
-                        f"该房客焦虑 +{SHOT_ADD_INTENSITY}，"
-                        f"且 {SHOT_BLOCK_TURNS} 回合内无访客来访。",
+                "text": TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.3"].format(p1=SHOT_TRIGGER_INTENSITY, p2=SHOT_ADD_INTENSITY, p3=SHOT_BLOCK_TURNS),
                 "mark": {
-                    "label": "焦虑峰值",
+                    "label": TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.4"],
                     "current": value,
                     "need": int(BREAKTHROUGH_LINE),
                 },
             },
             {
                 "name": NAME_VISIT,
-                "text": f"每次到访令 {VISIT_LOW_TARGETS} 名焦虑最低的房客 "
-                        f"焦虑 +{VISIT_LOW_INTENSITY}/+{VISIT_LOW_LAYERS}。",
+                "text": TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.5"].format(p1=VISIT_LOW_TARGETS, p2=VISIT_LOW_INTENSITY, p3=VISIT_LOW_LAYERS),
             },
             {
                 "name": NAME_SEARCH,
-                "text": f"搜索遭遇率 {ENCOUNTER_BASE:.0%} + {ENCOUNTER_PER_VISIT:.0%} × 到访次数；"
-                        f"遭遇者焦虑 +{ENCOUNTER_ADD_INTENSITY}/+{ENCOUNTER_ADD_LAYERS}，"
-                        f"并有 {ENCOUNTER_LOOT_LOSS_CHANCE:.0%} 概率丢失 1 件携带物资。",
+                "text": TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.card_info.6"].format(p1=ENCOUNTER_BASE, p2=ENCOUNTER_PER_VISIT, p3=ENCOUNTER_ADD_INTENSITY, p4=ENCOUNTER_ADD_LAYERS, p5=ENCOUNTER_LOOT_LOSS_CHANCE),
             },
         ],
     }
@@ -333,34 +322,24 @@ HANDLERS: dict[str, object] = {
 # 专有名词用 `【】`，数值两侧留空格，减号用 `−`。
 CODEX_SKILLS: tuple[tuple[str, str], ...] = (
     (
-        f"突破 · {NAME_BREAKTHROUGH}",
-        f"漏洞体来访时，若屋内任一房客的焦虑强度 ≥ {BREAKTHROUGH_LINE}，则触发突破。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.0.0"].format(p1=NAME_BREAKTHROUGH),
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.0.1"].format(p1=BREAKTHROUGH_LINE),
     ),
     (
-        f"解放 · {NAME_LIBERATION}",
-        f"连续 {SAFE_VISITS_NEEDED} 次到访期间，屋内最高焦虑强度需依次低于 "
-        f"{SAFE_BASE_LINE} / {SAFE_BASE_LINE - 1} / {SAFE_MIN_LINE}（要求逐次收紧）；"
-        f"期间最高焦虑强度 ≥ {INTERRUPT_LINE} 则进度清零，从下一次到访重新计算。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.1.0"].format(p1=NAME_LIBERATION),
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.1.1"].format(p1=SAFE_VISITS_NEEDED, p2=SAFE_BASE_LINE, p3=SAFE_BASE_LINE - 1, p4=SAFE_MIN_LINE, p5=INTERRUPT_LINE),
     ),
     (
-        f"主动能力① · {NAME_SHOT}",
-        f"漏洞体到访时，若屋内最高焦虑强度 ≥ {SHOT_TRIGGER_INTENSITY}，立刻对"
-        f"最高焦虑的房客发动：令其焦虑强度 +{SHOT_ADD_INTENSITY}，"
-        f"并令接下来 {SHOT_BLOCK_TURNS} 回合内没有访客来访。"
-        f"该效果只封锁人类访客，对漏洞体自身无效。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.2.0"].format(p1=NAME_SHOT),
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.2.1"].format(p1=SHOT_TRIGGER_INTENSITY, p2=SHOT_ADD_INTENSITY, p3=SHOT_BLOCK_TURNS),
     ),
     (
-        f"被动能力① · {NAME_VISIT}",
-        f"漏洞体每次到访时，取屋内焦虑强度最低的 {VISIT_LOW_TARGETS} 名房客，"
-        f"令其焦虑强度 +{VISIT_LOW_INTENSITY}、层数 +{VISIT_LOW_LAYERS}。"
-        f"该效果不经过抵御判定。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.3.0"].format(p1=NAME_VISIT),
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.3.1"].format(p1=VISIT_LOW_TARGETS, p2=VISIT_LOW_INTENSITY, p3=VISIT_LOW_LAYERS),
     ),
     (
-        f"被动能力② · {NAME_SEARCH}",
-        f"对局开始后，所有房客搜索时遭遇漏洞体的概率为 "
-        f"{ENCOUNTER_BASE:.0%} + {ENCOUNTER_PER_VISIT:.0%} × 漏洞体到访次数。"
-        f"遭遇时令该房客焦虑强度 +{ENCOUNTER_ADD_INTENSITY}、层数 +{ENCOUNTER_ADD_LAYERS}，"
-        f"并有 {ENCOUNTER_LOOT_LOSS_CHANCE:.0%} 概率令其丢失 1 件携带物资。",
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.4.0"].format(p1=NAME_SEARCH),
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.pseudos.pseudo_STAR.CODEX_SKILLS.4.1"].format(p1=ENCOUNTER_BASE, p2=ENCOUNTER_PER_VISIT, p3=ENCOUNTER_ADD_INTENSITY, p4=ENCOUNTER_ADD_LAYERS, p5=ENCOUNTER_LOOT_LOSS_CHANCE),
     ),
 )
 

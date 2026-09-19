@@ -176,7 +176,8 @@ MODIFIERS = (
   静态项与 provider 都住在 `modifier_rules` 的四张表里，已纳入 base 快照（随包装卸回滚，
   装载器每次「应用」先还原 base 再重装，所以重复装载不会累积）；
 - 调用点：`engine._apply_modifiers(channel, base, source, context)`；
-  `engine._apply_chance(base, source, context)`（再收敛 5%~95%）。
+  **概率类**没有单独的引擎入口——按 `calculate_modified_amount(base, collect_modifiers("chance", source, ctx))`
+  编译，需要时自己加减（惩罚/保底），最后过 `resolve(...)` 收敛到 5%~95%（见 `data/tags/_medical.py`）。
 
 ### 4.4 概率规则（`probability.resolve`）
 

@@ -20,18 +20,22 @@ description: Use when adding information/信息 or global events/事件 to OhNoI
 
 ```python
 from ..types import InformationTemplate       # DLC：from weiren_game.data.types import ...
+from weiren_game.data.lang import TEXT         # DLC 里用 pack_text_from_file(__file__)
 INFORMATION_TEMPLATES = {
     # 物资线索：说明被 [地点] 替换；奖励物品必须已存在
-    "my_reward": InformationTemplate("my_reward", "名号", "material_reward",
-                                     "某处藏着[地点]的东西。", reward_ids=("my_item",)),
+    "my_reward": InformationTemplate("my_reward", TEXT["info.my_reward.name"], "material_reward",
+                                     TEXT["info.my_reward.description"], reward_ids=("my_item",)),
     # 房客状态：A / B 会被替换成两名房客姓名；三段 = 待验证 / 已证实 / 已证伪
-    "my_state": InformationTemplate("my_state", "名号", "state",
-                                    "A 与 B 有点不对劲。",
-                                    "A 回合末回复 2 理智。",
-                                    "A 与 B 各回复 10 理智。",
-                                    "无。"),
+    "my_state": InformationTemplate("my_state", TEXT["info.my_state.name"], "state",
+                                    TEXT["info.my_state.description"],
+                                    TEXT["info.my_state.pending"],
+                                    TEXT["info.my_state.confirmed"],
+                                    TEXT["info.my_state.refuted"]),
 }
 ```
+
+文案写进 lang 表：`info.<id>.name|description|pending|confirmed|refuted`
+（加一条就能用，没有注册动作；`kind` / `location_id` / `reward_ids` 是数据键，不进 lang）。
 
 - `InformationTemplate` 字段以 `weiren_game/types.py` 为准：
   `id / name / kind / description / pending / confirmed / refuted / location_id / reward_ids / duration`。

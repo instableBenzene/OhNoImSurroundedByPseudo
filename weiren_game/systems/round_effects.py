@@ -12,6 +12,7 @@ from weiren_game.data import (
     EROSION_EMOTIONS,
     EVENT_IDS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -54,7 +55,7 @@ class RoundEffectsSystemMixin:
             # emotionValue change, not only to its erosion half.
             change = (depression_i * depression_l - elation_i * elation_l) * multiplier
             change = self._apply_modifiers(
-                "depressionChange", change, ("消沉", tenant.character_id),
+                "depressionChange", change, ("depression", tenant.character_id),
                 {"tenant": tenant, "change": change},
             )
             if change:
@@ -62,16 +63,16 @@ class RoundEffectsSystemMixin:
                 # The numerical depression value is explicitly hidden from the
                 # homeowner.  Keep it deterministic internally without leaking
                 # either the delta or total through the event log.
-                self._log(f"情绪结算：{self.character(tenant).name}的隐藏消沉值发生了变化。")
+                self._log(TEXT["systems.round_effects._settle_emotion_values.2"].format(p1=self.character(tenant).name))
 
-        self._collect_flush(f"情绪结算：{tenant_count} 名房客的隐藏消沉值发生了变化。")
+        self._collect_flush(TEXT["systems.round_effects._settle_emotion_values.3"].format(p1=tenant_count))
 
     def _run_house_item_start_hooks(self) -> None:
         """实例回合初·屋主仓库 scope：按 ITEM_HOOKS["turn_start.house"] 扫描。"""
         from weiren_game.data import ITEM_HOOKS
 
         for item_id, node_map in ITEM_HOOKS.items():
-            if self._house_count(item_id) <= 0:
+            if self.state.house.inventory.count(item_id) <= 0:
                 continue
             for hook in node_map.get("turn_start.house", {}).values():
                 hook(self)
@@ -189,19 +190,19 @@ class RoundEffectsSystemMixin:
                 sanity_cost += end_bonus_handler(self, tenant)
             sanity_cost = self._apply_modifiers(
                 "sanityConsume", sanity_cost,
-                ("回合末消耗", tenant.character_id), {"tenant": tenant},
+                ("turn_end_consume", tenant.character_id), {"tenant": tenant},
             )
-            self._consume_sanity(tenant, max(0, sanity_cost), "回合末消耗")
+            self._consume_sanity(tenant, max(0, sanity_cost), "turn_end_consume")
 
             if tenant.health >= 70:
-                self._loss_health(tenant, 3 + (2 if tenant.health >= 90 else 0), "高生命值自然流失")
+                self._loss_health(tenant, 3 + (2 if tenant.health >= 90 else 0), "high_health_decay")
             from weiren_game.data.personalities import BOND_END_HEALTH_HOOKS
 
             for _personality_id, end_health_hook in BOND_END_HEALTH_HOOKS.items():
                 end_health_hook(self, tenant)
 
         # 明细不在这里组装：log 层按播报形状自动归并（weiren_game/log_shape.py）。
-        self._collect_flush(f"回合末结算：{tenant_count} 名房客的理智与生命变化。")
+        self._collect_flush(TEXT["systems.round_effects._settle_base_end_effects.4"].format(p1=tenant_count))
 
     def _settle_buff_debuff_effects(self) -> None:
         """回合末依次结算创伤、紊乱及各情绪的自行演化。
@@ -212,11 +213,11 @@ class RoundEffectsSystemMixin:
         self._collect_start()
         tenant_count = len(self.home_tenants())
         for tenant in list(self.home_tenants()):
-            self._apply_status_end(tenant, tenant.trauma, physical=True, label="创伤")
-            self._apply_status_end(tenant, tenant.disorder, physical=False, label="紊乱")
+            self._apply_status_end(tenant, tenant.trauma, physical=True, label=TEXT["systems.round_effects._settle_buff_debuff_effects.1"])
+            self._apply_status_end(tenant, tenant.disorder, physical=False, label=TEXT["systems.round_effects._settle_buff_debuff_effects.2"])
             for key, label in {**EROSION_EMOTIONS, **AWAKENING_EMOTIONS}.items():
                 self._apply_emotion_end(tenant, tenant.condition(key), label)
-        self._collect_flush(f"回合末状态结算：{tenant_count} 名房客的创伤与紊乱。")
+        self._collect_flush(TEXT["systems.round_effects._settle_buff_debuff_effects.3"].format(p1=tenant_count))
 
     def _decay_conditions(self) -> None:
         """回合末公共衰减：所有状态层数 -1，归零移除。
@@ -242,8 +243,9 @@ class RoundEffectsSystemMixin:
                     if condition.layers <= 0:
                         tenant.clear_status(status_id)
 
-    def _settle_books_and_equipment(self) -> None:
-        """回合末结算装备书籍的研读进度、装备耐久消耗与该物资易损。"""
+    def _settle_held_items(self) -> None:
+        """回合末结算房客**携带中的物资**：先发实例钩子（内容按 item_id 登记），
+        再对耐久品统一扣 1 点耐久。研读/易损等具体效果都住内容层。"""
         for tenant in list(self.home_tenants()):
             for held in list(tenant.inventory.items):
                 held.held_turns += 1
@@ -277,7 +279,7 @@ class RoundEffectsSystemMixin:
             if tenant.shock:
                 death_chance = tenant.shock * .25
                 if self._rng(EVENT_IDS["shock.death"], tenant.id).random() < death_chance:
-                    self._kill_tenant(tenant, "在休克中死亡")
+                    self._kill_tenant(tenant, TEXT["systems.round_effects._settle_other_end_effects.1"])
                     continue
                 if self._rng(EVENT_IDS["shock.layers"], tenant.id).random() < death_chance:
                     tenant.shock_layers = min(99, tenant.shock_layers + 1)
@@ -293,7 +295,7 @@ class RoundEffectsSystemMixin:
                 tenant.at_home = False
                 tenant.temporarily_away = True
                 tenant.return_turn = self.state.flow.turn + duration
-                self._log(f"{self.character(tenant).name}被消沉压垮，离屋{duration}回合。")
+                self._log(TEXT["systems.round_effects._settle_other_end_effects.2"].format(p1=self.character(tenant).name, p2=duration))
 
 
         # 实例回合末收口（房客 scope）：健康结算完成后执行角色实例效果
@@ -342,7 +344,7 @@ def _difficulty_sanity_modifier(context: object):
     engine = context["engine"]  # type: ignore[index]
     bonus = DIFFICULTIES[engine.state.meta.difficulty]["end_sanity_bonus"]
     if bonus:
-        yield spec("sanityConsume").path("回合末消耗").flat(float(bonus)).source("难度")
+        yield spec("sanityConsume").path("turn_end_consume").flat(float(bonus)).source("difficulty")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regds

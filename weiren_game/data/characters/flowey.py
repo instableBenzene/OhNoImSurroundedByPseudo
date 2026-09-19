@@ -17,18 +17,19 @@ from dataclasses import dataclass, field
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 CHARACTER = CharacterDefinition(
-    "flowey", 22, "花尔维纳", "总是带着笑容的乐观派，相信事情总会好起来。", "gentle", "steady", 4, ("花店店员", "打工人", "25-30岁", "男性"),
+    "flowey", 22, TEXT["character.flowey.name"], TEXT["character.flowey.description"], "gentle", "steady", 4, (TEXT["character.flowey.tag.0"], TEXT["character.flowey.tag.1"], TEXT["character.flowey.tag.2"], TEXT["character.flowey.tag.3"]),
     actives=(
         A(
             "gardener",
-            "园艺达人",
-            "打理他的田：把【食物】种下、用【矿泉水】浇水，成熟后收成。",
+            TEXT["ability.gardener.name"],
+            TEXT["ability.gardener.description"],
             opens_panel=True,
         ),
     ),
-    source_note="原稿无专属技能；「园艺达人」与田为本项目新增（见 docs/BALANCE.md）",
+    source_note=TEXT["data.characters.flowey.module.1"],
 )
 
 # 界面头像图标（内容自声明）。
@@ -48,8 +49,8 @@ FAST_GROWTH_BONUS = 1   # 连续两回合满水时，本回合额外涨的进度
 WATER_ITEM = "water"    # 【矿泉水】
 
 # 显示名：原始叫法"干燥度"，但满格 = 刚浇过水，所以标签按语义用"湿润度"。
-NAME_MOISTURE = "湿润度"
-NAME_FIELD = "田"
+NAME_MOISTURE = TEXT["data.characters.flowey.NAME_MOISTURE"]
+NAME_FIELD = TEXT["data.characters.flowey.NAME_FIELD"]
 
 
 # ---------------------------------------------------------------- 专属状态
@@ -179,12 +180,12 @@ def _tick_plot(engine: EngineProtocol, tenant: object, plot: dict) -> None:
     else:
         plot["drought"] += 1
         if plot["drought"] >= DROUGHT_WITHER:
-            _wither(engine, tenant, plot, "连着三回合没浇水")
+            _wither(engine, tenant, plot, TEXT["data.characters.flowey._tick_plot.1"])
             return
         if plot["drought"] == DROUGHT_YIELD_LOSS:
             plot["yield_max"] = max(0, plot["yield_max"] - 1)
             if plot["yield_max"] <= 0:
-                _wither(engine, tenant, plot, "收成被旱没了")
+                _wither(engine, tenant, plot, TEXT["data.characters.flowey._tick_plot.2"])
                 return
     plot["last_moisture"] = plot["moisture"]
     plot["moisture"] = max(0, plot["moisture"] - 1)
@@ -199,7 +200,7 @@ def _ripen(engine: EngineProtocol, tenant: object, plot: dict) -> None:
     plot.update(_empty_plot())
     plot["product"] = seed
     plot["pending"] = count
-    engine._log(f"{engine.character(tenant).name}的{NAME_FIELD}熟了：{_item_name(seed)} ×{count}。")
+    engine._log(TEXT["data.characters.flowey._ripen.1"].format(p1=engine.character(tenant).name, p2=NAME_FIELD, p3=_item_name(seed), p4=count))
 
 
 def _wither(engine: EngineProtocol, tenant: object, plot: dict, why: str) -> None:
@@ -207,7 +208,7 @@ def _wither(engine: EngineProtocol, tenant: object, plot: dict, why: str) -> Non
     name = _item_name(plot["seed"])
     plot.update(_empty_plot())
     # 真警告（少用）：作物枯死是不可逆的损失，值得让玩家一眼看到。
-    engine._log(f"{engine.character(tenant).name}的{NAME_FIELD}里，{name}{why}，枯了。", kind="warn")
+    engine._log(TEXT["data.characters.flowey._wither.1"].format(p1=engine.character(tenant).name, p2=NAME_FIELD, p3=name, p4=why), kind="warn")
 
 
 # ---------------------------------------------------------------- 面板
@@ -227,7 +228,7 @@ def build_view(engine: EngineProtocol, tenant: object) -> dict | None:
         slots.append(_product_slot(plot, index))
     return {
         "title": NAME_FIELD,
-        "prompt": f"把【食物】拖进空地种下，把【矿泉水】拖进去浇水。",
+        "prompt": TEXT["data.characters.flowey.build_view.1"],
         "slots": slots,
         "rows": [],
         "actions": [],
@@ -251,30 +252,30 @@ def _backdrop() -> str:
 
 def _seed_slot(plot: dict, index: int) -> dict:
     """地格：种着东西时显示它 + 进度条 + 状态；空着时是个可拖入的空格。"""
-    label = f"{index + 1} 号地"
+    label = TEXT["data.characters.flowey._seed_slot.1"].format(p1=index + 1)
     if not plot["seed"]:
         return {
             "group": index, "role": "seed", "label": label, "item": None,
             "locked": False, "on_drop": "drop", "on_take": "",
-            "rows": [{"kind": "text", "label": "", "text": "空地。"}],
+            "rows": [{"kind": "text", "label": "", "text": TEXT["data.characters.flowey._seed_slot.2"]}],
         }
     rows = [
         {
             "kind": "bar",
-            "label": "生长",
+            "label": TEXT["data.characters.flowey._seed_slot.3"],
             "value": plot["progress"],
             "max": RIPE_PROGRESS,
-            "hint": f"每回合涨 1；连着两回合满水涨 2。到 {RIPE_PROGRESS} 成熟。",
+            "hint": TEXT["data.characters.flowey._seed_slot.4"].format(p1=RIPE_PROGRESS),
         },
         {
             "kind": "bar",
             "label": NAME_MOISTURE,
             "value": plot["moisture"],
             "max": MOISTURE_MAX,
-            "hint": "浇水回满，每回合 −1；干着会减产，干满三回合会枯。",
+            "hint": TEXT["data.characters.flowey._seed_slot.5"],
         },
     ]
-    rows.append({"kind": "text", "label": "状态", "text": _plot_status(plot)})
+    rows.append({"kind": "text", "label": TEXT["data.characters.flowey._seed_slot.6"], "text": _plot_status(plot)})
     return {
         "group": index, "role": "seed", "label": label,
         "item": {"item_id": plot["seed"], "count": 1},
@@ -287,12 +288,12 @@ def _seed_slot(plot: dict, index: int) -> dict:
 
 def _product_slot(plot: dict, index: int) -> dict:
     """产物格：成熟后产物落在这里，拖进仓库即收下。"""
-    label = f"{index + 1} 号地产物"
+    label = TEXT["data.characters.flowey._product_slot.1"].format(p1=index + 1)
     if not plot["pending"]:
         return {
             "group": index, "role": "product", "label": label, "item": None,
             "locked": True, "on_drop": "", "on_take": "",
-            "rows": [{"kind": "text", "label": "", "text": "还没有收成。"}],
+            "rows": [{"kind": "text", "label": "", "text": TEXT["data.characters.flowey._product_slot.2"]}],
         }
     return {
         "group": index, "role": "product", "label": label,
@@ -300,16 +301,16 @@ def _product_slot(plot: dict, index: int) -> dict:
         "locked": False,          # 可以拖走
         "on_drop": "",
         "on_take": "take",
-        "rows": [{"kind": "text", "label": "收成", "text": "拖进仓库即可收下。"}],
+        "rows": [{"kind": "text", "label": TEXT["data.characters.flowey._product_slot.3"], "text": TEXT["data.characters.flowey._product_slot.4"]}],
     }
 
 
 def _plot_status(plot: dict) -> str:
     """一句话状态：还差几回合熟 / 旱情。"""
     left = max(0, RIPE_PROGRESS - plot["progress"])
-    text = f"还差 {left} 点进度成熟（预计收 {plot['yield_max']} 份）。"
+    text = TEXT["data.characters.flowey._plot_status.1"].format(p1=left, p2=plot['yield_max'])
     if plot["moisture"] <= 0:
-        text += f" 已经断了 {plot['drought']} 回合水。"
+        text += TEXT["data.characters.flowey._plot_status.2"].format(p1=plot['drought'])
     elif plot["moisture"] < MOISTURE_MAX:
         text += f" {NAME_MOISTURE} {plot['moisture']}/{MOISTURE_MAX}。"
     return text
@@ -329,54 +330,54 @@ def resolve_action(
 
     state = _field(engine, tenant)
     if state is None:
-        raise RuleViolation("这位房客没有田。")
+        raise RuleViolation(TEXT["data.characters.flowey.resolve_action.1"])
     plot = state.plot(_plot_index(slot))
     if action == "drop":
         _action_drop(engine, tenant, plot, item_id, RuleViolation)
     elif action == "take":
         _action_take(engine, tenant, plot, RuleViolation)
     else:
-        raise RuleViolation("田里没有这种操作。")
+        raise RuleViolation(TEXT["data.characters.flowey.resolve_action.2"])
     _ = source
 
 
 def _action_drop(engine: EngineProtocol, tenant: object, plot: dict, item_id, error) -> None:
     """拖入：矿泉水 → 浇水；其它【食物】→ 种下。"""
     if not item_id:
-        raise error("没有认出拖进来的是什么。")
+        raise error(TEXT["data.characters.flowey._action_drop.1"])
     if item_id == WATER_ITEM:
         if not plot["seed"]:
-            raise error("这块地还空着，先种点什么再浇水。")
+            raise error(TEXT["data.characters.flowey._action_drop.2"])
         if plot["moisture"] >= MOISTURE_MAX:
-            raise error(f"这块地的{NAME_MOISTURE}已经满了。")
+            raise error(TEXT["data.characters.flowey._action_drop.3"].format(p1=NAME_MOISTURE))
         if not _consume(engine, tenant, WATER_ITEM):
-            raise error(f"没有{_item_name(WATER_ITEM)}可用。")
+            raise error(TEXT["data.characters.flowey._action_drop.4"].format(p1=_item_name(WATER_ITEM)))
         plot["moisture"] = MOISTURE_MAX
         plot["drought"] = 0
         return
     if not _is_food(item_id):
-        raise error(f"{_item_name(item_id)}种不下去，只能种【食物】。")
+        raise error(TEXT["data.characters.flowey._action_drop.5"].format(p1=_item_name(item_id)))
     if plot["seed"]:
-        raise error("这块地已经种着东西了。")
+        raise error(TEXT["data.characters.flowey._action_drop.6"])
     if plot["pending"]:
-        raise error("这一格的收成还没拿走，先把地腾干净。")
+        raise error(TEXT["data.characters.flowey._action_drop.7"])
     if not _consume(engine, tenant, item_id):
-        raise error(f"没有{_item_name(item_id)}可种。")
+        raise error(TEXT["data.characters.flowey._action_drop.8"].format(p1=_item_name(item_id)))
     _reset_growth(plot)
     plot["seed"] = item_id
     plot["moisture"] = MOISTURE_MAX          # 种下就算浇过一遍水
     plot["last_moisture"] = MOISTURE_MAX
-    engine._log(f"{engine.character(tenant).name}在{NAME_FIELD}里种下了{_item_name(item_id)}。")
+    engine._log(TEXT["data.characters.flowey._action_drop.9"].format(p1=engine.character(tenant).name, p2=NAME_FIELD, p3=_item_name(item_id)))
 
 
 def _action_take(engine: EngineProtocol, tenant: object, plot: dict, error) -> None:
     """拖走产物：并进屋主仓库。"""
     if not plot["pending"]:
-        raise error("这一格没有可以收下的东西。")
+        raise error(TEXT["data.characters.flowey._action_take.1"])
     item_id, count = plot["product"], int(plot["pending"])
     for _ in range(count):
         engine._merge_house_item(item_id, 1)
-    engine._log(f"{engine.character(tenant).name}收下了{_item_name(item_id)} ×{count}。")
+    engine._log(TEXT["data.characters.flowey._action_take.2"].format(p1=engine.character(tenant).name, p2=_item_name(item_id), p3=count))
     plot["product"] = ""
     plot["pending"] = 0
 
@@ -393,7 +394,7 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
     rows: list = []
     for index in range(PLOT_COUNT):
         plot = state.plot(index)
-        label = f"{index + 1} 号地"
+        label = TEXT["data.characters.flowey.detail_slot.1"].format(p1=index + 1)
         if plot["seed"]:
             rows.append({
                 "kind": "bar", "label": label,
@@ -402,7 +403,7 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
             })
         elif plot["pending"]:
             rows.append({"kind": "text", "label": label,
-                         "text": f"有收成没收：{_item_name(plot['product'])} ×{plot['pending']}"})
+                         "text": TEXT["data.characters.flowey.detail_slot.2"].format(p1=_item_name(plot['product']), p2=plot['pending'])})
     if not rows:
         return []
     return rows

@@ -1,6 +1,7 @@
 """性格·开朗：性格/羁绊效果全部集中在本文件。"""
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def start_of_turn_bond(engine: EngineProtocol, bonds: dict[str, int]) -> None:
@@ -10,7 +11,7 @@ def start_of_turn_bond(engine: EngineProtocol, bonds: dict[str, int]) -> None:
         return
     heal = {2: 1, 5: 2, 8: 5}[cheerful]
     for tenant in engine.home_tenants():
-        engine._restore_sanity(tenant, heal, "开朗羁绊")
+        engine._restore_sanity(tenant, heal, "cheerful_bond")
     if cheerful >= 8:
         for tenant in engine.home_tenants():
             if engine._is_personality(tenant, "cheerful"):
@@ -61,7 +62,7 @@ def _cheerful_sanity_modifier(context: object):
     engine = context["engine"]; tenant = context["tenant"]  # type: ignore[index]
     tier = engine._bond_tier("cheerful")
     if tier:
-        yield spec("sanityConsume").path("回合末消耗").flat(-{2: 1, 5: 2, 8: 5}[tier]).source("羁绊", "开朗")
+        yield spec("sanityConsume").path("turn_end_consume").flat(-{2: 1, 5: 2, 8: 5}[tier]).source("bond", "cheerful")
 
 
 def _cheerful_awakening_modifier(context: object):
@@ -75,7 +76,7 @@ def _cheerful_awakening_modifier(context: object):
         bonus += 1.00
     elif tier >= 5:
         bonus += .50
-    yield spec("awakeningGain").path("觉醒").percent(bonus).source("性格", "开朗")
+    yield spec("awakeningGain").path("awakening").percent(bonus).source("personality", "cheerful")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regc

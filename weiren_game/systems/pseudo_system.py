@@ -9,6 +9,7 @@ from weiren_game.data import (
     DIFFICULTIES,
     EVENT_IDS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -100,7 +101,7 @@ class PseudoSystemMixin:
             }:
                 if self._pseudo_actions_suppressed():
                     self._log(
-                        f"{self.state.pseudo_state.name}当前受到压制，{skill}未能发动。"
+                        TEXT["systems.pseudo_system._skill_respond_skill.1"].format(p1=self.state.pseudo_state.name, p2=skill)
                     )
                     return True
             return False
@@ -163,7 +164,7 @@ class PseudoSystemMixin:
             resisted = resister(self, mission, tenant, event, penalty=penalty)
         if resisted:
             self._log(
-                f"{self.character(tenant).name}抵御了{self.state.pseudo_state.name}的搜索技能。"
+                TEXT["systems.pseudo_system._search_resist_responder.1"].format(p1=self.character(tenant).name, p2=self.state.pseudo_state.name)
             )
         return resisted
 # PseudoActiveAbility.execute()
@@ -187,7 +188,7 @@ class PseudoSystemMixin:
         """结算伪人到访：压制期无效果，首次到访揭示伪人，之后按伪人种类触发拜访逻辑。"""
         pseudo = self.state.pseudo_state
         if not self._pseudo_capability("visit"):
-            self._log(f"{pseudo.name}受到压制，来访没有产生效果。")
+            self._log(TEXT["systems.pseudo_system._resolve_pseudo_visit.1"].format(p1=pseudo.name))
             return
         pseudo.visit_count += 1
         from weiren_game.data import CHARACTER_NODE_HOOKS
@@ -207,8 +208,8 @@ class PseudoSystemMixin:
             )
             if reveal_handler is not None:
                 reveal_handler(self)
-            self._log(f"伪人初访：{pseudo.name}首次到访，本次不触发突破。")
-            self._create_visit_information(True, "伪人初访")
+            self._log(TEXT["systems.pseudo_system._resolve_pseudo_visit.2"].format(p1=pseudo.name))
+            self._create_random_information(True, TEXT["systems.pseudo_system._resolve_pseudo_visit.3"], {"visit"})
             return
         from weiren_game.data import SCENARIO_HANDLERS
 
@@ -231,7 +232,7 @@ class PseudoSystemMixin:
                     self.state.world.visitors.next_pseudo_turn,
                     self._roll_next_pseudo_visit(self.state.flow.turn),
                 )
-            self._log("回溯触发：本次突破被取消，已回到回溯前局面。")
+            self._log(TEXT["systems.pseudo_system._attempt_breakthrough.1"])
             return False
         from weiren_game.data import NODE_HOOKS
 
@@ -263,18 +264,18 @@ class PseudoSystemMixin:
                 from weiren_game.lifecycle import AbilityLaunch
 
                 if self._skill_respond_skill(
-                    "搜索袭击", "cast",
+                    TEXT["systems.pseudo_system._pseudo_attack_searchers.1"], "cast",
                     mode=AbilityLaunch.PSEUDO_HUMAN, caster=pseudo,
                 ):
                     continue
                 if self._skill_respond_skill(
-                    "搜索袭击", "lock",
+                    TEXT["systems.pseudo_system._pseudo_attack_searchers.2"], "lock",
                     mode=AbilityLaunch.PSEUDO_HUMAN, caster=pseudo,
                     target=tenant, event=event, penalty=penalty,
                 ):
                     continue
                 if self._skill_respond_skill(
-                    "搜索袭击", "resist",
+                    TEXT["systems.pseudo_system._pseudo_attack_searchers.3"], "resist",
                     mode=AbilityLaunch.PSEUDO_HUMAN, caster=pseudo,
                     target=tenant, mission=mission, event=event, penalty=penalty,
                 ):
@@ -316,7 +317,7 @@ class PseudoSystemMixin:
         resolved = resolve(chance, guarantees)
         if resolved in (0.0, 1.0):
             return resolved
-        source = ("伪人技能", "遭遇", pseudo.scenario_id, tenant.character_id)
+        source = (TEXT["systems.pseudo_system._pseudo_encounter_chance.1"], TEXT["systems.pseudo_system._pseudo_encounter_chance.2"], pseudo.scenario_id, tenant.character_id)
         context = {"mission": mission, "tenant": tenant}
         chance = self._apply_modifiers("chance", chance, source, context)
         chance *= self._global_event_value("encounter.rate.multiplier", 1.0)
@@ -324,9 +325,9 @@ class PseudoSystemMixin:
 
     def _break_search_tool(self, mission: SearchMission, tenant: Tenant, item_id: str) -> None:
         """将损坏的防具工具从任务携带中移除并重算搜索参数。"""
-        self._take_tenant_item(tenant, item_id)
+        tenant.inventory.remove_first(item_id)
         self._recalculate_search(mission)
-        self._log(f"{ITEMS[item_id].name}在抵御伪人时损坏。")
+        self._log(TEXT["systems.pseudo_system._break_search_tool.1"].format(p1=ITEMS[item_id].name))
 
     def _set_pseudo_marks(self, target: float) -> bool:
         """外界把伪人印记直接改写为 target；受“不可被外界修改”声明保护。"""
@@ -334,11 +335,11 @@ class PseudoSystemMixin:
 
         definition = PSEUDOS.get(self.state.pseudo_state.scenario_id)
         if definition is None or not getattr(definition, "mark_field", ""):
-            self._log("当前的伪人没有可被改写的印记。")
+            self._log(TEXT["systems.pseudo_system._set_pseudo_marks.1"])
             return False
         if getattr(definition, "mark_externally_locked", False):
-            label = getattr(definition, "mark_label", "") or "印记"
-            self._log(f"{label}无法被外界修改。")
+            label = getattr(definition, "mark_label", "") or TEXT["systems.pseudo_system._set_pseudo_marks.2"]
+            self._log(TEXT["systems.pseudo_system._set_pseudo_marks.3"].format(p1=label))
             return False
         setattr(self.state.pseudo_state.scenario(), definition.mark_field, target)
         return True
@@ -374,14 +375,13 @@ class PseudoSystemMixin:
         target = self._require_home_tenant(tenant_id)
         evidence = self.accusation_evidence(tenant_id)
         if not evidence["ready"]:
-            raise RuleViolation("需要1条已证实或3条待验证的同目标指认信息。")
+            raise RuleViolation(TEXT["systems.pseudo_system.accuse.1"])
         for info in evidence["infos"]:
             info.status = "expired"
         if target.is_pseudo:
             handler = self._pseudo_handler("expel_infiltrator")
             if handler is not None:
-                handler(self, "屋主指认")
+                handler(self, TEXT["systems.pseudo_system.accuse.2"])
         else:
-            self._expel_tenant(target, "错误指认")
+            self._expel_tenant(target, TEXT["systems.pseudo_system.accuse.3"])
         self._record_action("accuse", tenant=tenant_id)
-

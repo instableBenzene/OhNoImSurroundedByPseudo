@@ -19,6 +19,7 @@ from ..types import ItemDefinition
 from pathlib import Path
 
 from .._discovery import discover_modules
+from weiren_game.data.lang import TEXT
 
 # md 中的物资大类（顺序即文档顺序）。
 CATEGORY_ORDER = (
@@ -78,6 +79,10 @@ START_LOOT_TABLE = {
     for label, ids in START_LOOT_TABLE.items()
 }
 
+# 开局补给**配方**（内容层）：基础次数表 + 可抽类别；难度只改"多抽/少抽几次"（draw_delta）。
+START_LOOT_RECIPE: tuple[str, ...] = ("food", "food", "medical", "tool", "carrier")
+START_LOOT_CATEGORIES: tuple[str, ...] = tuple(START_LOOT_TABLE)
+
 
 # 应用设计稿风味文本（id -> flavor）。
 from dataclasses import replace as _replace
@@ -99,7 +104,7 @@ def register_item(item: ItemDefinition, *, category: str, replace: bool = False)
     ``replace=True`` 时覆盖同 id 旧定义，并把它从原先所属分类里摘掉（内容包优先级用）。
     """
     if item.item_id in ITEMS and not replace:
-        raise ValueError(f"物品 ID 重复：{item.item_id}")
+        raise ValueError(TEXT["data.items.__init__.register_item.1"].format(p1=item.item_id))
     if replace:
         for members in CATEGORY_ITEMS.values():
             members.pop(item.item_id, None)
@@ -143,7 +148,7 @@ def _load_tag_files() -> None:
         try:
             entries = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
-            raise ValueError(f"tag 文件无法解析：{path}（{exc}）") from exc
+            raise ValueError(TEXT["data.items.__init__._load_tag_files.1"].format(p1=path, p2=exc)) from exc
         apply_item_tags(path.stem, entries or ())
 
 
@@ -204,21 +209,21 @@ ON_GAIN_INFO_SPECS: dict[str, dict[str, object]] = {
         "false": 1,
         "kinds": ("material_reward", "visit"),
         "keep": False,
-        "log": "已自动兑换为信息。",
+        "log": TEXT["data.items.__init__.ON_GAIN_INFO_SPECS.newspaper.log"],
     },
     "medical_newspaper": {
         "truth": 1,
         "false": 1,
         "kinds": ("material_reward", "location_modifier"),
         "keep": False,
-        "log": "已自动兑换为信息。",
+        "log": TEXT["data.items.__init__.ON_GAIN_INFO_SPECS.medical_newspaper.log"],
     },
     "video_tape": {
         "truth": 3,
         "false": 0,
         "kinds": None,
         "keep": False,
-        "log": "已自动兑换为信息。",
+        "log": TEXT["data.items.__init__.ON_GAIN_INFO_SPECS.video_tape.log"],
     },
     "smartphone": {
         "truth": 0,

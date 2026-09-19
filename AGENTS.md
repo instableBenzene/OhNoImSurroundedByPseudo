@@ -30,6 +30,7 @@
 - 分离度自检：`python tools/audit_separation.py`
 - 内容校验：`python tools/validate_content.py`
 - 日志文案自检：`python tools/audit_text.py`（规则见 `docs/STYLE.md` §11；有 error 退出码 1）
+- 文本盘点（lang 底表/查重/术语）：`python tools/dump_text.py --out <dir>`（只读；产物 `text_table.tsv` + `text_report.txt`）
 - 角色脚手架：`python tools/new_character.py <ascii_id> <中文名> [--carry N]`
 - 浏览器对局压测：`node tools/browser_playtest.mjs url=http://127.0.0.1:8730/ games=30 turns=12 budget=420`
 - 版本：`GAME_VERSION="2.1.0"`（`weiren_game/data/__init__.py`）；存档 `meta.packs` 与当前启用包不一致会拒读。
@@ -45,6 +46,7 @@
 | `docs/BALANCE.md` | **平衡改动记录**：每个技能被增强/削弱过几轮的账（只记"改了什么"；为什么改在 DECISIONS） |
 | `docs/ROADMAP.md` | **想做的系统（讨论结论）**：无尽/故事模式、对话系统、规则战底线、存档迁移——写清"复用/新造/待答" |
 | `docs/ARCH.md` | **效果内核**：数值通道 × 布尔闸门（共用 path/source、分用算术/逻辑）、令牌词表、闸门目录、迁移策略 |
+| `docs/CORE.md` | **核心方法总清单**（`tools/dump_core.py` 生成）：核心有哪些方法、**内容往哪挂**（扩展点 + 节点名）、**核心有没有混进内容 id** |
 | `docs/ADD_CONTENT.md` | **内容创作**（合并原 CONTENT_TYPES / ADD_CHARACTER / ADD_DLC）：内容类型全景、加房客步骤、写 DLC 步骤、检查清单、已知限制 |
 | `docs/COOKBOOK.md` | **创作样例集（给人读）**：需求模板 + 可抄改的最小样例（物品/技能/被动/伪人/信息/事件/DLC）与常见坑 |
 | `docs/PACKAGING.md` | 免安装分发（便携 `runtime/` + VBS；可选 PyInstaller exe） |
@@ -59,20 +61,30 @@
 ## 3. 硬性不变量（不要破坏）
 
 1. **核心/内容分离（含 UI）**：系统层与前端不得出现具体内容 id/名称，也不得 import 具体内容模块（扫描范围以 `tools/audit_separation.py` 的 `SYSTEM_GLOBS` 为准）；需要交互/渲染内容时经通用机制（注册表全集见下方 §3）。
-   **内容文案（提示语/标题/标签/选项名）同样不得写死在前端或系统里，必须由内容层随视图/状态下发。**新内容只放 `data/` 或 `dlc/`。
+  **内容文案（提示语/标题/标签/选项名）同样不得写死在前端或系统里，必须由内容层随视图/状态下发。**新内容只放 `data/` 或 `dlc/`。
+  **面向玩家的文字一律先落 lang 表**（base = `weiren_game/data/lang.py`；每个 DLC = `dlc/<包>/lang.py`），
+  别处只写 key（`TEXT["…"]` / 前端 `TXT("…")` / 槽位 `data-t`）——**加文本 = 加一条，没有注册动作**；
+  数据键（`path`/`source`/tag/性别…）**不进 lang**。见 `.opencode/skills/weiren-dev/SKILL.md` §2.1。
    **验收**：删任一内容文件（角色/性格/伪人/物品/标签）项目仍能开局；系统/前端内容名残留为 0。
    **反向**：`data/` 不得 import `weiren_game.systems`（只可用协议 `weiren_game.types.EngineProtocol`）。
+   **`EngineProtocol` 就是「内容能碰什么引擎 API」的权威**（清单由 `tools/dump_core.py --refs` 按实测内容面生成，
+   双向差集必须为 0）。内容要用引擎的新方法 → **先补进协议**；不在协议里的方法，内容不该碰。
 2. **注册表自描述 + 自动发现**：`data/_discovery.py` 扫描目录；放/删 `.py` 即生效，无需登记。
    - 顺序（影响随机确定性，勿随意改）：`CHARACTER_MODULES` 按文件名、`CHARACTERS` 按 `source_id`、`personalities/pseudos/tags` 按文件名、`items` 按 `CATEGORY_ORDER`。
    - 可登记的东西（**完整、权威的清单是 `content.py::_BASE_CONTAINERS`**，新增注册表必须登记进去，见 §3.11）：
      - 角色/能力：`ACTIVE_DISPATCH`、`INTERACTIONS`、`PENDING_VIEW`、`TARGET_OPTIONS`、`MARKS`、`DETAIL_SLOT`、`CONTAINERS`、`PANEL`、
-       `CODEX_EXTRA/SECTION/SUMMARY`、`SEARCH_REWARD`、`TURN_START`、`VALUE_HOOKS`、`NODE_HOOKS`、`HOOKS`、`ON_*`、`CAN_LOCK_PERSONALITY`、`PROTECTED_STARTER`；
+       `CODEX_EXTRA/SECTION/SUMMARY`、`SEARCH_REWARD`、`TURN_START`、`VALUE_HOOKS`、`NODE_HOOKS`、`HOOKS`、`ON_*`、`PROTECTED_STARTER`；
      - 伪人：`DEFINITION`/`HANDLERS`、`CARD_SLOT`、`DEFAULT_PSEUDO`；
      - 物品/地点/信息/性格/标签：`ITEMS`+`ITEM_HOOKS`、`LOCATIONS`+`MAP_GROUPS`、`MAPS`、`INFORMATION_TEMPLATES`、`PERSONALITIES`、`TAG_BEHAVIORS`、`ABILITY_CHIPS`、`MODIFIERS`；
      - 外观（资源包）：`THEME`、`SYMBOLS`、`ASSETS`；头像/图标/地图是**文件**（见 §6「外观与材质」）。
-3. **数值/概率走通道 + 修饰器**：`engine._apply_modifiers(...)` / `_apply_chance(...)`；实现见 `modifier_rules.py`/`probability.py`。**旧 `ModifierPool` 已删，勿复活**。
+3. **数值/概率走通道 + 修饰器**：数值 `engine._apply_modifiers(...)`；概率用
+   `calculate_modified_amount(base, collect_modifiers("chance", …))` → 自调 → `resolve(...)`
+   （**没有** `_apply_chance` 这个入口，别照旧文档写）。实现见 `modifier_rules.py`/`probability.py`。
+   **旧 `ModifierPool` 已删，勿复活**。
 4. **概率统一**：必定 0/100；非必定收敛 **5%~95%**；`random() < p`。
 5. **`path` vs `source`**：`path`=响应哪些功能；`source`=调用点事件构成；命中取交（`match="all"` 取子集）。
+   **令牌一律英文**（词表见 `docs/ARCH.md` §4；专名用既有 id）；要显示就过
+   `lang.source_label()` / `token_label()`，别把令牌直接插进文案。
 6. **布尔闸门 vs 数值通道**：两者**共用 `path`/`source` 匹配**（同一套注册与命中），但**分用聚合**——
    通道是算术（`flat/percent/mul/final/max/min`），闸门是逻辑（`any`=OR、`veto`=NOT）。
    **闸门是纯查询**（不掷骰、不写状态）；掷骰与消耗只发生在**结算点**。
@@ -107,6 +119,7 @@ weiren_game/data/resourcepack/ 资源包（默认材质）：theme.py（CSS 变�
 weiren_game/data/codex_pack.py       图鉴包（羁绊档位/伪人技能/地点图标与文案/关联）
 weiren_game/data/codex_mechanics.py  图鉴「机制」教程正文（通用规则，与代码一致）
 weiren_game/data/labels.py           内容展示标签（分类/tag/品质段位/组图标 + EQUIP_TAGS）
+weiren_game/data/lang.py             文本总表（lang）：**面向玩家的文字都住这里**，别处只引用 key
 weiren_game/data/information_text.py 信息图鉴完整描述（自设计稿）
 weiren_game/data/items/codex_text.py 物资图鉴完整文本（自设计稿）
 weiren_game/config.py / dlc.py / models.py / lifecycle.py / cli.py
@@ -129,6 +142,8 @@ tools/preview_resourcepack.py 把资源包/base 材质渲成 PNG（背景/物品
 tools/dump_codex_text.py      导出技能正文（含 chips）供排版复核（**导入内容层，不手抄**）
 tools/render_text_sheet.mjs   把导出的正文过一遍真实 `fmt()` 排版并截图
 tools/dump_effects.py         效果注册表 dump（只读；核对 docs/ARCH.md 的闸门/数值目录）
+tools/dump_core.py            核心方法总清单 + 扩展点 + 内容 id 越界检查（只读；生成 docs/CORE.md）
+tools/dump_text.py            面向玩家的文本底表 + 查重 + 术语一致性（只读；lang 盘点，见 docs/ROADMAP.md §7）
 tools/new_character.py        房客脚手架（自动分配 source_id 与 AVATAR）
 tools/prepare_portable.py     准备便携运行时（embeddable Python → runtime/）
 tools/extract_source_catalog.py / summarize_source_catalog.py
@@ -169,6 +184,12 @@ runtime/                       便携 Python 运行时（免安装用；非源�
 - **交互范式统一**（选人 / 物品 / 数量 / 卡片选项 / 清单+详情 / 浮层）：见 `docs/STYLE.md` §10–§12；
   前端**按范式渲染，禁止按能力 id 特判**。
 - Esc 桌面、`POST /api/abort_start`（丢掉没选完的发现）、`POST /api/quit`（落盘 → 停服）等入口见 `docs/GUIDE.md` §14。
+- **文字走 lang 表**（已全量迁移）：base 在 `weiren_game/data/lang.py::TEXT`，
+  每个 DLC 自带 `dlc/<包>/lang.py`（模块写 `TEXT = pack_text_from_file(__file__)`）；
+  前端用 `GET /api/lang` + `TXT(key)` 取字，静态标记 `data-t` / `data-t-html` / `data-t-ph` /
+  `data-t-aria` / `data-t-title`（`applyStaticText()` 在 boot 里跑）。
+  **数据键（`path`/`source`/tag/…）不搬**；系统层/前端的键是按位置生成的（后续可改名）。
+  手法见 `docs/DECISIONS.md`。
 
 **外观与材质**（三层，低 → 高：base → 资料包 → 资源包，同名覆盖）
 
@@ -206,7 +227,9 @@ runtime/                       便携 Python 运行时（免安装用；非源�
   ④ **前端注释、注释里的示例词也算文件文本**：`audit_separation` **不豁免注释**，别写内容名；
   ⑤ **提交前显式读退出码**：`;` 串命令时 `$?` 是**最后一条**的结果，
   测试红了照样会提交——把 `$LASTEXITCODE` 存进变量再判断；
-  ⑥ **探针先自证**：工具"没报错"≠ 可信（`docs/PRINCIPLES.md` §15），拿已知样例验一遍。
+  ⑥ **探针先自证**：工具"没报错"≠ 可信（`docs/PRINCIPLES.md` §15），拿已知样例验一遍；
+  ⑦ **控制台里的中文会把数字读错**：乱码吞掉相邻字符（`语料：2990` 在终端显示成 `语料：990`——
+  真把 `2990` 记成过 `990`）——**计数一律读工具写出的 UTF-8 产物文件，别读屏**。
 - **画完图必须自己看一眼再改一轮**：美术/贴图/图标/头像/素材位改完，用
   `python tools/preview_resourcepack.py <包名>` 渲成 PNG，**自己读图**（Read 能看图片）——
   只看代码不算验证。经验：一轮肉眼复核几乎总能抓到硬伤（写错的数字、压过界的标题、
@@ -257,7 +280,7 @@ runtime/                       便携 Python 运行时（免安装用；非源�
 - **决策记录 / 归档**：`docs/DECISIONS.md`（**为什么这么改 + 踩坑**）；`docs/archive/QA_TASK.md`（旧任务书）。文档地图见 §2。
 - **内容全景 / 样例 / 美术**：`docs/ADD_CONTENT.md`（base vs DLC 全类型）、`docs/COOKBOOK.md`
   （给人读的样例集：照着改就能用）。
-- **自检/压测/脚手架/分发**：`tools/audit_separation.py`、`tools/audit_text.py`（日志文案，规则见 `docs/STYLE.md` §11）、`tools/validate_content.py`、`tools/dump_effects.py`（核对 `docs/ARCH.md` 的闸门目录）、`tools/new_character.py`、`tools/browser_playtest.mjs`、`tools/smoke_simulation.py`、`tools/prepare_portable.py`、`docs/PACKAGING.md`。
+- **自检/压测/脚手架/分发**：`tools/audit_separation.py`、`tools/audit_text.py`（日志文案，规则见 `docs/STYLE.md` §11）、`tools/validate_content.py`、`tools/dump_effects.py`（核对 `docs/ARCH.md` 的闸门目录）、`tools/dump_text.py`（面向玩家的文本底表 + 查重 + 术语，lang 盘点）、`tools/new_character.py`、`tools/browser_playtest.mjs`、`tools/smoke_simulation.py`、`tools/prepare_portable.py`、`docs/PACKAGING.md`。
 
 **每次改完的固定动作**：
 ```

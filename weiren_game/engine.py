@@ -28,9 +28,12 @@ from .data import (
     RARE_EMOTIONS,
     PROTECTED_STARTERS,
     START_LOOT_TABLE,
+    START_LOOT_CATEGORIES,
+    START_LOOT_RECIPE,
     CharacterDefinition,
     CODEX_SUMMARY_HOOKS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -105,14 +108,14 @@ class GameEngine(
     def _require_no_pending_choice(self) -> None:
         """存在待选（discover 未结算）时禁止其它行为。"""
         if self._pending_choice is not None:
-            raise RuleViolation("正在等待玩家选择，无法进行其它操作。")
+            raise RuleViolation(TEXT["engine._require_no_pending_choice.1"])
 
     def choose_discover(self, option: object) -> object:
         """提交一次 discover 选择并解除待选状态。"""
         if self._pending_choice is None:
-            raise RuleViolation("当前没有待选择项。")
+            raise RuleViolation(TEXT["engine.choose_discover.1"])
         if option not in self._pending_choice.get("options", ()):
-            raise RuleViolation("该选项不在本次选择范围内。")
+            raise RuleViolation(TEXT["engine.choose_discover.2"])
         self._pending_choice = None
         resume = self._pending_resume
         self._pending_resume = None
@@ -143,7 +146,7 @@ class GameEngine(
             if build(self) is not None:
                 resolve(self, value)
                 return
-        raise RuleViolation("当前没有待处理的交互。")
+        raise RuleViolation(TEXT["engine.resolve_view.1"])
 
     # ------------------------------------------------------------------ setup
     @classmethod
@@ -180,17 +183,17 @@ class GameEngine(
         start_log: list[str] = []
         choice_rng = LoggedRandom(
             resolved_seed,
-            "开局选择",
+            TEXT["engine.new_game.1"],
             lambda line: start_log.append(line),
         )
         if random_pseudo:
             pseudo_id = choice_rng.choice(tuple(PSEUDOS))
         if difficulty not in DIFFICULTIES:
-            raise RuleViolation(f"未知难度：{difficulty}")
+            raise RuleViolation(TEXT["engine.new_game.2"].format(p1=difficulty))
         if max_turns < 12:
-            raise RuleViolation("目标回合数不能少于12。")
+            raise RuleViolation(TEXT["engine.new_game.3"])
         if pseudo_id not in PSEUDOS:
-            raise RuleViolation(f"未知伪人：{pseudo_id}")
+            raise RuleViolation(TEXT["engine.new_game.4"].format(p1=pseudo_id))
 
         pseudo_def = PSEUDOS[pseudo_id]
         disabled: list[str] = []
@@ -199,11 +202,11 @@ class GameEngine(
 
         for character_id in disabled_character_ids or ():
             if character_id not in CHARACTERS or not CHARACTERS[character_id].available:
-                raise RuleViolation(f"无法禁用未知或未公开房客：{character_id}")
+                raise RuleViolation(TEXT["engine.new_game.5"].format(p1=character_id))
             if character_id in PROTECTED_STARTERS:
-                raise RuleViolation("开局核心角色不能被禁用。")
+                raise RuleViolation(TEXT["engine.new_game.6"])
             if character_id in human_characters:
-                raise RuleViolation("伪人的人类原型不能列入禁用角色。")
+                raise RuleViolation(TEXT["engine.new_game.7"])
             if character_id not in disabled:
                 disabled.append(character_id)
         from .data import BASE_MAP_ID, MAPS
@@ -254,7 +257,7 @@ class GameEngine(
         )
         if len(roster) < starter_count:
             raise RuleViolation(
-                f"禁用角色过多，至少需要 {starter_count} 名可用人类房客。"
+                TEXT["engine.new_game.8"].format(p1=starter_count)
             )
         pool = list(roster)
         if defer_start and start_choices is None:
@@ -283,7 +286,7 @@ class GameEngine(
                 if chosen not in options:
                     names = "、".join(CHARACTERS[value].name for value in options)
                     raise RuleViolation(
-                        f"第{pick_index + 1}次发现必须从以下选项选择：{names}。"
+                        TEXT["engine.new_game.9"].format(p1=pick_index + 1, p2=names)
                     )
             if chosen is None:
                 chosen = options[0]
@@ -309,7 +312,7 @@ class GameEngine(
         """提交一次开局选人；全部选完后创建房客并完成开局。"""
         pending = self._pending_choice
         if not pending or pending.get("kind") != "start_choice":
-            raise RuleViolation("当前没有开局选择。")
+            raise RuleViolation(TEXT["engine.commit_start_choice.1"])
         options = list(pending["options"])
         chosen = choice if choice in options else options[0]
         self._clear_pending_choice()
@@ -364,7 +367,7 @@ class GameEngine(
         # 时运走修饰器管线：全局 fortune_delta（a4/a-4）与仅开局生效的
         # start_fortune_delta 都以「开局」为 source 在此处被收集。
         start_fortune = self._apply_modifiers(
-            "search", 0.0, ("开局", "时运"), {"tenant": None, "rng": None},
+            "search", 0.0, ("setup", "luck"), {"tenant": None, "rng": None},
         )
         draw_delta = int(DIFFICULTIES[difficulty].get("start_loot_draws", 0))
         for label, count in self._start_loot_schedule(draw_delta):
@@ -375,12 +378,12 @@ class GameEngine(
                 self._gain_item(item_id)
         self._activate_new_bonds(initial=True)
         names = "、".join(self.character(t).name for t in self.home_tenants())
-        self._log(f"本局种子：{state.meta.seed}；难度：{difficulty}（{DIFFICULTIES[difficulty]['label']}）。", shown=False)
+        self._log(TEXT["engine._finish_start.3"].format(p1=state.meta.seed, p2=difficulty, p3=DIFFICULTIES[difficulty]['label']), shown=False)
         human = CHARACTERS.get(pseudo_def.human_character_id)
         human_name = human.name if human else pseudo_def.human_character_id
-        self._log(f"本局伪人：{pseudo_def.name}。人类形态“{human_name}”不会自然出现。", shown=False)
-        self._log(f"天色已暗。{names}已经在屋里，门外的道路一片漆黑。")
-        self._log(f"目标：撑到第{max_turns}回合结束，或先完成伪人的解放条件。")
+        self._log(TEXT["engine._finish_start.4"].format(p1=pseudo_def.name, p2=human_name), shown=False)
+        self._log(TEXT["engine._finish_start.5"].format(p1=names))
+        self._log(TEXT["engine._finish_start.6"].format(p1=max_turns))
 
     def _start_loot_schedule(self, draw_delta: int) -> list[tuple[str, int]]:
         """开局补给次数表：基础为食物 2 / 医疗 1 / 工具 1 / 载体 1。
@@ -388,8 +391,8 @@ class GameEngine(
         ``draw_delta`` 即"多抽/少抽几次池子"：为正时额外抽若干次，为负时随机去掉
         若干次（类别不再固定，按种子确定）。
         """
-        labels = ["food", "food", "medical", "tool", "carrier"]
-        categories = ["food", "medical", "tool", "carrier"]
+        labels = list(START_LOOT_RECIPE)
+        categories = list(START_LOOT_CATEGORIES)
         if draw_delta > 0:
             rng = self._rng("start.loot.draws")
             labels.extend(rng.choice(categories) for _ in range(int(draw_delta)))
@@ -448,16 +451,15 @@ class GameEngine(
         meta = raw.get("meta") or {}
         version = meta.get("version")
         if version != GAME_VERSION:
-            raise RuleViolation(f"存档版本 {version} 与游戏版本 {GAME_VERSION} 不兼容。")
+            raise RuleViolation(TEXT["engine.load.1"].format(p1=version, p2=GAME_VERSION))
         saved_packs = tuple(meta.get("packs") or ())
         if sorted(saved_packs) != sorted(CONTENT.manifest()):
             raise RuleViolation(
-                "存档启用内容包与当前启动内容包不一致："
-                f"存档={saved_packs}，当前={CONTENT.manifest()}。"
+                TEXT["engine.load.2"].format(p1=saved_packs, p2=CONTENT.manifest())
             )
         engine = cls(GameState.from_dict(raw))
         engine._save_path = source
-        engine._log("进入游戏。")
+        engine._log(TEXT["engine.load.3"])
         engine.migrate_carriers()
         return engine
     def save(self, path: str | Path, *, quiet: bool = False) -> Path:
@@ -466,16 +468,16 @@ class GameEngine(
         ``quiet=True``（自动存档）时只在完整日志里留痕，不进入玩家的可见消息。
         """
         if self._pending_ability:
-            raise RuleViolation("命运抽牌结算期间无法保存。")
+            raise RuleViolation(TEXT["engine.save.1"])
         if self._pending_choice is not None:
-            raise RuleViolation("正在等待玩家选择，无法保存。")
+            raise RuleViolation(TEXT["engine.save.2"])
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_suffix(target.suffix + ".tmp")
         temporary.write_text(json.dumps(self.state.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8")
         temporary.replace(target)
         self._save_path = target
-        self._log("保存游戏。", shown=not quiet)
+        self._log(TEXT["engine.save.3"], shown=not quiet)
         return target
 
     # ---------------------------------------------------------------- messages/actions
@@ -514,7 +516,7 @@ class GameEngine(
             rows = rows_from_lines(collected or [])
         if not rows:
             return
-        text = summary or (f"{title}：{len(rows)} 项变化。" if title else "")
+        text = summary or (TEXT["engine._collect_flush.1"].format(p1=title, p2=len(rows)) if title else "")
         if not text:
             return
         self._show_message(text, detail or {"rows": rows})
@@ -557,27 +559,23 @@ class GameEngine(
 
     def _log_lines(self) -> list[str]:
         """将完整日志逐行渲染为文本（含未公开记录与对应回合号）。"""
-        return [f"[第{entry['turn']}回合] {entry['text']}" for entry in self.state.log.entries]
-
-    def full_log_text(self) -> str:
-        """返回完整对局日志文本，便于导出为 txt 文件。"""
-        return "\n".join(self._log_lines())
+        return [TEXT["engine._log_lines.1"].format(p1=entry['turn'], p2=entry['text']) for entry in self.state.log.entries]
 
     def export_full_log(self) -> str:
         """导出整局完整文本：元数据 + 全部消息日志 + 全部动作记录。"""
         pseudo = self.state.pseudo_state
-        ending = f"{'胜利' if self.state.flow.victory else '失败'}：{self.state.flow.ending}" if self.state.flow.game_over else "未结束"
+        ending = f"{'胜利' if self.state.flow.victory else '失败'}：{self.state.flow.ending}" if self.state.flow.game_over else TEXT["engine.export_full_log.1"]
         lines = [
-            f"版本：{self.state.meta.version}",
-            f"种子：{self.state.meta.seed}",
-            f"难度：{self.state.meta.difficulty}",
-            f"伪人：{pseudo.name}（{pseudo.scenario_id}）",
-            f"结局：{ending}",
+            TEXT["engine.export_full_log.2"].format(p1=self.state.meta.version),
+            TEXT["engine.export_full_log.3"].format(p1=self.state.meta.seed),
+            TEXT["engine.export_full_log.4"].format(p1=self.state.meta.difficulty),
+            TEXT["engine.export_full_log.5"].format(p1=pseudo.name, p2=pseudo.scenario_id),
+            TEXT["engine.export_full_log.6"].format(p1=ending),
             "",
-            "===== 对局消息与事件 =====",
+            TEXT["engine.export_full_log.7"],
             *self._log_lines(),
             "",
-            "===== 动作记录 =====",
+            TEXT["engine.export_full_log.8"],
         ]
         for record in self.state.log.action_log:
             payload = json.dumps(record, ensure_ascii=False, sort_keys=True)
@@ -657,10 +655,10 @@ class GameEngine(
 
         tenant = self.state.house.tenants.get(int(tenant_id))
         if tenant is None:
-            raise RuleViolation("该房客不在屋内。")
+            raise RuleViolation(TEXT["engine.panel_action.1"])
         entry = CHARACTER_PANELS.get(tenant.character_id)
         if entry is None:
-            raise RuleViolation("该房客没有可用的专属面板。")
+            raise RuleViolation(TEXT["engine.panel_action.2"])
         entry[1](
             self, tenant, str(action), slot=slot, item_id=item_id, source=source
         )
@@ -668,12 +666,12 @@ class GameEngine(
     def tenant_name(self, tenant_id: int) -> str:
         """按房客 ID 返回其角色名称；查无此人时返回“未知房客”。"""
         tenant = self.state.house.tenants.get(tenant_id)
-        return self.character(tenant).name if tenant else "未知房客"
+        return self.character(tenant).name if tenant else TEXT["engine.tenant_name.1"]
 
     def _add_tenant(self, character_id: str) -> TenantState:
         """为可用角色登记一名新房客，分配 ID 与初始情绪后加入状态。"""
         if character_id not in CHARACTERS or not CHARACTERS[character_id].available:
-            raise RuleViolation("该房客在原稿中尚未开放。")
+            raise RuleViolation(TEXT["engine._add_tenant.1"])
         tenant_id = self.state.ids.allocate_tenant()
         tenant = TenantState(id=tenant_id, character_id=character_id)
         definition = CHARACTERS[character_id]
@@ -693,34 +691,23 @@ class GameEngine(
     def _require_home_tenant(self, tenant_id: int | None, *, must_act: bool = False) -> TenantState:
         """校验房客在场、存活且满足行动条件后返回该房客。"""
         if not tenant_id or tenant_id not in self.state.house.tenants:
-            raise RuleViolation("未找到该房客。")
+            raise RuleViolation(TEXT["engine._require_home_tenant.1"])
         tenant = self.state.house.tenants[tenant_id]
         if not tenant.alive or not tenant.at_home:
-            raise RuleViolation("该房客目前不在屋内。")
+            raise RuleViolation(TEXT["engine._require_home_tenant.2"])
         if must_act and tenant.skip_until_turn >= self.state.flow.turn:
-            raise RuleViolation("该房客本回合无法行动。")
+            raise RuleViolation(TEXT["engine._require_home_tenant.3"])
         return tenant
 
-    def _has_character(self, character_id: str, home_only: bool = True) -> bool:
-        """检查当前房客中是否存在指定角色（默认仅限屋内，且技能未被禁用）。"""
-        group = self.home_tenants() if home_only else self.living_tenants()
-        # Queries (including the status screen) must never consume randomness.
-        # A concrete passive trigger performs its own failure roll.
-        return any(
-            t.character_id == character_id and not t.shock and not t.passives_disabled
-            for t in group
-        )
     # --------------------------------------------------------------- round start
     def _log_searching_summary(self) -> None:
         """回合开始阶段：打印仍在搜索中的房客摘要（与既有流程同位置）。"""
         if self.state.world.missions:
             details = "；".join(
-                f"{self.tenant_name(mission.tenant_id)}在外"
-                f"{mission.elapsed_search_turns}回合，还剩"
-                f"{max(0, mission.remain_search_turns)}回合返回"
+                TEXT["engine._log_searching_summary.1"].format(p1=self.tenant_name(mission.tenant_id), p2=mission.elapsed_search_turns, p3=max(0, mission.remain_search_turns))
                 for mission in self.state.world.missions
             )
-            self._log(f"搜索中：{details}。")
+            self._log(TEXT["engine._log_searching_summary.2"].format(p1=details))
 
     def _run_pseudo_end_effects(self) -> None:
         """回合结束阶段：执行当前伪人场景注册的 settle_end 处理器。"""
@@ -736,11 +723,11 @@ class GameEngine(
         """开始新回合：记录快照并依次执行回合开始阶段的各类结算。"""
         self._require_no_pending_choice()
         if self._pending_ability:
-            raise RuleViolation("命运抽牌结算期间无法开始新回合。")
+            raise RuleViolation(TEXT["engine.start_turn.1"])
         if self.state.flow.game_over:
-            raise RuleViolation("本局已经结束。")
+            raise RuleViolation(TEXT["engine.start_turn.2"])
         if self.state.flow.phase == "action":
-            raise RuleViolation("当前回合尚未结束。")
+            raise RuleViolation(TEXT["engine.start_turn.3"])
         snapshot = self.state.to_dict(include_history=False)
         self.state.log.history.append(snapshot)
         self.state.log.history = self.state.log.history[-20:]
@@ -750,7 +737,7 @@ class GameEngine(
         self.state.round.item_uses_this_turn = 0
         self.state.log.current_turn_actions = []
         # 回合初重置“当回合生效”的命运抽牌效果（属该角色运行时）。
-        self._log(f"\n========== 第 {self.state.flow.turn} 回合：回合开始 ==========")
+        self._log(TEXT["engine.start_turn.4"].format(p1=self.state.flow.turn))
 
         # 阶段顺序由 lifecycle.START_TURN_PHASES 表声明（当前顺序与重构前一致）。
         from weiren_game.lifecycle import START_TURN_PHASES
@@ -761,7 +748,7 @@ class GameEngine(
         if not self.state.flow.game_over:
             self.state.flow.phase = "action"
             if self.state.world.events.door_events:
-                self._log(f"门外有 {len(self.state.world.events.door_events)} 个事件等待处理，暂时不能结束回合。")
+                self._log(TEXT["engine.start_turn.5"].format(p1=len(self.state.world.events.door_events)))
 
     # --------------------------------------------------------------- round end
     def resume_to_action(self) -> None:
@@ -782,15 +769,15 @@ class GameEngine(
         """结束行动阶段，执行回合末结算并判断胜利或进入回合间歇。"""
         self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("当前不在玩家行动阶段。")
+            raise RuleViolation(TEXT["engine.end_turn.1"])
         if self.state.world.events.door_events:
-            raise RuleViolation("门外仍有未处理事件，不能结束回合。")
+            raise RuleViolation(TEXT["engine.end_turn.2"])
         if self._pending_ability:
-            raise RuleViolation("仍有命运牌尚未选择或反悔，不能结束回合。")
+            raise RuleViolation(TEXT["engine.end_turn.3"])
         self.state.flow.phase = "turn_end"
         self._record_action("end_turn")
         # 结构行与"回合开始"统一（原来是 `----`，和 `====` 不一致）。
-        self._log(f"\n========== 第 {self.state.flow.turn} 回合：回合结束 ==========")
+        self._log(TEXT["engine.end_turn.4"].format(p1=self.state.flow.turn))
 
         # 阶段顺序由 lifecycle.END_TURN_PHASES 表声明（当前顺序与重构前一致）。
         from weiren_game.lifecycle import END_TURN_PHASES
@@ -802,7 +789,7 @@ class GameEngine(
         self._decay_global_events()
 
         if not self.state.flow.game_over and self.state.flow.turn >= self.state.flow.max_turns:
-            self._finish(True, "你们撑到了日出。第一束阳光照进屋内，伪人的阴影消失在晨雾中。")
+            self._finish(True, TEXT["engine.end_turn.5"])
         elif not self.state.flow.game_over:
             self.state.flow.phase = "between_turns"
 
@@ -828,11 +815,11 @@ class GameEngine(
         if tenant.is_pseudo:
             handler = self._pseudo_handler("expel_infiltrator")
             if handler is not None:
-                handler(self, "替身死亡")
+                handler(self, TEXT["engine._kill_tenant.1"])
             return
         self._remove_tenant_from_house(tenant)
         # 重后果（红色）：房客死亡不可逆。
-        self._log(f"死亡：{self.character(tenant).name}{reason}。", kind="danger")
+        self._log(TEXT["engine._kill_tenant.2"].format(p1=self.character(tenant).name, p2=reason), kind="danger")
 
     def _notify_tenant_death(self) -> None:
         """房客死亡节点：通知当前伪人场景与角色光环/被动的死亡响应。"""
@@ -851,7 +838,7 @@ class GameEngine(
     def _check_survival(self) -> None:
         """房客全部死亡时以失败结局结束本局。"""
         if not self.state.flow.game_over and not self.living_tenants():
-            self._finish(False, "最后一名房客也倒下了，屋主再也无力抵挡敲门声。")
+            self._finish(False, TEXT["engine._check_survival.1"])
 
     def _finish(self, victory: bool, ending: str) -> None:
         """以给定胜负与结局文本结束本局游戏。"""
@@ -859,13 +846,13 @@ class GameEngine(
         self.state.flow.victory = victory
         self.state.flow.ending = ending
         self.state.flow.phase = "finished"
-        self._log(("胜利：" if victory else "失败：") + ending)
+        self._log((TEXT["engine._finish.1"] if victory else TEXT["engine._finish.2"]) + ending)
 
     # ------------------------------------------------------------ replay/status
     def rewind_one_turn(self) -> None:
         """回退至上一回合开始前的快照并恢复状态。"""
         if not self.state.log.history:
-            raise RuleViolation("没有可以回溯的回合。")
+            raise RuleViolation(TEXT["engine.rewind_one_turn.1"])
         old_history = self.state.log.history[:-1]
         snapshot = self.state.log.history[-1]
         # 回溯只回退规则状态；完整日志是单调历史，保留下来供回看/导出。
@@ -873,7 +860,7 @@ class GameEngine(
         self.state = GameState.from_dict(snapshot)
         self.state.log.history = old_history
         self.state.log.entries = entries
-        self._log(f"已回溯至第{self.state.flow.turn + 1}回合开始前；相同操作会得到相同随机结果。")
+        self._log(TEXT["engine.rewind_one_turn.2"].format(p1=self.state.flow.turn + 1))
 
     def emotion_visible(self, tenant: object, key: str) -> bool:
         """屋主是否能看到某情绪。
@@ -889,7 +876,7 @@ class GameEngine(
         )
         return self._eval_gate(
             "emotion.visible",
-            source=("显示情绪", key),
+            source=("emotion_visible", key),
             context={"tenant": tenant, "key": key},
             base=base,
         )
@@ -899,8 +886,7 @@ class GameEngine(
         from weiren_game.data import CHARACTER_MODULES
 
         lines = [
-            f"回合 {self.state.flow.turn}/{self.state.flow.max_turns} | 阶段：{self.state.flow.phase} | "
-            f"难度：{self.state.meta.difficulty} | 种子：{self.state.meta.seed}"
+            TEXT["engine.status_lines.1"].format(p1=self.state.flow.turn, p2=self.state.flow.max_turns, p3=self.state.flow.phase, p4=self.state.meta.difficulty, p5=self.state.meta.seed)
         ]
         pseudo = self.state.pseudo_state
         # 「已确认」含初访前就生效的技能（known），与伪人卡口径一致。
@@ -911,42 +897,40 @@ class GameEngine(
                 "progress_text"
             )
             progress = progress_handler(self) if progress_handler is not None else ""
-            lines.append(f"伪人：{pseudo.name} | 到访{pseudo.visit_count}次 | {progress}")
+            lines.append(TEXT["engine.status_lines.2"].format(p1=pseudo.name, p2=pseudo.visit_count, p3=progress))
         else:
-            lines.append(f"伪人：尚未确认（场景：{pseudo.name}）")
+            lines.append(TEXT["engine.status_lines.3"].format(p1=pseudo.name))
         bonds = self.bond_levels()
-        lines.append("性格加权：" + ("、".join(f"{PERSONALITY_LABELS[key]}({value})" for key, value in bonds.items()) or "无"))
+        lines.append(TEXT["engine.status_lines.4"] + ("、".join(f"{PERSONALITY_LABELS[key]}({value})" for key, value in bonds.items()) or TEXT["engine.status_lines.5"]))
         for tenant in self.living_tenants():
             definition = self.character(tenant)
             if tenant.at_home:
                 # Fries is a perfect substitute; exposing this flag here would
                 # make its information-and-accusation game moot.
-                place = "屋内"
+                place = TEXT["engine.status_lines.6"]
             elif tenant.temporarily_away:
                 remaining = max(0, tenant.return_turn - self.state.flow.turn)
-                place = f"离屋，剩{remaining}回合返回"
+                place = TEXT["engine.status_lines.7"].format(p1=remaining)
             else:
-                place = "搜索中"
+                place = TEXT["engine.status_lines.8"]
             statuses: list[str] = []
             if tenant.trauma.active:
-                statuses.append(f"创伤{tenant.trauma.intensity}/{tenant.trauma.layers}")
+                statuses.append(TEXT["engine.status_lines.9"].format(p1=tenant.trauma.intensity, p2=tenant.trauma.layers))
             if tenant.disorder.active:
-                statuses.append(f"紊乱{tenant.disorder.intensity}/{tenant.disorder.layers}")
+                statuses.append(TEXT["engine.status_lines.10"].format(p1=tenant.disorder.intensity, p2=tenant.disorder.layers))
             for key, label in {**EROSION_EMOTIONS, **AWAKENING_EMOTIONS, **RARE_EMOTIONS}.items():
                 condition = tenant.condition(key)
                 if condition.active and self.emotion_visible(tenant, key):
                     statuses.append(f"{label}{condition.intensity}/{condition.layers}")
             if tenant.shock:
-                statuses.append(f"休克{tenant.shock}/{tenant.shock_layers}")
+                statuses.append(TEXT["engine.status_lines.11"].format(p1=tenant.shock, p2=tenant.shock_layers))
             personality = self._tenant_personalities(tenant)
             lines.append(
-                f"{tenant.id} {definition.name:<8} [{place}] 生命{tenant.health:>5.1f}/{tenant.max_health:g} "
-                f"理智{tenant.sanity:>5.1f} 消沉[隐藏] "
-                f"{PERSONALITY_LABELS.get(personality[0], personality[0])}-{PERSONALITY_LABELS.get(personality[1], personality[1])} | "
-                + ("、".join(statuses) or "无显现状态")
+                TEXT["engine.status_lines.12"].format(p1=tenant.id, p2=definition.name, p3=place, p4=tenant.health, p5=tenant.max_health, p6=tenant.sanity, p7=PERSONALITY_LABELS.get(personality[0], personality[0]), p8=PERSONALITY_LABELS.get(personality[1], personality[1]))
+                + ("、".join(statuses) or TEXT["engine.status_lines.13"])
             )
             if tenant.inventory.items:
-                lines.append("    装备：" + "、".join(
+                lines.append(TEXT["engine.status_lines.14"] + "、".join(
                     f"{ITEMS[held.item_id].name}" + (f"({held.durability})" if held.durability else "")
                     for held in tenant.inventory.items
                 ))
@@ -959,10 +943,7 @@ class GameEngine(
             )
             remaining = max(0, mission.remain_search_turns)
             lines.append(
-                f"  ↳ {self.tenant_name(mission.tenant_id)}在{LOCATIONS[mission.location_id].name}："
-                f"搜索{mission.elapsed_search_turns}/{mission.actual_search_turns}回合，剩{remaining}回合返回；"
-                f"携带物资 {carried_groups}/{mission.carry_capacity}（实际/上限），"
-                f"预计带回{len(mission.rewards)}件"
+                TEXT["engine.status_lines.15"].format(p1=self.tenant_name(mission.tenant_id), p2=LOCATIONS[mission.location_id].name, p3=mission.elapsed_search_turns, p4=mission.actual_search_turns, p5=remaining, p6=carried_groups, p7=mission.carry_capacity, p8=len(mission.rewards))
             )
         return lines
 
@@ -970,7 +951,7 @@ class GameEngine(
         """生成当前共享物资栏的逐行文本描述。"""
         house = self.state.house.inventory
         if not house:
-            return ["物资栏为空。"]
+            return [TEXT["engine.inventory_lines.1"]]
         result = []
         item_ids = sorted(
             {value.item_id for value in house},
@@ -988,26 +969,24 @@ class GameEngine(
                         and candidate.durability > 0
                     )
                 ]
-                durability = " [耐久:" + ",".join(map(str, values)) + "]"
+                durability = TEXT["engine.inventory_lines.2"] + ",".join(map(str, values)) + "]"
             result.append(f"{item_id}: {item.name} ×{amount}{durability} — {item.description}")
         return result
 
     def location_lines(self) -> list[str]:
         """生成本局可用地点的逐行文本描述。"""
         return [
-            f"{key}: {LOCATIONS[key].name}（回合{LOCATIONS[key].turn_delta:+d}，行为{LOCATIONS[key].behavior_delta:+d}）— {LOCATIONS[key].description}"
+            TEXT["engine.location_lines.1"].format(p1=key, p2=LOCATIONS[key].name, p3=LOCATIONS[key].turn_delta, p4=LOCATIONS[key].behavior_delta, p5=LOCATIONS[key].description)
             for key in self.state.world.locations.available_locations
         ]
 
     def codex_lines(self) -> list[str]:
         """生成图鉴统计文本；具体内容可在各自模块里追加统计行。"""
         lines = [
-            f"房客 {sum(c.available for c in CHARACTERS.values())}/{len(CHARACTERS)}",
-            f"物资 {len(ITEMS)} 种；搜索地点 {len(LOCATIONS)} 个"
-            f"（本局 {len(self.state.world.locations.available_locations)} 个）；"
-            f"信息模板 {len(INFORMATION_TEMPLATES)} 类",
-            f"伪人 {len(PSEUDOS)} 类：" + "、".join(value.name for value in PSEUDOS.values()),
-            "羁绊：" + "；".join(f"{PERSONALITY_LABELS[key]}—{value}" for key, value in BOND_DESCRIPTIONS.items()),
+            TEXT["engine.codex_lines.1"].format(p1=sum(c.available for c in CHARACTERS.values()), p2=len(CHARACTERS)),
+            TEXT["engine.codex_lines.2"].format(p1=len(ITEMS), p2=len(LOCATIONS), p3=len(self.state.world.locations.available_locations), p4=len(INFORMATION_TEMPLATES)),
+            TEXT["engine.codex_lines.3"].format(p1=len(PSEUDOS)) + "、".join(value.name for value in PSEUDOS.values()),
+            TEXT["engine.codex_lines.4"] + "；".join(f"{PERSONALITY_LABELS[key]}—{value}" for key, value in BOND_DESCRIPTIONS.items()),
         ]
         for hook in CODEX_SUMMARY_HOOKS:
             lines.extend(hook(self))

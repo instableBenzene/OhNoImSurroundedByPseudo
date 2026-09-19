@@ -13,6 +13,7 @@ from weiren_game.data import (
     CHARACTER_MODULES,
     EVENT_IDS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -27,10 +28,6 @@ from weiren_game.exceptions import RuleViolation
 class AbilitySystemMixin:
 
     # -------------------------------------------------------------- active skills
-    def _ability_state(self, tenant: Tenant, ability_id: str):
-        """返回房客对应技能状态的运行时对象（缺失时返回 None）。"""
-        return tenant.ability_state(ability_id)
-
     def _set_ability_cooldown(self, tenant: Tenant, ability_id: str, until: int) -> None:
         """把某主动技能的冷却写到其 AbilityState.cooldown_until。"""
         state = tenant.ability_state(ability_id)
@@ -49,11 +46,6 @@ class AbilitySystemMixin:
         if module is not None:
             return module
         return import_module(f"weiren_game.data.characters.{character_id}")
-
-    def _ability_has_local_cost(self, character_id: str, ability_id: str) -> bool:
-        """技能是否通过本地 costs_<ability_id> 提供 cost。"""
-        module = self._local_skill_module(character_id)
-        return callable(getattr(module, f"costs_{ability_id}", None))
 
     def _gate_local_skill(
         self,
@@ -105,13 +97,10 @@ class AbilitySystemMixin:
             chance += .10
         if self._condition_extra_effect_active(actor, "disorder") and actor.disorder.intensity == 10:
             chance += .10
-        from weiren_game.data import SCENARIO_HANDLERS
-
-        fail_modifier = SCENARIO_HANDLERS.get(
-            self.state.pseudo_state.scenario_id, {}
-        ).get("ability_fail_modifier")
-        if fail_modifier is not None:
-            chance = fail_modifier(self, actor, chance)
+        # 「谁会额外失败」走通用通道（内容用 spec("abilityFail") 声明，如伪人替身）。
+        chance = self._apply_modifiers(
+            "abilityFail", chance, ("ability_fail", actor.character_id), {"tenant": actor},
+        )
         fail_chance = resolve(
             chance,
             ([1.0] if chance >= 1.0 else []) + ([0.0] if chance <= 0 else []),
@@ -119,11 +108,8 @@ class AbilitySystemMixin:
         failed = self._rng(
             EVENT_IDS["ability.fail"], actor.id, ability_id
         ).random() < fail_chance
-        fail_resolved = SCENARIO_HANDLERS.get(
-            self.state.pseudo_state.scenario_id, {}
-        ).get("ability_fail_resolved")
-        if fail_resolved is not None:
-            fail_resolved(self, actor, ability_id, failed)
+        # 通用节点：核心只广播"这次判定出结果了"，怎么用是内容的事。
+        self._emit_node("ability.resolved", actor=actor, ability_id=ability_id, failed=failed)
         return failed
 
     def use_ability(
@@ -145,28 +131,28 @@ class AbilitySystemMixin:
         if not _bypass_limits:
             self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段使用能力。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.1"])
         actor = self._require_home_tenant(actor_id, must_act=True)
         definition = self.character(actor)
         if actor.shock or actor.abilities_disabled:
-            raise RuleViolation("该房客的主动能力已失效。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.2"])
         if not definition.actives:
-            raise RuleViolation(f"{definition.name}没有主动能力。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.3"].format(p1=definition.name))
         ability = next((value for value in definition.actives if value.id == ability_id), None)
         if ability is None:
             ability = definition.actives[0]
         if getattr(ability, "opens_panel", False):
             # 只负责打开专属面板的技能：不掷失败、不付代价、不记冷却，也不该走结算。
-            raise RuleViolation(f"“{ability.name}”在界面里打开，不走技能结算。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.4"].format(p1=ability.name))
         state = actor.ability_state(ability.id)
         cooldown = state.cooldown_until if state else 0
         if not _bypass_limits and self.state.flow.turn < cooldown:
-            raise RuleViolation(f"能力冷却中，要到第{cooldown}回合才能使用。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.5"].format(p1=cooldown))
         if self._ability_failed(actor, ability.id):
             if getattr(ability, "per_turn", False):
                 self._mark_ability_used(actor, ability.id)
-            self._log(f"{definition.name}尝试使用“{ability.name}”，但能力失效。")
-            self._mark_ability_failed("能力失效")
+            self._log(TEXT["systems.ability_system.use_ability.6"].format(p1=definition.name, p2=ability.name))
+            self._mark_ability_failed(TEXT["systems.ability_system.use_ability.7"])
             self._run_ability_outcome(actor, ability.id)
             return None
         self._gate_local_skill(
@@ -181,7 +167,7 @@ class AbilitySystemMixin:
         result: Any = None
         handler = ABILITY_DISPATCH.get(actor.character_id, {}).get(ability.id)
         if handler is None:
-            raise RuleViolation("该房客没有可主动结算的原稿能力。")
+            raise RuleViolation(TEXT["systems.ability_system.use_ability.8"])
         result = handler(
             self,
             actor,
@@ -206,7 +192,7 @@ class AbilitySystemMixin:
             secondary_target=secondary_target_id, secondary_option=secondary_option,
             secondary_amount=secondary_amount,
         )
-        self._log(f"{definition.name}使用了“{ability.name}”。")
+        self._log(TEXT["systems.ability_system.use_ability.9"].format(p1=definition.name, p2=ability.name))
         self._run_ability_outcome(actor, ability.id)
         self._flush_skill_outcomes()
         return result
@@ -215,7 +201,7 @@ class AbilitySystemMixin:
         """技能私有失败标记：由可能失败的技能在失败分支调用。"""
         self._ability_release_failed = True
         if reason:
-            self._record_log(f"技能释放失败：{reason}")
+            self._record_log(TEXT["systems.ability_system._mark_ability_failed.1"].format(p1=reason))
 
     def _run_ability_outcome(self, actor: Tenant, ability_id: str) -> None:
         """按“是否失败”派发 ability.used / ability.failed 节点。"""
@@ -264,9 +250,8 @@ class AbilitySystemMixin:
             return
         self._remove_tenant_from_house(tenant)
         # 重后果（红色）：驱逐不可撤销，而且会牵动羁绊与其余房客。
-        self._log(f"{source}驱逐了{self.character(tenant).name}。", kind="danger")
+        self._log(TEXT["systems.ability_system._expel_tenant.1"].format(p1=source, p2=self.character(tenant).name), kind="danger")
         exempt = sanity_exempt_ids or set()
         for other in self.home_tenants():
             if other.id not in exempt:
-                self._consume_sanity(other, 5, "同伴被驱逐")
-
+                self._consume_sanity(other, 5, "companion_expelled")

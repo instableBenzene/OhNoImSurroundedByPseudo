@@ -13,6 +13,7 @@ from weiren_game.data import (
     PERSONALITIES,
     PERSONALITY_LABELS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -123,7 +124,7 @@ class PersonalitySystemMixin:
                 if on_activate is not None:
                     on_activate(self, tier)
                 if not initial:
-                    self._log(f"羁绊激活：{PERSONALITY_LABELS[personality]}（{tier}）。")
+                    self._log(TEXT["systems.personality_system._activate_new_bonds.1"].format(p1=PERSONALITY_LABELS[personality], p2=tier))
         if initial:
             for module in PERSONALITY_MODULES.values():
                 on_initial = getattr(module, "ON_INITIAL", None)
@@ -153,14 +154,3 @@ class PersonalitySystemMixin:
         return self._rng(f"{event_id}.{tenant.id}").random() >= resolve(
             chance, guarantees
         )
-
-    def lock_personality(self, tenant_id: int) -> None:
-        """行动阶段将混的性格锁定为固定主性格并获得固定携带量。"""
-        if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段固定混的性格。")
-        tenant = self._require_home_tenant(tenant_id, must_act=True)
-        from weiren_game.data import NODE_HOOKS
-
-        for hook in NODE_HOOKS.get("personality.lock", ()):
-            hook(self, tenant)
-        self._record_action("lock_personality", tenant=tenant.id)

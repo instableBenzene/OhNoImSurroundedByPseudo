@@ -84,7 +84,7 @@ END_TURN_PHASES = (
     (Node.TURN_END_PSEUDO_ATTACK, "_pseudo_attack_searchers"),
     (Node.TURN_END_STATUS, "_settle_buff_debuff_effects"),
     (Node.TURN_END_INFORMATION, "_apply_pending_information_effects"),
-    (Node.TURN_END_EQUIPMENT, "_settle_books_and_equipment"),
+    (Node.TURN_END_EQUIPMENT, "_settle_held_items"),
     (Node.TURN_END_INSTANCES, "_run_pseudo_end_effects"),
     (Node.TURN_END_INSTANCES, "_settle_other_end_effects"),
     (Node.TURN_END_INFORMATION, "_expire_information"),

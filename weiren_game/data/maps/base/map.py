@@ -6,11 +6,12 @@ DLC 想把自己的地点加进城郊小镇，可以在 ``register(ctx)`` 里调
 """
 
 from weiren_game.data.types import MapDefinition
+from weiren_game.data.lang import TEXT
 
 MAP = MapDefinition(
     "base",
-    "城郊小镇",
-    "城郊小屋",
+    TEXT["map.base.name"],
+    TEXT["map.base.shelter"],
     locations=(
         "community_hospital",
         "pharmacy",
@@ -39,5 +40,5 @@ MAP = MapDefinition(
         "pawnshop",
     ),
     draw_count=10,
-    description="郊区小镇：医院、市场、五金店与零星的小铺散在几条街上，夜里几乎没人。",
+    description=TEXT["data.maps.base.map.module.1"],
 )

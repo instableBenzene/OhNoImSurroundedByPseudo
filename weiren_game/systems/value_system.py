@@ -6,10 +6,12 @@ import math
 
 from weiren_game.content import CONTENT
 from weiren_game.data import (
+    CHARACTER_NODE_HOOKS,
     CHARACTER_VALUE_HOOKS,
     DIFFICULTIES,
     EVENT_IDS,
 )
+from weiren_game.data.lang import TEXT, source_label, token_label
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -38,7 +40,7 @@ class ValueSystemMixin:
         held.durability -= cost
         if held.durability <= 0:
             tenant.inventory.items.remove(held)
-            self._log(f"{self.character(tenant).name}装备的{ITEMS[held.item_id].name}损坏。")
+            self._log(TEXT["systems.value_system._consume_held_durability.1"].format(p1=self.character(tenant).name, p2=ITEMS[held.item_id].name))
             return True
         return False
 
@@ -56,7 +58,7 @@ class ValueSystemMixin:
             return 0.0
         base = self._apply_modifiers(
             "healthDamage", amount,
-            ("伤害", source, tenant.character_id), {"tenant": tenant, "consume": False},
+            ("damage", source, tenant.character_id), {"tenant": tenant, "consume": False},
         )
         armoured = self._apply_armour(tenant, base)
         transferred = self._health_protection_multiplier(tenant, base, consume=False)
@@ -69,7 +71,7 @@ class ValueSystemMixin:
         # Rose can heal to full as a consequence of taking damage, which may
         # release the current ICU target immediately.
         self._after_health_changed()
-        self._log(f"{self.character(tenant).name}因{source}受到{lost:.1f}生命伤害。")
+        self._log(TEXT["systems.value_system._damage_health.2"].format(p1=self.character(tenant).name, p2=source_label(source), p3=lost))
         if transferred > 0:
             from weiren_game.data import NODE_HOOKS
 
@@ -81,7 +83,7 @@ class ValueSystemMixin:
             if receivers:
                 share = transferred / len(receivers)
                 for receiver in receivers:
-                    self._loss_health(receiver, share, "羁绊分担")
+                    self._loss_health(receiver, share, "bond_share")
         return lost
 
     def _consume_health(self, tenant: Tenant, amount: float, source: str) -> float:
@@ -89,7 +91,7 @@ class ValueSystemMixin:
         if amount <= 0 or not tenant.alive:
             return 0.0
         if tenant.health < amount:
-            self._log(f"{self.character(tenant).name}的生命不足{amount:g}，{source}的生命消耗失败。")
+            self._log(TEXT["systems.value_system._consume_health.1"].format(p1=self.character(tenant).name, p2=amount, p3=source_label(source)))
             return 0.0
         from weiren_game.data import NODE_HOOKS
 
@@ -99,7 +101,7 @@ class ValueSystemMixin:
                 return converted
         amount = self._apply_modifiers(
             "healthConsume", amount,
-            ("消耗", source, tenant.character_id), {"tenant": tenant, "consume": True},
+            ("consume", source, tenant.character_id), {"tenant": tenant, "consume": True},
         )
         transferred = self._health_protection_multiplier(tenant, amount, consume=True)
         before = tenant.health
@@ -108,7 +110,7 @@ class ValueSystemMixin:
         lost = max(0.0, before - tenant.health)
         self._after_health_decrease(tenant, lost)
         self._after_health_changed()
-        self._log(f"{self.character(tenant).name}因{source}消耗{lost:.1f}生命。")
+        self._log(TEXT["systems.value_system._consume_health.3"].format(p1=self.character(tenant).name, p2=source_label(source), p3=lost))
         if transferred > 0:
             from weiren_game.data import NODE_HOOKS
 
@@ -118,7 +120,7 @@ class ValueSystemMixin:
                 if receivers:
                     break
             for receiver in receivers:
-                self._loss_health(receiver, transferred / len(receivers), "该性格羁绊分担")
+                self._loss_health(receiver, transferred / len(receivers), "personality_bond_share")
         return lost
 
     def _loss_health(self, tenant: Tenant, amount: float, source: str) -> float:
@@ -127,7 +129,7 @@ class ValueSystemMixin:
             return 0.0
         amount = self._apply_modifiers(
             "healthLoss", amount,
-            ("生命流失", source, tenant.character_id), {"tenant": tenant},
+            ("health_loss", source, tenant.character_id), {"tenant": tenant},
         )
         before = tenant.health
         tenant.health = max(-100.0, tenant.health - amount)
@@ -135,10 +137,10 @@ class ValueSystemMixin:
         lost = max(0.0, before - tenant.health)
         self._after_health_decrease(tenant, lost)
         self._after_health_changed()
-        self._log(f"{self.character(tenant).name}因{source}流失{lost:.1f}生命。")
+        self._log(TEXT["systems.value_system._loss_health.2"].format(p1=self.character(tenant).name, p2=source_label(source), p3=lost))
         return lost
 
-    def _restore_health(self, tenant: Tenant, amount: float, source: str = "回复") -> float:
+    def _restore_health(self, tenant: Tenant, amount: float, source: str = TEXT["systems.value_system._restore_health.1"]) -> float:
         """回复生命至上限，返回实际回复量。
 
         注意：**不再顺手清除休克**。休克只由**内容层明确声明的效果**解除
@@ -158,7 +160,7 @@ class ValueSystemMixin:
         if amount <= 0 or not tenant.alive:
             return 0.0
         if tenant.sanity < amount:
-            self._log(f"{self.character(tenant).name}的理智不足{amount:g}，{source}的理智消耗失败。")
+            self._log(TEXT["systems.value_system._consume_sanity.1"].format(p1=self.character(tenant).name, p2=amount, p3=source_label(source)))
             return 0.0
         from weiren_game.data import NODE_HOOKS
 
@@ -166,19 +168,19 @@ class ValueSystemMixin:
             converted = hook(self, tenant, amount, source)
             if converted is not None:
                 return converted
-        return self._reduce_sanity(tenant, amount, source, floor_zero=True, change_type="消耗")
+        return self._reduce_sanity(tenant, amount, source, floor_zero=True, change_type="consume")
 
     def _damage_sanity(self, tenant: Tenant, amount: float, source: str) -> float:
         """对理智造成包含难度倍率的伤害。"""
         value = self._apply_modifiers(
             "sanityDamage", amount,
-            ("伤害", source, tenant.character_id), {"tenant": tenant},
+            ("damage", source, tenant.character_id), {"tenant": tenant},
         )
-        return self._reduce_sanity(tenant, value, source, floor_zero=False, change_type="伤害")
+        return self._reduce_sanity(tenant, value, source, floor_zero=False, change_type="damage")
 
     def _loss_sanity(self, tenant: Tenant, amount: float, source: str) -> float:
         """以流失语义扣减理智（不设下限）。"""
-        return self._reduce_sanity(tenant, amount, source, floor_zero=False, change_type="流失")
+        return self._reduce_sanity(tenant, amount, source, floor_zero=False, change_type="loss")
 
     def _reduce_sanity(self, tenant: Tenant, amount: float, source: str, *, floor_zero: bool, change_type: str) -> float:
         """统一削减理智：应用冻结保护、角色减半等修饰并触发后续效果。"""
@@ -186,7 +188,7 @@ class ValueSystemMixin:
             return 0.0
         from weiren_game.data import NODE_HOOKS
 
-        channel = {"消耗": "sanityConsume", "伤害": "sanityDamage", "流失": "sanityLoss"}.get(
+        channel = {"consume": "sanityConsume", "damage": "sanityDamage", "loss": "sanityLoss"}.get(
             change_type, "sanityLoss"
         )
         amount = self._apply_modifiers(
@@ -215,38 +217,32 @@ class ValueSystemMixin:
             )
         for hook in NODE_HOOKS.get("sanity.after_decrease", ()):
             hook(self, tenant)
-        self._log(f"{self.character(tenant).name}因{source}{change_type}{lost:.1f}理智。")
+        self._log(TEXT["systems.value_system._reduce_sanity.1"].format(p1=self.character(tenant).name, p2=source_label(source), p3=token_label(change_type), p4=lost))
         return lost
 
-    def _restore_sanity(self, tenant: Tenant, amount: float, source: str = "回复") -> float:
-        """回复理智（该角色减半），溢出部分按角色被动转为星星或该角色标记。"""
+    def _restore_sanity(self, tenant: Tenant, amount: float, source: str = TEXT["systems.value_system._restore_sanity.1"]) -> float:
+        """回复理智；溢出多少、怎么用，交给内容层（发 `sanity.restored` 节点）。"""
         if amount <= 0 or not tenant.alive:
             return 0.0
         amount = self._apply_modifiers(
-            "sanityRestore", amount, ("回复", tenant.character_id),
+            "sanityRestore", amount, ("restore", tenant.character_id),
             {"tenant": tenant},
         )
-        hooks = CHARACTER_VALUE_HOOKS.get(tenant.character_id)
         before = tenant.sanity
         raw_after = tenant.sanity + amount
         cap = tenant.max_sanity
         tenant.sanity = min(cap, raw_after)
         overflow = max(0.0, raw_after - cap)
-        if overflow and hooks:
-            overflow_hook = hooks.get("restore_overflow")
-            if overflow_hook is not None:
-                overflow_hook(self, tenant, overflow)
-        from weiren_game.data import SCENARIO_HANDLERS
-
-        overflow_share = SCENARIO_HANDLERS.get(
-            self.state.pseudo_state.scenario_id, {}
-        ).get("sanity_overflow_share")
-        if overflow_share is not None:
-            overflow_share(self, tenant, overflow)
+        # 核心只发**通用节点**：谁关心溢出谁自己登记（全局 `NODE_HOOKS` / 角色
+        # `CHARACTER_NODE_HOOKS` / 伪人场景各自判断），核心不为任何单个角色或场景留专属入口。
+        self._emit_node("sanity.restored", tenant=tenant, overflow=overflow)
+        tenant_hook = CHARACTER_NODE_HOOKS.get(tenant.character_id, {}).get("sanity.restored")
+        if tenant_hook is not None:
+            tenant_hook(self, tenant=tenant, overflow=overflow)
         return tenant.sanity - before
 
     def _after_health_decrease(self, tenant: Tenant, amount: float) -> None:
-        """生命下降后结算角色连锁效果（该角色驭血魔化印记）。"""
+        """生命下降后结算内容层登记的角色连锁（`CHARACTER_VALUE_HOOKS`）。"""
         if amount <= 0:
             return
         hooks = CHARACTER_VALUE_HOOKS.get(tenant.character_id)
@@ -290,7 +286,7 @@ def _difficulty_health_damage_modifier(context: object):
     engine = context["engine"]  # type: ignore[index]
     mult = float(DIFFICULTIES[engine.state.meta.difficulty]["damage_multiplier"])
     if mult != 1.0:
-        yield spec("healthDamage").path("伤害").final().mul(mult).source("难度")
+        yield spec("healthDamage").path("damage").final().mul(mult).source("difficulty")
 
 
 def _difficulty_sanity_damage_modifier(context: object):
@@ -300,7 +296,7 @@ def _difficulty_sanity_damage_modifier(context: object):
     engine = context["engine"]  # type: ignore[index]
     mult = float(DIFFICULTIES[engine.state.meta.difficulty]["damage_multiplier"])
     if mult != 1.0:
-        yield spec("sanityDamage").path("伤害").final().mul(mult).source("难度")
+        yield spec("sanityDamage").path("damage").final().mul(mult).source("difficulty")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regdd

@@ -25,8 +25,10 @@ from .dlc import (
 )
 from .engine import GameEngine, RuleViolation
 from .data.labels import ACTIVE_USES_CHIP
+from .data.lang import TEXT
 
 from .paths import app_base, resource_dir, saves_dir
+from weiren_game.data.lang import TEXT
 
 WEBUI_DIR = resource_dir("webui")
 DEFAULT_PORT = 8730
@@ -74,9 +76,9 @@ def _location_supply(location) -> str:
         label = "、".join(tag_label(tag) for tag in tags)
         parts.append(f"{weight:g}% {'【' + label + '】' if label else '其他物资'}")
     for key, value in location.quality_modifiers:
-        parts.append(f"{tier_label(key)}品质概率{(float(value) - 1) * 100:+.0f}%")
+        parts.append(TEXT["web_ui._location_supply.1"].format(p1=tier_label(key), p2=(float(value) - 1) * 100))
     for key, value in location.item_tag_modifiers:
-        parts.append(f"{tag_label(key)}权重 ×{value:g}")
+        parts.append(TEXT["web_ui._location_supply.2"].format(p1=tag_label(key), p2=value))
     return "；".join(parts)
 
 
@@ -94,13 +96,13 @@ def _location_mechanics(location) -> list[str]:
     """地点特殊设定，逐条（界面用小列表渲染）。"""
     mech = []
     if location.fixed:
-        mech.append("必定可选（固定出现）")
+        mech.append(TEXT["web_ui._location_mechanics.1"])
     if location.turn_delta:
-        mech.append(f"搜索回合数{location.turn_delta:+d}")
+        mech.append(TEXT["web_ui._location_mechanics.2"].format(p1=location.turn_delta))
     if location.behavior_delta:
-        mech.append(f"搜索行为次数{location.behavior_delta:+d}")
+        mech.append(TEXT["web_ui._location_mechanics.3"].format(p1=location.behavior_delta))
     if location.encounter_bonus:
-        mech.append(f"遭遇伪人概率{location.encounter_bonus:+.0%}")
+        mech.append(TEXT["web_ui._location_mechanics.4"].format(p1=location.encounter_bonus))
     return mech
 
 
@@ -556,7 +558,7 @@ def _global_event_rows(engine: GameEngine) -> list[dict]:
         definition = GLOBAL_EVENT_DEFINITIONS.get(event_id)
         layers = int(instance.layers)
         # 长期事件（约定 99）显示为「长期」，其余写明确回合数。
-        remain = "长期" if layers >= 99 else f"还能持续 {layers} 回合"
+        remain = TEXT["web_ui._global_event_rows.1"] if layers >= 99 else TEXT["web_ui._global_event_rows.2"].format(p1=layers)
         rows.append({
             "id": event_id,
             "label": definition.label if definition is not None else event_id,
@@ -599,7 +601,7 @@ def build_state(engine: GameEngine) -> dict:
     for tenant in engine.living_tenants():
         info = engine.character(tenant)
         abilities = []
-        for kind, group in (("主动", info.actives), ("被动", info.passives)):
+        for kind, group in ((TEXT["web_ui.build_state.1"], info.actives), (TEXT["web_ui.build_state.2"], info.passives)):
             for ability in group:
                 state = tenant.ability_state(ability.id)
                 entry = {
@@ -713,8 +715,8 @@ def build_state(engine: GameEngine) -> dict:
     for tenant in engine.home_tenants():
         info = engine.character(tenant)
         p_key, s_key = engine._tenant_personalities(tenant)
-        providers.setdefault(p_key, []).append(f"{info.name}（主）")
-        providers.setdefault(s_key, []).append(f"{info.name}（副）")
+        providers.setdefault(p_key, []).append(TEXT["web_ui.build_state.3"].format(p1=info.name))
+        providers.setdefault(s_key, []).append(TEXT["web_ui.build_state.4"].format(p1=info.name))
     # 本局可提供各羁绊的房客名单：排除本局被禁用的角色与伪人的人类形态（不参与本局）。
     disabled = set(engine.state.world.disabled_characters)
     pseudo_definition = PSEUDOS.get(engine.state.pseudo_state.scenario_id)
@@ -724,9 +726,9 @@ def build_state(engine: GameEngine) -> dict:
         if not definition.available or cid in disabled or cid == human_id:
             continue
         if definition.primary in PERSONALITIES:
-            potential.setdefault(definition.primary, []).append(f"{definition.name}（主）")
+            potential.setdefault(definition.primary, []).append(TEXT["web_ui.build_state.5"].format(p1=definition.name))
         if definition.secondary in PERSONALITIES:
-            potential.setdefault(definition.secondary, []).append(f"{definition.name}（副）")
+            potential.setdefault(definition.secondary, []).append(TEXT["web_ui.build_state.6"].format(p1=definition.name))
     for key in PERSONALITIES:
         label = PERSONALITY_LABELS[key]
         lv = int(levels.get(key, 0))
@@ -789,9 +791,9 @@ def build_state(engine: GameEngine) -> dict:
             "state": {"pending": "pending", "confirmed": "true",
                       "refuted": "false", "expired": "expired"}.get(info.status, "true"),
             "desc": info.text,
-            "source": info.source or "未知",
+            "source": info.source or TEXT["web_ui.build_state.7"],
             "kind_label": _kind_label(info.kind),
-            "expire": (f"{left} 回合后失效"
+            "expire": (TEXT["web_ui.build_state.8"].format(p1=left)
                        if info.status in ("pending", "confirmed") and left > 0 else ""),
             "effect": "",
         })
@@ -1027,10 +1029,6 @@ def art_url(kind: str, entity_id: str) -> str:
     return icon_url(kind, entity_id)
 
 
-def _now_iso() -> str:
-    return datetime.datetime.now().isoformat(timespec="seconds")
-
-
 def _safe_filename(name: str) -> str:
     """把用户输入的存档名转成安全的文件名（去路径分隔符与非法字符）。"""
     cleaned = re.sub(r'[\\/:*?"<>|]+', "_", str(name).strip())
@@ -1110,7 +1108,7 @@ class Session:
             try:
                 load_single_dlc(name)
             except Exception as exc:  # noqa: BLE001 - 装载失败转为可见错误
-                raise RuleViolation(f"DLC「{name}」装载失败：{exc}")
+                raise RuleViolation(TEXT["web_ui.new_game.1"].format(p1=name, p2=exc))
         self.engine = GameEngine.new_game(
             seed=options.get("seed") or None,
             map_id=str(options.get("map") or "") or None,
@@ -1143,7 +1141,8 @@ class Session:
         except RuleViolation:
             return
         index = _read_index()
-        index[path.name] = {"name": self._pending_save["name"], "created": _now_iso()}
+        index[path.name] = {"name": self._pending_save["name"],
+                            "created": datetime.datetime.now().isoformat(timespec="seconds")}
         _write_index(index)
         self.save_path = path
         self._pending_save = None
@@ -1170,10 +1169,10 @@ class Session:
 
     def load_save(self, filename: str) -> None:
         if not filename:
-            raise RuleViolation("未指定存档。")
+            raise RuleViolation(TEXT["web_ui.load_save.1"])
         path = SAVES_DIR / Path(filename).name
         if not path.is_file():
-            raise RuleViolation("存档不存在。")
+            raise RuleViolation(TEXT["web_ui.load_save.2"])
         self.engine = GameEngine.load(path)
         self.save_path = path
         self._pending_save = None
@@ -1181,7 +1180,7 @@ class Session:
 
     def delete_save(self, filename: str) -> None:
         if not filename:
-            raise RuleViolation("未指定存档。")
+            raise RuleViolation(TEXT["web_ui.delete_save.1"])
         path = SAVES_DIR / Path(filename).name
         if path.is_file():
             path.unlink()
@@ -1194,7 +1193,7 @@ class Session:
 
     def perform(self, payload: dict) -> None:
         if self.engine is None:
-            raise RuleViolation("尚未开始新对局。")
+            raise RuleViolation(TEXT["web_ui.perform.1"])
         action = payload.get("type")
         if action == "end_turn":
             self.engine.end_turn()
@@ -1206,20 +1205,20 @@ class Session:
         elif action == "discover":
             pending = self.engine._pending_choice
             if not pending:
-                raise RuleViolation("当前没有待选。")
+                raise RuleViolation(TEXT["web_ui.perform.2"])
             options = list(pending.get("options", ()))
             index = int(payload.get("index", 0))
             if not 0 <= index < len(options):
-                raise RuleViolation("选项超出范围。")
+                raise RuleViolation(TEXT["web_ui.perform.3"])
             self.engine.choose_discover(options[index])
         elif action == "start_choice":
             pending = self.engine._pending_choice
             if not pending or pending.get("kind") != "start_choice":
-                raise RuleViolation("当前没有开局选择。")
+                raise RuleViolation(TEXT["web_ui.perform.4"])
             options = list(pending.get("options", ()))
             index = int(payload.get("index", 0))
             if not 0 <= index < len(options):
-                raise RuleViolation("选项超出范围。")
+                raise RuleViolation(TEXT["web_ui.perform.5"])
             self.engine.commit_start_choice(options[index])
             if not self.engine._pending_choice and self.engine.state.flow.phase in {"created", "between_turns"}:
                 self.engine.start_turn()
@@ -1282,16 +1281,19 @@ class Session:
             target = self.save_path or SAVE_PATH
             path = self.engine.save(target)
             index = _read_index()
-            index.setdefault(path.name, {"name": path.stem, "created": _now_iso()})
+            index.setdefault(path.name, {
+                "name": path.stem,
+                "created": datetime.datetime.now().isoformat(timespec="seconds"),
+            })
             _write_index(index)
             self.save_path = path
         elif action == "load":
             if not SAVE_PATH.is_file():
-                raise RuleViolation("没有找到存档。")
+                raise RuleViolation(TEXT["web_ui.perform.6"])
             self.engine = GameEngine.load(SAVE_PATH)
             self.engine.resume_to_action()
         else:
-            raise RuleViolation(f"暂不支持的动作为 {action!r}。")
+            raise RuleViolation(TEXT["web_ui.perform.7"].format(p1=action))
 
 
 def _codex_extra(character_id: str) -> list:
@@ -1307,7 +1309,7 @@ def _codex_extra(character_id: str) -> list:
         return []
 
 
-_BOOK_GAIN_MARKERS = ("获得被动能力", "习得")
+_BOOK_GAIN_MARKERS = (TEXT["web_ui._BOOK_GAIN_MARKERS.0"], TEXT["web_ui._BOOK_GAIN_MARKERS.1"])
 
 
 def codex_state() -> dict:
@@ -1348,9 +1350,9 @@ def codex_state() -> dict:
             "duration": _info.duration,
             "rewards": [[r, ITEMS[r].name] for r in _info.reward_ids if r in ITEMS],
             "effect": [
-                (f"【{tag_label(_key.split(':', 1)[1])}】权重 ×{float(_val):g}" if _key.startswith("tag:")
-                 else f"{tier_label(_key.split(':', 1)[1])}品质权重 ×{float(_val):g}" if _key.startswith("quality:")
-                 else f"持续 {float(_val):g} 回合")
+                (TEXT["web_ui.codex_state.1"].format(p1=tag_label(_key.split(':', 1)[1]), p2=float(_val)) if _key.startswith("tag:")
+                 else TEXT["web_ui.codex_state.2"].format(p1=tier_label(_key.split(':', 1)[1]), p2=float(_val)) if _key.startswith("quality:")
+                 else TEXT["web_ui.codex_state.3"].format(p1=float(_val)))
                 for _key, _val in LOCATION_INFORMATION_MODIFIERS.get(_iid, {}).items()
             ],
             "pending": _info.pending, "confirmed": _info.confirmed, "refuted": _info.refuted,
@@ -1426,19 +1428,19 @@ def codex_state() -> dict:
     for lid, loc in sorted(LOCATIONS.items(), key=lambda kv: kv[1].name):
         # 物资类型（按设计稿的完整句式还原掉落分布）。
         supply = "；".join(
-            f"{weight:g}%可能获得"
-            + ("【" + "、".join(tag_label(tag) for tag in tags) + "】" if tags else "其他物资")
+            TEXT["web_ui.codex_state.4"].format(p1=weight)
+            + ("【" + "、".join(tag_label(tag) for tag in tags) + "】" if tags else TEXT["web_ui.codex_state.5"])
             for tags, weight in loc.tag_distribution
         )
         for key, value in loc.quality_modifiers:
             delta = (float(value) - 1.0) * 100
             tier = tier_label(key)
             if "以上" in tier or "及" in tier:
-                supply += f"；{tier}品质概率{delta:+.0f}%"
+                supply += TEXT["web_ui.codex_state.6"].format(p1=tier, p2=delta)
             else:
-                supply += f"；{tier}品质概率{delta:+.0f}%"
+                supply += TEXT["web_ui.codex_state.7"].format(p1=tier, p2=delta)
         for key, value in loc.item_tag_modifiers:
-            supply += f"；{tag_label(key)}权重 ×{value:g}"
+            supply += TEXT["web_ui.codex_state.8"].format(p1=tag_label(key), p2=value)
         locations.append({
             "id": lid, "name": loc.name, "art": art_url("locations", lid),
             "desc": _pack.LOCATION_TEXT.get(lid, loc.description),
@@ -1487,7 +1489,7 @@ def codex_state() -> dict:
             if definition.primary == key or definition.secondary == key:
                 providers.append({
                     "id": cid, "name": definition.name, "avatar": avatar_of(cid),
-                    "role": "主" if definition.primary == key else "副",
+                    "role": TEXT["web_ui.codex_state.9"] if definition.primary == key else TEXT["web_ui.codex_state.10"],
                 })
         personalities.append({
             "key": key, "label": label, "desc": BOND_DESCRIPTIONS.get(key, ""),
@@ -1562,7 +1564,7 @@ def apply_settings(payload: dict) -> None:
     if "difficulty" in payload and payload["difficulty"]:
         difficulty = str(payload["difficulty"])
         if difficulty not in DIFFICULTIES:
-            raise RuleViolation(f"未知难度：{difficulty}")
+            raise RuleViolation(TEXT["web_ui.apply_settings.1"].format(p1=difficulty))
         CONFIG.difficulty = difficulty
     if "max_turns" in payload and payload["max_turns"]:
         CONFIG.max_turns = max(1, int(payload["max_turns"]))
@@ -1654,6 +1656,8 @@ def make_handler(session: Session, *, quit_server=None):
                 return
             if path == "/api/resourcepack":
                 self._send_json({"ok": True, **resource_pack_state()})
+            if path == "/api/lang":
+                self._send_json({"ok": True, "text": TEXT})
                 return
             if path == "/api/resourcepack/asset":
                 from urllib.parse import parse_qs
@@ -1703,7 +1707,7 @@ def make_handler(session: Session, *, quit_server=None):
                     if name:
                         target = SAVES_DIR / Path(name).name
                         if not target.is_file():
-                            self._send_json({"ok": False, "error": "存档不存在。"}, 404)
+                            self._send_json({"ok": False, "error": TEXT["web_ui.do_GET.1"]}, 404)
                             return
                         engine = GameEngine.load(target)
                         stem = target.stem
@@ -1711,7 +1715,7 @@ def make_handler(session: Session, *, quit_server=None):
                         engine = session.engine
                         stem = "current"
                     else:
-                        self._send_json({"ok": False, "error": "当前没有对局。"}, 400)
+                        self._send_json({"ok": False, "error": TEXT["web_ui.do_GET.2"]}, 400)
                         return
                     text = engine.export_full_log()
                 except RuleViolation as exc:
@@ -1775,7 +1779,7 @@ def make_handler(session: Session, *, quit_server=None):
                     })
                     return
                 else:
-                    self._send_json({"ok": False, "error": "未知接口"}, 404)
+                    self._send_json({"ok": False, "error": TEXT["web_ui.do_POST.1"]}, 404)
                     return
             except RuleViolation as exc:
                 self._send_json({"ok": False, "error": str(exc), "messages": session.drain()})
@@ -1791,7 +1795,7 @@ def run_server(port: int = DEFAULT_PORT, *, open_browser: bool = True) -> None:
     try:
         load_configured_dlc()
     except Exception as exc:  # noqa: BLE001 - 单个包损坏不应阻止启动界面
-        print(f"启用内容包装载失败（已忽略）：{exc}")
+        print(TEXT["web_ui.run_server.1"].format(p1=exc))
     session = Session()
     holder: dict = {}
 
@@ -1809,7 +1813,7 @@ def run_server(port: int = DEFAULT_PORT, *, open_browser: bool = True) -> None:
     )
     holder["server"] = server
     url = f"http://127.0.0.1:{port}/"
-    print(f"本地界面已启动：{url}（关闭本窗口即停止服务）")
+    print(TEXT["web_ui.run_server.2"].format(p1=url))
     if open_browser:
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()
     try:
@@ -1821,7 +1825,7 @@ def run_server(port: int = DEFAULT_PORT, *, open_browser: bool = True) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="《完蛋，我被伪人包围了！？》本地 Web 界面")
+    parser = argparse.ArgumentParser(description=TEXT["web_ui.main.1"])
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args(argv)

@@ -7,11 +7,12 @@ from weiren_game.probability import resolve
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "demit", 17, "堤谧特", "喜欢打发时间的天然呆，比较忧郁。", "loner", "gentle", 3,
-    ("无业游民", "18-24岁", "男性"), (A("silent", "默默无声", "堤谧特不会受到任何伪人主动技能的影响。"),),
+    "demit", 17, TEXT["character.demit.name"], TEXT["character.demit.description"], "loner", "gentle", 3,
+    (TEXT["character.demit.tag.0"], TEXT["character.demit.tag.1"], TEXT["character.demit.tag.2"]), (A("silent", TEXT["ability.silent.name"], TEXT["ability.silent.description"]),),
 )
 
 # ---------------------------------------------------------------- function
@@ -26,7 +27,7 @@ def resists_pseudo_active(
         return False
     from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
 
-    source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+    source = (TEXT["data.characters.demit.resists_pseudo_active.1"], TEXT["data.characters.demit.resists_pseudo_active.2"], TEXT["data.characters.demit.resists_pseudo_active.3"], TEXT["data.characters.demit.resists_pseudo_active.4"])
     ctx = {"engine": engine, "tenant": tenant, "event_id": event_id}
     value = calculate_modified_amount(
         0.0, collect_modifiers("chance", source, ctx)
@@ -35,7 +36,7 @@ def resists_pseudo_active(
     chance = resolve(value - success_penalty, guarantee)
     if engine._rng(f"{event_id}.demit.resist").random() < chance:
         engine._skill_outcome(tenant, f"{event_id}.demit", True)
-        engine._log(f"堤谧特的「默默无声」使其免受{engine.state.pseudo_state.name}影响。")
+        engine._log(TEXT["data.characters.demit.resists_pseudo_active.5"].format(p1=engine.state.pseudo_state.name))
         return True
     engine._skill_outcome(tenant, f"{event_id}.demit", False)
     return False
@@ -50,7 +51,7 @@ def _demit_resist_modifier(context: object):
         return
     yield (
         spec("chance").certain(1.0).match("all")
-        .path("抵御", "伪人使用主动能力").source("角色技能", "堤谧特", "默默无声")
+        .path("resist", "pseudo_active").source("ability", "demit", "silent")
     )
 
 

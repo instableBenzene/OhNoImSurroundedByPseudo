@@ -5,13 +5,14 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field, fields
 from typing import Any
 
-from .data import GAME_VERSION
+from .data import DEFAULT_PSEUDO, GAME_VERSION
 from .session import GameFlowState, InstancePool, RoundActionState, SaveMetadata
 from .pseudo import PseudoRuntime
 from .condition import Condition
 from .global_event import GlobalEventState
 from .items import Inventory
 from .tenant import TenantState
+from weiren_game.data.lang import TEXT
 
 # 设计约定：不要把特殊角色独有的字段直接加入通用 TenantState
 # （reason/madness/personas/性格锁定/角色专属印记、状态或技能参数等）。
@@ -78,7 +79,7 @@ class Information:
     truth: bool = True
     kind: str = "visit"
     subtype: str = ""
-    source: str = "未知"
+    source: str = TEXT["models.module.1"]
     template_id: str | None = None
     location_id: str | None = None
     target_ids: list[int] = field(default_factory=list)
@@ -293,7 +294,7 @@ class GameState:
             self,
             "pseudo_state",
             pseudo_state
-            or PseudoRuntime(pseudo_instance_id=1, scenario_id="pseudo_benzene"),
+            or PseudoRuntime(pseudo_instance_id=1, scenario_id=DEFAULT_PSEUDO),
         )
         object.__setattr__(self, "log", log or SessionLogState())
 
@@ -344,6 +345,5 @@ class GameState:
             pseudo_state=PseudoRuntime.from_dict(raw.get("pseudo_state", {})),
             log=SessionLogState.from_dict(raw.get("log", {})),
         )
-
 
 

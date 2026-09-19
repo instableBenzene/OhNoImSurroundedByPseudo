@@ -15,6 +15,7 @@ description: Use when packaging content as a DLC pack for OhNoImSurroundedByPseu
 ```
 dlc/<dlc_name>/
   dlc.json                # {"name","version","min_game_version": "2.1.0"}
+  lang.py                 # **本包全部文案**（TEXT = {...}），模块里 TEXT = pack_text_from_file(__file__)
   __init__.py             # 可选：def register(ctx): ...
   characters/<id>.py      # 暴露 CHARACTER（或 CHARACTERS）
   personalities/<key>.py  # 一类性格：LABEL + TIERS/TIER_AT/HOOKS/BOND_*
@@ -36,10 +37,21 @@ dlc/<dlc_name>/
 
 ## 规则
 - **零改核心**：DLC 只放内容；不得 import 具体内置内容，只用协议与注册表。
+- **文案一律住本包的 `lang.py`**（一个包一个文件，不做回退链、不做多语言）：
+  ```python
+  # dlc/<包>/lang.py
+  TEXT = {"item.my_item.name": "我的物品", "ability.my_skill.description": "……"}
+  # dlc/<包>/items/my.py
+  from weiren_game.data.lang import pack_text_from_file
+  TEXT = pack_text_from_file(__file__)          # 按包目录取表
+  ```
+  键名沿用既有 id（`character.<id>.*` / `item.<id>.*` / `ability.<id>.*` / `pseudo.<id>.*`）；
+  **加文本只是往本包 lang 加一条**，没有注册动作；取错 key 会 `KeyError`。
+  DLC 文本随包装载/卸载（表本身不参与注册表快照，包没载就不会被读）。
 - **DLC 伪人的图鉴技能**：本体图鉴「伪人」页的技能来自 `codex_pack.PSEUDO_SKILLS`。DLC 伪人优先在
   自己模块里声明 `CODEX_SKILLS = ((name, text), ...)`（图鉴页会自动回退读它）；也可在 `codex/register(ctx)`
   里直接改静态表——**这些表已纳入快照，卸载会回滚**。（突破/解放来自 `DEFINITION`，无需处理。）
-- **限定 chip 由技能自声明**：`A(..., chips=("冷却 2 回合",))`；**不要**指望内置的 chip 表（已删除）。
+- **限定 chip 由技能自声明**：`A(..., chips=(TEXT["ability.<id>.chip.0"],))`；**不要**指望内置的 chip 表（已删除）。
 - **人类形态互斥**：`DEFINITION.human_character_id` 指向的角色会被自动排除出访客池，也不能被列入禁用角色。
 - **新增性格/状态/情绪/tag 行为/地点分组**都是"放文件即生效"；**全局事件**要在 `register(ctx)` 或模块导入时显式注册。
 - **新注册表**必须加进 `weiren_game/content.py` 的 `_BASE_CONTAINERS`，否则卸载后残留。

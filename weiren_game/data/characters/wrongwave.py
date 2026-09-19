@@ -7,13 +7,14 @@ from weiren_game.probability import resolve
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "wrongwave", 6, "错潮", "自称是笨蛋，但真打起架来有惊人的直觉。",
-    "loner", "impatient", 4, ("无业游民", "18-24岁", "男性", "便利店店员"),
-    (A("water_thrower", "矿泉水瓶投掷爱好者", "错潮搜索返回时，必定获得一瓶矿泉水。"),
-     A("there_you_go", "走你！", "搜索中受到伪人主动能力影响时，可消耗一个【饮料】或【罐头】：有 **70%** 可能不受影响。\n*若抵御成功，伪人会在错潮搜索返回后的下一个回合来访。*")),
+    "wrongwave", 6, TEXT["character.wrongwave.name"], TEXT["character.wrongwave.description"],
+    "loner", "impatient", 4, (TEXT["character.wrongwave.tag.0"], TEXT["character.wrongwave.tag.1"], TEXT["character.wrongwave.tag.2"], TEXT["character.wrongwave.tag.3"]),
+    (A("water_thrower", TEXT["ability.water_thrower.name"], TEXT["ability.water_thrower.description"]),
+     A("there_you_go", TEXT["ability.there_you_go.name"], TEXT["ability.there_you_go.description"])),
 )
 
 # ---------------------------------------------------------------- function
@@ -56,11 +57,11 @@ def try_resist(
     )
     if drink is None:
         return False
-    engine._take_tenant_item(tenant, drink.item_id)
+    tenant.inventory.remove_first(drink.item_id)
     engine._recalculate_search(mission)
     from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
 
-    source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+    source = (TEXT["data.characters.wrongwave.try_resist.1"], TEXT["data.characters.wrongwave.try_resist.2"], TEXT["data.characters.wrongwave.try_resist.3"], TEXT["data.characters.wrongwave.try_resist.4"])
     ctx = {"engine": engine, "tenant": tenant}
     value = calculate_modified_amount(
         0.0, collect_modifiers("chance", source, ctx)
@@ -87,7 +88,7 @@ def _wrongwave_resist_modifier(context: object):
         return
     yield (
         spec("chance").flat(0.70).match("all")
-        .path("抵御", "伪人使用主动能力").source("角色技能", "错潮", "走你")
+        .path("resist", "pseudo_active").source("ability", "wrongwave", "there_you_go")
     )
 
 

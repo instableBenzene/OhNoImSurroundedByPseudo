@@ -165,17 +165,9 @@ class TenantState:
         """移除指定状态。"""
         self.conditions.pop(status_id, None)
 
-    def personality_weight(self, personality_id: str) -> float:
-        """返回指定人格的权重（未设置时为 0.0）。"""
-        return self.personalities.get(personality_id, 0.0)
-
     def has_ability(self, ability_id: str) -> bool:
         """判断住户是否持有指定技能 ID。"""
         return any(state.ability_id == ability_id for state in self.abilities)
-
-    def ability_states(self, ability_id: str) -> list[AbilityState]:
-        """返回指定技能 ID 的全部技能状态。"""
-        return [state for state in self.abilities if state.ability_id == ability_id]
 
     def ability_state(self, ability_id: str) -> AbilityState | None:
         """返回指定技能 ID 的首个技能状态，未持有则返回 None。"""
@@ -183,15 +175,6 @@ class TenantState:
             (state for state in self.abilities if state.ability_id == ability_id),
             None,
         )
-
-    def carried(self, item_id: str) -> int:
-        """返回背包中该物品 ID 的累计数量。"""
-        return self.inventory.count(item_id)
-
-    def locked_until(self, action_kind: str) -> int:
-        """返回该行动被锁定的到期回合（0 表示未锁定）。"""
-
-        return self.action_locks.get(action_kind, 0)
 
     # ---- 状态便捷属性：读写统一收进 conditions -----------------------------
     @property

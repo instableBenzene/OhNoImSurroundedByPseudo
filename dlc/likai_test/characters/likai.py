@@ -7,11 +7,13 @@
 
 from weiren_game.data.types import AbilityDefinition, CharacterDefinition
 from weiren_game.global_event import GlobalEventDefinition, register_global_event
+from weiren_game.data.lang import pack_text_from_file
+TEXT = pack_text_from_file(__file__)
 
 register_global_event(
     GlobalEventDefinition(
         id="likai.deaths",
-        label="老楷·死亡次数",
+        label=TEXT["dlc.likai_test.characters.likai.module.1"],
         source_id="dlc:likai_test",
     )
 )
@@ -21,25 +23,23 @@ def _rebirth_ability() -> AbilityDefinition:
     """流浪者的重生（被动描述）。"""
     return AbilityDefinition(
         "likai_rebirth",
-        "老楷的重生",
-        "死亡后有 x% 可能以全新访客的身份回到访客池；"
-        "概率 = 75% - 15%×死亡次数（最低 5%）。每次死亡后，"
-        "老楷再次入住时最大生命值 +10×死亡次数。",
+        TEXT["dlc.likai_test.characters.likai._rebirth_ability.1"],
+        TEXT["dlc.likai_test.characters.likai._rebirth_ability.2"],
     )
 
 
 CHARACTER = CharacterDefinition(
     "likai",
     900,
-    "老楷",
-    "常年流浪的中年人，具有极强的生存能力。",
+    TEXT["character.likai.name"],
+    TEXT["character.likai.description"],
     "steady",
     "keen",
     4,
-    ("25岁-30岁", "男性", "无业游民"),
+    (TEXT["character.likai.tag.0"], TEXT["character.likai.tag.1"], TEXT["character.likai.tag.2"]),
     passives=(_rebirth_ability(),),
     available=True,
-    source_note="测试 DLC：likai_test",
+    source_note=TEXT["dlc.likai_test.characters.likai.module.2"],
 )
 
 # 头像：从 12 个形状里挑一个（不声明会回退通用头像、`validate_content` 也会提醒）。

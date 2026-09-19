@@ -9,6 +9,10 @@
 >
 > 本页样例已实测：把 §1–§6 的代码块按标注的文件位置放进一个临时 DLC，能正常装载、
 > 各项都注册成功、卸载后无残留（见 §8 自检）。
+>
+> ⚠️ **样例里的文字为了短，直接写在定义里**；真实写法必须**先把文本放进 lang 表**
+> （base = `weiren_game/data/lang.py`；DLC = `dlc/<包>/lang.py`），定义里只写
+> `TEXT["item.<id>.name"]` 这类 key。键名约定见 `docs/ADD_CONTENT.md`「文本（lang）」。
 
 ---
 
@@ -467,7 +471,7 @@ python tools/smoke_simulation.py --seeds 3 --log-dir <tmp>
 python game_ui.py                       # 进游戏看一眼
 ```
 
-- **数值与随机**：走通道与收敛（`engine._apply_modifiers` / `_apply_chance`）；
+- **数值与随机**：走通道与收敛（`engine._apply_modifiers`；概率见 `docs/GUIDE.md` §4.3）；
   **必定**用 0/1；"能不能 / 是否免疫"用**闸门**（纯查询）。见 `docs/ARCH.md`。
 - **确定性**：新增**可搜索物品**、`available=True` 的角色、新地点会改变按种子的随机序列——
   可能牵动固定种子的测试/素材，先跑单测。

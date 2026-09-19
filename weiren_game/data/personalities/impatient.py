@@ -1,6 +1,7 @@
 """性格·急躁：性格/羁绊效果全部集中在本文件。"""
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def end_health_loss(engine: EngineProtocol, tenant: object) -> None:
@@ -12,7 +13,7 @@ def end_health_loss(engine: EngineProtocol, tenant: object) -> None:
     tier = engine._bond_tier("impatient")
     chance = {0: .20, 2: .30, 4: .35, 6: .40, 8: .40}.get(tier, .20)
     if engine._rng(EVENT_IDS["impatient.health"], tenant.id).random() < chance:
-        engine._damage_health(tenant, 5, "急躁性格")
+        engine._damage_health(tenant, 5, "impatient_personality")
 
 
 BOND_END_HEALTH = end_health_loss
@@ -78,7 +79,7 @@ def _impatient_turn_modifier(context: object):
         return
     tier = engine._bond_tier("impatient")
     delta = {2: -2, 4: -4, 6: -6, 8: -99}.get(tier, -1) if tier else -1
-    yield spec("search").path("回合").flat(delta).source("性格", "急躁")
+    yield spec("search").path("turn").flat(delta).source("personality", "impatient")
 
 
 def _impatient_success_modifier(context: object):
@@ -88,7 +89,7 @@ def _impatient_success_modifier(context: object):
         return
     tier = engine._bond_tier("impatient")
     rate = {2: -.15, 4: -.15, 6: -.10, 8: -.10}.get(tier, -.20) if tier else -.20
-    yield spec("chance").path("搜索").flat(rate).source("性格", "急躁")
+    yield spec("chance").path("search").flat(rate).source("personality", "impatient")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regi

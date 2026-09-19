@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from weiren_game.effects.health_sanity import decay_high_health_immunity
+from weiren_game.data.lang import TEXT
 
 
 StatusCategory = Literal["physical", "mental", "other"]
@@ -69,61 +70,55 @@ class EmotionDefinition(StatusDefinition):
     kind: EmotionKind = "erosion"
     rarity: Rarity = "common"
 
-    @property
-    def is_rare(self) -> bool:
-        """该情绪是否为稀有情绪。"""
-        return self.rarity == "rare"
-
-
 STATUS_DEFINITIONS: dict[str, StatusDefinition] = {
     "trauma": StatusDefinition(
-        "trauma", "创伤", "physical",
+        "trauma", TEXT["status.trauma.label"], "physical",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         chip_icon="i-trauma", chip_css="warn",
-        description="皮肉之下留下了难以消退的痛楚，连呼吸都牵着伤口。",
+        description=TEXT["status.trauma.description"],
     ),
     "disorder": StatusDefinition(
-        "disorder", "紊乱", "physical",
+        "disorder", TEXT["status.disorder.label"], "physical",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         chip_icon="i-disorder", chip_css="info",
-        description="内科的毛病缠上身，忽冷忽热、时好时坏，把人的精神一点点磨掉。",
+        description=TEXT["status.disorder.description"],
     ),
     "shock": StatusDefinition(
-        "shock", "休克", "physical", intensity_max=4,
+        "shock", TEXT["status.shock.label"], "physical", intensity_max=4,
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         chip_icon="i-shock", chip_css="danger",
-        description="生命体征正在崩塌边缘，意识一点点滑向黑暗。",
+        description=TEXT["status.shock.description"],
     ),
     # 回合到期型临时修饰（原 TenantState.buffs 的第一类）：
     # 强度默认为 1，层数表示剩余持续回合。
     "fiji_afterglow": StatusDefinition(
-        "fiji_afterglow", "高级巧克力的余韵", "other",
+        "fiji_afterglow", TEXT["status.fiji_afterglow.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="item:fiji_chocolate",
         nodes=frozenset({"turn_start.depression_effect"}),
-        description="甜味已经化开，心里却还留着一小块被安抚过的暖意。",
+        description=TEXT["status.fiji_afterglow.description"],
     ),
     # 澪叁贰玖机制型状态（第二类）。
     "vigilant_pseudo_zero329": StatusDefinition(
-        "vigilant_pseudo_zero329", "警惕伪人-澪叁贰玖", "other",
+        "vigilant_pseudo_zero329", TEXT["status.vigilant_pseudo_zero329.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="passive:zero329",
-        description="把每一个“同伴”都当成可能的假货，反复核对。",
+        description=TEXT["status.vigilant_pseudo_zero329.description"],
     ),
     "information_gathering_zero329": StatusDefinition(
-        "information_gathering_zero329", "情报搜集-澪叁贰玖", "other",
+        "information_gathering_zero329", TEXT["status.information_gathering_zero329.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="ability:information_collect@zero329",
-        description="不动声色地把零碎线索一条条收进本子。",
+        description=TEXT["status.information_gathering_zero329.description"],
     ),
     "high_health_immunity": StatusDefinition(
-        "high_health_immunity", "高生命免疫", "other", intensity_max=99,
+        "high_health_immunity", TEXT["status.high_health_immunity.label"], "other", intensity_max=99,
         shown=frozenset({"icon", "description"}),
         source_id="effects:health_sanity",
         nodes=frozenset({"turn_end.status_effects"}),
         auto_decay=False,
         hook=decay_high_health_immunity,
-        description="身体状态尚可，还能替自己挡下一次新的伤口。",
+        description=TEXT["status.high_health_immunity.description"],
     ),
 }
 
@@ -135,35 +130,35 @@ def register_status_definition(definition: StatusDefinition) -> None:
 
 EMOTION_DEFINITIONS: dict[str, EmotionDefinition] = {
     # 侵蚀情绪集（常见）
-    "boredom": EmotionDefinition("boredom", "无聊", "mental", kind="erosion",
-        description="什么都没意思，时间变得又长又钝。"),
-    "irritation": EmotionDefinition("irritation", "烦躁", "mental", kind="erosion",
-        description="一点小事就能点着，耐性薄得像纸。"),
-    "anxiety": EmotionDefinition("anxiety", "焦虑", "mental", kind="erosion",
-        description="心口发紧，总觉得坏事就在下一刻。"),
-    "melancholy": EmotionDefinition("melancholy", "忧郁", "mental", kind="erosion",
-        description="低落像潮水漫上来，连抬手都嫌费力。"),
-    "panic": EmotionDefinition("panic", "恐慌", "mental", kind="erosion",
-        description="恐惧接管了身体，只想逃，却无处可逃。"),
+    "boredom": EmotionDefinition("boredom", TEXT["emotion.boredom.label"], "mental", kind="erosion",
+        description=TEXT["emotion.boredom.description"]),
+    "irritation": EmotionDefinition("irritation", TEXT["emotion.irritation.label"], "mental", kind="erosion",
+        description=TEXT["emotion.irritation.description"]),
+    "anxiety": EmotionDefinition("anxiety", TEXT["emotion.anxiety.label"], "mental", kind="erosion",
+        description=TEXT["emotion.anxiety.description"]),
+    "melancholy": EmotionDefinition("melancholy", TEXT["emotion.melancholy.label"], "mental", kind="erosion",
+        description=TEXT["emotion.melancholy.description"]),
+    "panic": EmotionDefinition("panic", TEXT["emotion.panic.label"], "mental", kind="erosion",
+        description=TEXT["emotion.panic.description"]),
     # 觉醒情绪集（常见）
-    "satisfaction": EmotionDefinition("satisfaction", "满足", "mental", kind="awakening",
-        description="够好了——暂时不必再要求更多。"),
-    "focus": EmotionDefinition("focus", "专注", "mental", kind="awakening",
-        description="世界安静下来，只剩下手头这一件事。"),
-    "trust": EmotionDefinition("trust", "信任", "mental", kind="awakening",
-        description="愿意把后背交给身边的人。"),
-    "excitement": EmotionDefinition("excitement", "兴奋", "mental", kind="awakening",
-        description="心跳加快，什么都想立刻去做。"),
-    "happiness": EmotionDefinition("happiness", "快乐", "mental", kind="awakening",
-        description="难得的轻松，嘴角不由自主地翘起来。"),
+    "satisfaction": EmotionDefinition("satisfaction", TEXT["emotion.satisfaction.label"], "mental", kind="awakening",
+        description=TEXT["emotion.satisfaction.description"]),
+    "focus": EmotionDefinition("focus", TEXT["emotion.focus.label"], "mental", kind="awakening",
+        description=TEXT["emotion.focus.description"]),
+    "trust": EmotionDefinition("trust", TEXT["emotion.trust.label"], "mental", kind="awakening",
+        description=TEXT["emotion.trust.description"]),
+    "excitement": EmotionDefinition("excitement", TEXT["emotion.excitement.label"], "mental", kind="awakening",
+        description=TEXT["emotion.excitement.description"]),
+    "happiness": EmotionDefinition("happiness", TEXT["emotion.happiness.label"], "mental", kind="awakening",
+        description=TEXT["emotion.happiness.description"]),
     # 少见情绪：仍然归属侵蚀/觉醒两族，只是出现概率低。
     # 显示名是「清醒」：这条情绪与**理智值**（0~100 那个数值）不是一回事，
     # 旧名「理智」会让人以为"有理智就能满足它"（玩家真这么误解过）。
     # id 保持 `reason`（存档与代码引用它，改名会断老存档）。
-    "reason": EmotionDefinition("reason", "清醒", "mental", kind="awakening", rarity="rare",
-        description="在疯涨的情绪里，保住一条清醒的缝隙。"),
-    "madness": EmotionDefinition("madness", "癫狂", "mental", kind="erosion", rarity="rare",
-        description="理智的堤坝出现裂口，某些声音开始说话。"),
+    "reason": EmotionDefinition("reason", TEXT["emotion.reason.label"], "mental", kind="awakening", rarity="rare",
+        description=TEXT["emotion.reason.description"]),
+    "madness": EmotionDefinition("madness", TEXT["emotion.madness.label"], "mental", kind="erosion", rarity="rare",
+        description=TEXT["emotion.madness.description"]),
 }
 
 
@@ -189,9 +184,9 @@ def _register_reveal_event(emotion_key: str) -> None:
     register_global_event(
         GlobalEventDefinition(
             id=emotion_reveal_event(emotion_key),
-            label=f"情绪显现（{label}）",
+            label=TEXT["condition._register_reveal_event.1"].format(p1=label),
             icon="i-emotion",
-            description=f"{label}被看穿了，短时间内藏不住。",
+            description=TEXT["condition._register_reveal_event.2"].format(p1=label),
         )
     )
 

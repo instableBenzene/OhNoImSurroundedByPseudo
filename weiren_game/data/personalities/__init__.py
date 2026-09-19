@@ -10,11 +10,12 @@
 from pathlib import Path
 
 from .._discovery import discover_modules
+from weiren_game.data.lang import TEXT
 
 # 八类常规性格的中文名（顺序即 PERSONALITIES 顺序）。
 PERSONALITY_LABELS: dict[str, str] = {
-    "cheerful": "开朗", "loner": "孤僻", "keen": "机敏", "stubborn": "固执",
-    "steady": "稳重", "impatient": "急躁", "gentle": "温和", "suspicious": "多疑",
+    "cheerful": TEXT["data.personalities.__init__.PERSONALITY_LABELS.cheerful"], "loner": TEXT["data.personalities.__init__.PERSONALITY_LABELS.loner"], "keen": TEXT["data.personalities.__init__.PERSONALITY_LABELS.keen"], "stubborn": TEXT["data.personalities.__init__.PERSONALITY_LABELS.stubborn"],
+    "steady": TEXT["data.personalities.__init__.PERSONALITY_LABELS.steady"], "impatient": TEXT["data.personalities.__init__.PERSONALITY_LABELS.impatient"], "gentle": TEXT["data.personalities.__init__.PERSONALITY_LABELS.gentle"], "suspicious": TEXT["data.personalities.__init__.PERSONALITY_LABELS.suspicious"],
 }
 # 常规性格键（参与羁绊）；展示用的特殊键由 data/__init__.py 追加到 LABELS。
 PERSONALITIES: list[str] = list(PERSONALITY_LABELS)
@@ -79,9 +80,9 @@ def _health_protection_modifier(context: object):
     if reduction <= 0:
         return
     if consume:
-        yield spec("healthConsume").path("消耗").percent(-reduction).source("羁绊", "减伤")
+        yield spec("healthConsume").path("consume").percent(-reduction).source("bond", "damage_reduce")
     else:
-        yield spec("healthDamage").path("伤害").percent(-reduction).source("羁绊", "减伤")
+        yield spec("healthDamage").path("damage").percent(-reduction).source("bond", "damage_reduce")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _rp

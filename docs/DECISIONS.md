@@ -3,6 +3,241 @@
 > `AGENTS.md` 只保留"现状速览"；**具体到某次为何这么改、当时踩了什么坑**记在这里。
 > 目的：不把入口文档撑成流水账，又不丢上下文。要加新条目就追加在顶部。
 
+## 引用面盘点（第四轮）：`EngineProtocol` 从 24 条补齐到 81 条，并做成机检
+
+**做法**：给 `tools/dump_core.py` 加了 `--refs`：**AST 扫描**运行时（`weiren_game/` + `dlc/`），
+把每个核心符号的引用**按调用者方法名**列出（`模块.类.方法`，不含行号），并区分同文件/跨文件；
+>5 个调用者只记数。`tests/` 与 `tools/` **不算引用**（不参与游戏运行），只被它们引用的单独标注。
+
+**为什么换掉正则**：原来逐行扫，**注释、docstring、`lang.py` 的点分键**（`"…_decrement_inventory.1"`）
+都会被当成"有人用"。换成 AST 后这些天然排除，于是又掉出 7 个真死：
+`information_system.verify_information`、`item_system._decrement_inventory`、`random_system._loot_draw`、
+`search_system.apply_search_modifier`、`dlc.reload_dlc`/`load_dlc`/`load_dlcs`（测试同步改）。
+**还修了一个真 bug**：`from x import 名字 as 别名` 只记了别名、漏了原名（`register_container_type` 被误判为 0 引用）。
+
+**最大的一块**：`EngineProtocol`（"内容能碰什么引擎 API"的权威）只声明了 **24** 个方法，
+而实测内容面有 **81** 个。已按实测重写（签名由 AST 生成），并删掉内容从未调用的 3 个
+（`_mark_ability_used` / `_record_log` / `_show_message`）。**协议与实测面双向差集现在为 0**，
+且 `--refs` 每次都会重算这个差集（`## EngineProtocol vs 实测内容面`），协议再漂移会立刻看见。
+
+**我上一条判断错的地方（记下来以免再犯）**：我曾把 `_clear_pending_choice` / `_record_action` /
+`_collect_start|flush` 列为"内容越界"。细看后**都不该收敛**：
+前者是命运牌取消待选的**合法逃生口**（引擎不可能认识命运牌），后两者就是内容层该用的日志 API。
+所以处理方式是**写进协议并说明用途**，而不是把内容的手脚捆住。
+
+**未做（留档）**：`_Spec` / `_GateSpec` 的链式方法名（`path`/`id`/`match`/`flat`/`max`/`min`/`any`/`certain`）
+与字段名到处撞，是这张表噪声的主要来源；改名（`path`→`where`、`id`→`key`、`match`→`mode`…）是一次性
+机械替换，能让后续盘点不用再人工剔除噪声——**尚未做**。
+
+**验证**：`compileall` / 74 单测 / 四个审计 / `validate_content` / 冒烟 3 seeds 全绿；
+`docs/CORE_REFS.md` 重生成（627 项；1–5 个调用者 411、>5 个 201、0 个 15）。
+
+## 第二轮核心瘦身：四处「专属 / 兼容」逻辑搬出核心
+
+作者逐个核对了 `docs/CORE.md` 的方法清单，指出若干方法泛用性不足。本轮按
+「公共路径只该为多处共用而建」改掉：
+
+| 之前（在核心） | 现在（在内容层 / 通用机制） |
+| --- | --- |
+| `item_system._use_analgesic` + `use_item` 里的 `"anodyne" in item.tags` 分支 | `data/tags/anodyne.py::use`；核心只写 `_item_tag_fn(item, "use")` |
+| `item_system._item_tag_use` / `_item_tag_after_food` | 合并为一个 `_item_tag_fn(item, 钩子名)`——核心不再枚举钩子名 |
+| `ability_system._ability_has_local_cost` | 删掉；`chaos` 自己用 `engine._local_skill_module(...)` 查 `costs_<id>` |
+| `SCENARIO_HANDLERS["ability_fail_modifier"]`（只为薯条存在） | 通用通道 `abilityFail`（内容写 `spec("abilityFail").path("ability_fail")`） |
+| `SCENARIO_HANDLERS["ability_fail_resolved"]`（只为薯条存在） | 通用节点 `ability.resolved` |
+| `round_effects._settle_books_and_equipment`（名字像内容） | 改名 `_settle_held_items`；派发本来就按 `ITEM_HOOKS[item_id]`（内容登记） |
+| `personality_system.lock_personality`（玩家指令，只为混存在） | 删掉；改名 `chaos.pure_ego_personality`，走**回合初·实例·房客**路径（`TURN_START`）自动判定 |
+
+**没动的一处**：`item_system._durability_multiplier` 看着像专属，其实只是读**全局事件**
+`item.durability.multiplier` 的通用访问器——任何内容都能设置那个事件，保留。
+
+### 这次新立的两条命名 / 合并判据（作者提出）
+
+1. **"看起来泛用"是陷阱**：过往只把**明显私有**的方法搬了出去，但长期创作里，私有方法常因疏忽
+   起了个通用名字（`lock_personality` 就是——它只服务混）。判据：**这个方法除了某一个角色/场景，
+   还有谁会调？** 没有 → 名字要写成它自己的（`pure_ego_personality` 这种），并走既有的
+   `lifecycle` 节点路径（本例走回合初·实例·房客），**不要留在核心当公共动作**。
+2. **合并要看"容纳关系"**：公共方法之间若有"甲 ⊂ 乙"的关系，就该只留乙、让甲退回内容层。
+   典型例：使用镇痛剂 ⊂ 使用物品（已改成 tag 的 `use`）、食用食物后 ⊂ 食物 tag 自己的方法。
+   **判断入口就是 `weiren_game/lifecycle.py`**：属于既有节点的一律走节点，别新造公共方法。
+
+**副作用**：`use_item` 的分支从「医疗 / 镇痛 / 通用」三条压成「有 tag 行为就用它，否则通用」；
+tag `use` 的签名多了可选 `condition=None`（医药不需要、镇痛剂需要），已同步
+`docs/ADD_CONTENT.md` 与 `.opencode/skills/weiren-new-item`。
+
+**验证**：探针证明镇痛剂 tag 行为真的落地（状态 `analgesia_trauma (1, 10)`）、薯条失败修正
+`0.25`（普通角色 `0.0`）、`ability.resolved` 已订阅；`compileall` / 74 单测 / 四个审计 /
+冒烟 3 seeds 全绿；`docs/CORE.md` 重生成：735 → **732** 项、扩展点 54 → **51**、
+核心内容 id 引用仍是 **0**。
+
+### 第三轮：按「单语句转发」与「同形重复」继续合并
+
+作者要求"能合并的尽量合并"。扫了两类：
+
+**① 纯转发（一个函数只是换个名字再调另一个）→ 删掉，调用点直接调目标**：
+`_ability_state`（死代码）、`_reduce_condition`（死代码）、`_take_tenant_item`、`_house_count`、
+`_spend_role_mark`、`_create_visit_information`、`_now_iso`。
+
+**② 同形重复 → 合成一个循环**：`dlc.py` 里 9 个 `load_*_dir` 结构完全一样
+（glob 目录 → 逐文件交给 loader → 收集文件名），合成一个 `_load_dir(dlc_dir, subdir, loader, pattern=…, replace=…)`，
+`load_single_dlc` 里直接调用它（顺序不变 = 注册顺序不变）。
+
+**刻意没合并的**（同形但语义不同，合了反而更差，附理由）：
+`session.InstancePool.allocate_*`（6 个按实体类型的分配器）、`content.py` 的注册表访问器、
+`modifier_rules._Spec/_GateSpec` 的链式构件、`tenant` 的属性访问器——它们是**类型化的 API**，
+合成 `allocate("tenant")` / `get(key)` 会丢掉类型与可读性；
+`_emotion_weighted_key`（内含加权公式）、`_mission_rng`（从任务对象推导随机源参数）、
+`_settle_turn_end_status_effects`（给 lifecycle 绑定节点名）、`full_log_text`（测试用的公开导出）、
+`_loss_sanity` / `_consume_sanity` 等（`EngineProtocol` 的内容 API）同理保留。
+
+**验证**：74 单测 + 审计 + 冒烟全绿；DLC 双包实跑一局正常；`docs/CORE.md`：732 → **714 项**。
+
+## 罕见的专属机制不该进核心：`sanity_overflow_share` 后门拆掉
+
+**作者指出**：`value_system._restore_sanity` 里出现了「星星」，怀疑把「溢出量的一半」这种
+很少用到的机制塞进了主程序。核对结果——**一半对**：
+
+- `bigstar` 的 100% 转星之印记走的是 `CHARACTER_VALUE_HOOKS`（**通用**的角色值钩子，行为在内容层）；
+- 但伪人薯条的「溢出 50% 转暴露值」走的是核心里的
+  `SCENARIO_HANDLERS[场景].get("sanity_overflow_share")` ——**核心按名字点名一个专属机制**，属实是后门。
+
+**改法（作者的判断：罕见方法当个体专属，重复也无妨）**：核心**只发通用节点**，不再有任何专属入口：
+
+```python
+self._emit_node("sanity.restored", tenant=tenant, overflow=overflow)
+tenant_hook = CHARACTER_NODE_HOOKS.get(tenant.character_id, {}).get("sanity.restored")
+if tenant_hook is not None:
+    tenant_hook(self, tenant=tenant, overflow=overflow)
+```
+
+两边各自订阅同一节点：`bigstar`（角色作用域，100%）与 `pseudo_fries`（全局，50%）。
+核心从此不知道"溢出该怎么用"。顺带把核心 docstring 里的内容名（「星星」「驭血魔化印记」）改成通用措辞
+——`audit_separation` 只查注册名，这种"例子式"的内容名它抓不到。
+
+**这条与 `docs/PRINCIPLES.md` §二.2 的关系**：那条讲"通用规则要删特例、留一条公共路径"；
+这次补的是它的边界——**公共路径只该为"多处共用"而建**。只服务一个角色/场景的罕见机制，
+就留在它自己的文件里（重复几遍没关系），核心最多提供一个**通用事件**。
+
+**验证**：订阅核对（全局 `pseudo_fries.on_sanity_restored`、角色 `bigstar.collect_star_overflow`）；
+探针证明一次溢出同时触发两个派发（`('global', 20.0), ('tenant', 20.0)`）；
+`compileall` / 74 单测 / 审计 / 冒烟 4 seeds 全绿。
+
+## 匹配令牌英文化：`path` / `source` 与调用点 `source` 全部改英文
+
+**背景（作者指出）**：程序标识不该用中文。原先 `docs/ARCH.md` §4 是一份**中文令牌词表**，
+于是 `spec(...).path("回合末消耗").source("角色技能", "ED Tear", "我不能没有购物袋")` 这种写法到处都是。
+
+**做法**：一次性 AST 脚本，只改**令牌位置**的中文：
+① 提供方 `path(...)` / `source(...)` 的参数（含 `source = (...)` 变量元组）；
+② 调用点 `_apply_modifiers` / `_apply_chance` / `_eval_gate` 的 source 元组，
+以及 `value_system` 那组 `_damage_*` / `_consume_*` / `_loss_*` / `_restore_*` 的第 3 个参数。
+**专名一律映射到既有 id**（苯环→`benzene`、薯条→`fries`、沃尔玛购物袋→`walmart_bag`、
+走你→`there_you_go`、女祭司→`priestess`、星云传说→`nebula_legend`…），其余见 `docs/ARCH.md` §4。
+
+**关键耦合**：调用点的 `source` **同时是日志用词**（模板 `X因{source}{change_type}…理智`）。
+所以拆成两层——代码里是英文令牌，日志走 `lang.source_label(令牌)` / `token_label(令牌)`，
+文案住 `TEXT["source.<令牌>"]` / `TEXT["token.<令牌>"]`。`change_type` 同理
+（`consume`/`damage`/`loss`/`restore`，通道映射表随之改英文键）。
+
+**踩到的坑**：单测 `test_difficulty_start` 当场抓到一处不匹配（测试里还写着 `("开局","时运")`）——
+正是"两边令牌不一致会**静默失效**"的典型。另有两个漏网（`走你` 没进映射表、DLC 的新词 `角色被动`），
+补表重跑后归零。`tools/`、`tests/` 里的令牌也一并更新了。
+
+**验证**：令牌位置**中文残留 0**（`weiren_game` 与 `dlc` 各扫一遍）；`compileall` / 74 单测 /
+`audit_separation` / `audit_text`（error 0）/ `validate_content` / 冒烟 4 seeds 全绿；
+冒烟日志**无令牌泄漏**（`因damage…` 之类）；无头对局正常。
+
+## lang 全量迁移完成：base + 每个 DLC 的文字都住 lang 表
+
+**做法**：写一次性迁移脚本（AST 扫 Python、状态机扫 `index.html` 的 JS/标记；脚本留临时目录、不进仓库），
+只认**明确的展示位**：
+
+- 内容构造器的展示字段（`A` / `I` / `L` / `CharacterDefinition` / `PseudoDefinition` /
+  `InformationTemplate` / `MarkDefinition` / `MapDefinition` / `FateCard` / `StatusDefinition` / …）；
+- 模块级文字表（`codex_*` / `labels` / `flavor` / `information_text` / `data/__init__` 的标签表）；
+- **除 docstring 与数据键位置外的所有汉字字面量**；
+- 前端：JS 字面量与模板串里的中文片段、静态标记文本与 `placeholder/title/aria-label`。
+
+数据键（`spec/path/source`、`option/tag/key/resource/…` 参数、dict 键）**一律不碰**——参与规则命中，
+禁止翻译。**匹配键留在原地是对的**（`tools/dump_text.py` 的 scan 会告诉你还剩哪些，都是这一类）。
+
+**规模**：base `weiren_game/data/lang.py` **2487 键**；每个 DLC 一份（STAR 89 / likai_test 12 /
+_template 5）；前端 chrome `ui.js.*` + `ui.markup.*` 约 300 条。迁移点合计约 **2400 处**。
+
+**键名**：内容层用**既有 id**（`ability.<id>.desc` / `character.<id>.name` / `item.<id>.name`）——
+语义、稳定、随定义走。系统层与前端是**按位置自动生成**的（`<模块>.<函数>.<n>`、`ui.js.<n>`、
+`ui.markup.<n>`），**不是手写语义键**：这是为了在一次会话里覆盖全部文字而做的取舍。
+**改名很便宜**（引用已集中在表里，改一处即可），日后再逐步语义化。
+
+**DLC**：`dlc/<包>/lang.py`；包自己的模块写 `TEXT = pack_text_from_file(__file__)`
+（`weiren_game/data/lang.py` 提供，按包目录缓存）。DLC 是按文件路径加载的（父包不存在），
+所以不能用相对 import。**不做回退链、不做语言切换**（作者已定）。
+
+**有意没做**：① **没统一漂移用词**（`损失/扣除/失去`、`数字%概率`）——有些"漂移"其实是不同语义
+（作者指出），要逐条判断，工具只负责列出来；② 匹配键、docstring、`tools/`、`tests/` 自己的中文不动。
+
+**踩到的坑（都已验证修掉）**：
+
+- **前端 helper 不能叫 `t`**：页面里大量 `const t = STATE.tenants.find(...)`（租客）会**遮住**全局 helper，
+  运行时报 `TypeError: t is not a function`（无头对局一跑就抓到 41 条）。改名为 `TXT` 后归零。
+- **Python 3.11 的 f-string `format_spec` 位置不可靠**：`ast.get_source_segment` 可能返回整条 f-string，
+  把 `{lost:.1f}` 拼坏。改成**从 spec 的常量段重建**。
+- **f-string 表达式里的子字面量不能单独替换**：`f"{x or '数量'}"` 里的 `'数量'` 换成 `TEXT["…"]`
+  会因引号冲突变成语法错误；改为「整条 f-string 一起处理，或跳过子字面量」。
+- **HTML 标记里文本节点与属性重叠**：同一标签既有中文文本又有中文 `title` 时，两处替换会互相覆盖
+  （`intelCount` 那行被拼坏）。改为**互斥处理 + 手工收尾**。
+
+**验证**：`compileall` / 74 单测 / `audit_separation` / `audit_text`（error 0）/ `validate_content` /
+冒烟 3 seeds 全绿；`dump_text` 复查（重复组 23 → 18）；**无头 CDP 对局 2 局 × 12 回合，JS 报错 0**；
+启动器截图肉眼确认文字渲染正常（无 key 泄漏）。
+
+## lang 定型：不做可插拔、每包一个公共 lang 文件；术语与概率写法同步固化
+
+**术语规范（作者定）**
+
+- **数值变化**：**消耗 / 流失 / 伤害 / 回复 是已定义的四种**，各管各的语义、不能互相替换；
+  `减少` **没有定义过**，是代表 消耗/流失/伤害 的**泛称**（泛指时才用）；`损失 / 扣除 / 失去`
+  是漂移，应改齐上面四个。
+- **概率写法**：**`数字%可能`**（`25%可能xxxx`）是唯一格式；`数字%概率` 是要改的漂移。
+
+两条都写进 `tools/dump_text.py` **现算**（实测：`数字%概率` 18 处、`损失/扣除/失去` 17 处、
+`数字%可能` 已合规 23 处），不再靠记性。
+
+**lang 方案（作者定，取代本文件上方 `docs/ROADMAP.md` §7 原先的"有序语言包 + 回退链"）**
+
+- **不做可插拔语言包**：一个包（base = `weiren_game/data/`；每个 DLC = 它自己）带**一个公共 lang
+  文件**，面向玩家的文字全放里面；源码里**不再写字面量**，一律引用 lang 条目。
+- 形状：**扁平字典 + 语义键**，`TEXT["<模块>.<语义>"]`。模板写 `{名字}`，调用处 `.format(...)`；
+  内容层的键用**既有 id** 拼（`ability.<id>.desc`），随定义走。
+- **前端 chrome 也收进后端**：`GET /api/lang` 下发，`index.html` 用 `t(key)` 取字；静态标记
+  `data-t` / `data-t-html` / `data-t-ph` / `data-t-aria`，`applyStaticText()` 在 boot 里跑。
+- **数据键不搬**（`path` / `source` / tag / 性别 / 年龄 / 兴趣）——它们参与规则命中，禁止翻译。
+- lang 表住**内容层**（`data/lang.py`）所以分离度自检仍全绿：系统层只出现 key，不出现内容名。
+
+**已落地（本批，作为样板）**：`data/lang.py` + `/api/lang` + 前端取字机制；
+`systems/cost_system.py`（同一 key 顺手消掉两处重复报错）与启动器 chrome 已迁。
+无头 CDP 对局验证：启动器 → 创建对局 → 打到第 8 回合，JS 报错 0。余下按
+系统层 → 内容层 → 前端 chrome → DLC 分批迁（见 `docs/ROADMAP.md` §7）。
+
+## 文本盘点工具落地：`tools/dump_text.py`（并纠正「语料 990」这个错数）
+
+**做了什么**：把上一轮两个一次性探针（查重、术语扫描）合成一个**只读**工具，叠在同一份语料上：
+① 底表（来源文件 / 行号 / 文本 / 汉字数 → `text_table.tsv`，lang 的"搬运清单"）；
+② 查重（占位符归一化后完全相同）；③ 术语一致性（词族计数 + 少数派**逐处列出原句**，
+另附粗粒度风格指标）。词族**登记在工具里、不抄进 `docs/STYLE.md`**（STYLE 只留"一个概念一个词"，
+避免清单和代码漂移），次数一律现算。退出码恒为 0：它是盘点，不是闸门。
+
+**纠错**：上一轮把语料记成 **990**，实际是 **2990** —— 终端乱码把全角冒号后的 `2` 一并吃掉
+（`语料：2990` 显示成 `语料：990`），照着屏上的数字抄就错了。`docs/ROADMAP.md` 已改回 2990，
+并在 `AGENTS.md` §7 记下"计数读 UTF-8 产物文件、别读屏"。
+
+**没做成"自动发现词族"**：试过用 n-gram 找"多数派加一个字"（`理智` → `理智值`）。
+不加限定会得到几千对垃圾 —— `房客` 后面跟任何字都成了候选（跨词相邻）；限定"只在右侧加字 +
+少数派跨 ≥2 个文件"后仍有 805 对。**没有分词就没有词边界**，所以放弃自动发现：
+词族人工登记、计数机器现算，工具只盘点、不做判据（判据在 `docs/ROADMAP.md` §7「少数派才是漂移」）。
+
+**验证**：工具复现了上一轮记录的全部数字（成句文本 2017 条 / 重复组 23 组；理智 217 / 理智值 10、
+生命 203 / 生命值 19、损失 10 / 失去 4 / 扣除 3），口径对齐后才改的文档。
+
 ## 「导出的游戏记录不从第 1 回合开始」= 旧档缺字段，不是截断
 
 **现象（玩家报告）**：存档界面导出的完整日志不是从第 1 回合开始。

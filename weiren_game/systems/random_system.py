@@ -12,6 +12,7 @@ from weiren_game.data import (
     EVENT_IDS,
     GAME_VERSION,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -71,7 +72,7 @@ class RandomSystemMixin:
         """按权重从候选中随机选取一项并返回。"""
         entries = [(value, float(weight)) for value, weight in values if float(weight) > 0]
         if not entries:
-            raise RuleViolation("随机候选池为空。")
+            raise RuleViolation(TEXT["systems.random_system._weighted_choice.1"])
         local = rng or self._rng(event_id or "weighted", *event_suffix)
         total = sum(weight for _, weight in entries)
         point = local.uniform(0, total)
@@ -81,29 +82,6 @@ class RandomSystemMixin:
             if point <= cursor:
                 return value
         return entries[-1][0]
-
-    def _loot_draw(
-        self,
-        pool: Sequence[Any],
-        count: int,
-        event_id: str | int | None = None,
-        *suffix: object,
-    ) -> list[Any]:
-        """从战利品表抽取 ``count`` 件物资（允许重复），用于无需玩家选择的掉落。"""
-        if not pool or count <= 0:
-            return []
-        local = self._rng(event_id or "loot", *suffix)
-        result = [local.choice(list(pool)) for _ in range(count)]
-        material = str(event_id or "loot")
-        if suffix:
-            material = ".".join(
-                (material, *(str(part) for part in suffix))
-            )
-        self._record_log(
-            f"[抽取/战利品] {material} 从 [{'、'.join(str(v) for v in pool)}] "
-            f"中抽到了 [{'、'.join(str(v) for v in result)}]"
-        )
-        return result
 
     def discover(
         self,
@@ -153,7 +131,7 @@ class RandomSystemMixin:
         count = min(count, len(candidates))
         if not candidates:
             raise RuleViolation(
-                "发现候选池为空，无法提供任何选项。"
+                TEXT["systems.random_system.discover.1"]
             )
         local = self._rng(event_id or "discover", *event_suffix)
         if weighted:
@@ -177,8 +155,7 @@ class RandomSystemMixin:
                 (material, *(str(part) for part in event_suffix))
             )
         self._record_log(
-            f"[发现] {material} 从 [{'、'.join(str(v) for v in candidates)}] "
-            f"中选择了 [{'、'.join(str(v) for v in result)}]"
+            TEXT["systems.random_system.discover.2"].format(p1=material, p2='、'.join(str(v) for v in candidates), p3='、'.join(str(v) for v in result))
         )
         self._pending_choice = {"options": list(result)}
         return result
@@ -252,7 +229,6 @@ class RandomSystemMixin:
         result = [self._weighted_choice(entries, rng=local) for _ in range(count)]
         material = ".".join(("start.loot", *(str(part) for part in suffix)))
         self._record_log(
-            f"[抽取/开局补给] {material} 从 [{'、'.join(value for value, _ in entries)}] "
-            f"中抽到了 [{'、'.join(str(value) for value in result)}]"
+            TEXT["systems.random_system._start_loot_draw.1"].format(p1=material, p2='、'.join(value for value, _ in entries), p3='、'.join(str(value) for value in result))
         )
         return result

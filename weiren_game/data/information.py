@@ -1,30 +1,31 @@
 """动态信息模板与地点信息修正表。"""
 
 from .types import InformationTemplate
+from weiren_game.data.lang import TEXT
 
 INFORMATION_TEMPLATES = {
-    "discarded_briefcase": InformationTemplate("discarded_briefcase", "被丢弃的公文包", "material_reward", "医药代表的急救展示公文包被丢在[地点]。", reward_ids=("meteor_plan",)),
-    "secret_raid": InformationTemplate("secret_raid", "绝密小镇跑刀之旅", "material_reward", "一盒奢华进口巧克力被丢在[地点]。", reward_ids=("fiji_chocolate",)),
-    "lost_return": InformationTemplate("lost_return", "退货途中的遗失物", "material_reward", "物流员在[地点]弄丢了一件特种防寒服。", reward_ids=("polar_jacket",)),
-    "security_backup": InformationTemplate("security_backup", "私拷的安防备份", "material_reward", "安保人员在[地点]藏了监控备份。", reward_ids=("video_tape",)),
-    "good_talk": InformationTemplate("good_talk", "投缘的交谈", "state", "A和B聊得很投缘。", "A、B回合末各回复2理智。", "A、B立即各回复10理智。", "无。"),
-    "odd_smile": InformationTemplate("odd_smile", "深夜的诡异微笑", "state", "A在镜子前练习自然地微笑。", "A回合末额外消耗2理智。", "无。", "A回复10理智，专注强化2、延长2。"),
-    "tense_nerves": InformationTemplate("tense_nerves", "紧绷的神经", "state", "A死死盯着B并攥着尖锐工具。", "A回合末恐慌延长2。", "A恐慌+1/+2，B受到5生命伤害。", "A、B各回复5理智且觉醒情绪+2/+2。"),
-    "suppressed_sobbing": InformationTemplate("suppressed_sobbing", "压抑的抽泣", "state", "A反锁房门后传来抽泣。", "无。", "A受到10理智伤害，侵蚀情绪恶化2、延长3。", "A回复15理智，觉醒情绪强化2、延长3。"),
-    "moment_peace": InformationTemplate("moment_peace", "片刻的宁静", "state", "A帮助B处理伤口。", "A、B回合末侵蚀情绪-1/-1。", "A回复15理智；B回复5生命、10理智并获得宽慰2/3。", "无。"),
-    "supply_dispute": InformationTemplate("supply_dispute", "物资分配争端", "state", "A和B因罐头分配争吵。", "A、B回合末理智消耗+3。", "A、B立即消耗10理智。", "A、B各回复15理智并获得信任2/3。"),
-    "courier_absent": InformationTemplate("courier_absent", "驿站老板旷工事件", "location_modifier", "县快递驿站无人看管。", location_id="courier_station"),
-    "double_eleven": InformationTemplate("double_eleven", "「双11」驿站爆仓", "location_modifier", "贵重快递被放在无人照看的篮子里。", location_id="courier_station"),
-    "medical_samples": InformationTemplate("medical_samples", "集采药物样品推广", "location_modifier", "医院展示柜有高级试用品。", location_id="county_hospital"),
-    "er_disturbance": InformationTemplate("er_disturbance", "急诊科夜间医闹", "location_modifier", "急诊清创室和药房防线空虚。", location_id="county_hospital"),
-    "clerk_gaming": InformationTemplate("clerk_gaming", "夜班店员沉迷游戏", "location_modifier", "便利店店员沉迷手游。", location_id="convenience_store"),
-    "cold_chain": InformationTemplate("cold_chain", "冷链运输车卸货失误", "location_modifier", "高档巧克力和便当被留在店外。", location_id="convenience_store"),
-    "shelf_collapse": InformationTemplate("shelf_collapse", "五金区货架倒塌", "location_modifier", "超市五金区暂时无人看守。", location_id="supermarket"),
-    "late_inventory": InformationTemplate("late_inventory", "深夜闭店盘点", "location_modifier", "备用工具被随意放在推车里。", location_id="supermarket"),
-    "lost_nebula_kit": InformationTemplate("lost_nebula_kit", "遗落的星云手术包", "material_reward", "医院VIP病房遗落最高级医疗物资。", location_id="county_hospital", reward_ids=("nebula_surgery", "rescue_cart")),
-    "unclaimed_phone": InformationTemplate("unclaimed_phone", "无主失物招领", "material_reward", "便利店冰柜顶有一台无主手机。", location_id="convenience_store", reward_ids=("smartphone",)),
-    "disturbing_picture_book": InformationTemplate("disturbing_picture_book", "令人不安的绘本", "material_reward", "超市儿童区有一本无条码旧书。", location_id="supermarket", reward_ids=("nebula_legend",)),
-    "valuable_package": InformationTemplate("valuable_package", "贵重的包裹", "material_reward", "驿站深处有无单号木箱。", location_id="courier_station", reward_ids=("gramophone",)),
+    "discarded_briefcase": InformationTemplate("discarded_briefcase", TEXT["info.discarded_briefcase.name"], "material_reward", TEXT["info.discarded_briefcase.description"], reward_ids=("meteor_plan",)),
+    "secret_raid": InformationTemplate("secret_raid", TEXT["info.secret_raid.name"], "material_reward", TEXT["info.secret_raid.description"], reward_ids=("fiji_chocolate",)),
+    "lost_return": InformationTemplate("lost_return", TEXT["info.lost_return.name"], "material_reward", TEXT["info.lost_return.description"], reward_ids=("polar_jacket",)),
+    "security_backup": InformationTemplate("security_backup", TEXT["info.security_backup.name"], "material_reward", TEXT["info.security_backup.description"], reward_ids=("video_tape",)),
+    "good_talk": InformationTemplate("good_talk", TEXT["info.good_talk.name"], "state", TEXT["info.good_talk.description"], TEXT["data.information.module.1"], TEXT["data.information.module.2"], TEXT["data.information.module.3"]),
+    "odd_smile": InformationTemplate("odd_smile", TEXT["info.odd_smile.name"], "state", TEXT["info.odd_smile.description"], TEXT["data.information.module.4"], TEXT["data.information.module.5"], TEXT["data.information.module.6"]),
+    "tense_nerves": InformationTemplate("tense_nerves", TEXT["info.tense_nerves.name"], "state", TEXT["info.tense_nerves.description"], TEXT["data.information.module.7"], TEXT["data.information.module.8"], TEXT["data.information.module.9"]),
+    "suppressed_sobbing": InformationTemplate("suppressed_sobbing", TEXT["info.suppressed_sobbing.name"], "state", TEXT["info.suppressed_sobbing.description"], TEXT["data.information.module.10"], TEXT["data.information.module.11"], TEXT["data.information.module.12"]),
+    "moment_peace": InformationTemplate("moment_peace", TEXT["info.moment_peace.name"], "state", TEXT["info.moment_peace.description"], TEXT["data.information.module.13"], TEXT["data.information.module.14"], TEXT["data.information.module.15"]),
+    "supply_dispute": InformationTemplate("supply_dispute", TEXT["info.supply_dispute.name"], "state", TEXT["info.supply_dispute.description"], TEXT["data.information.module.16"], TEXT["data.information.module.17"], TEXT["data.information.module.18"]),
+    "courier_absent": InformationTemplate("courier_absent", TEXT["info.courier_absent.name"], "location_modifier", TEXT["info.courier_absent.description"], location_id="courier_station"),
+    "double_eleven": InformationTemplate("double_eleven", TEXT["info.double_eleven.name"], "location_modifier", TEXT["info.double_eleven.description"], location_id="courier_station"),
+    "medical_samples": InformationTemplate("medical_samples", TEXT["info.medical_samples.name"], "location_modifier", TEXT["info.medical_samples.description"], location_id="county_hospital"),
+    "er_disturbance": InformationTemplate("er_disturbance", TEXT["info.er_disturbance.name"], "location_modifier", TEXT["info.er_disturbance.description"], location_id="county_hospital"),
+    "clerk_gaming": InformationTemplate("clerk_gaming", TEXT["info.clerk_gaming.name"], "location_modifier", TEXT["info.clerk_gaming.description"], location_id="convenience_store"),
+    "cold_chain": InformationTemplate("cold_chain", TEXT["info.cold_chain.name"], "location_modifier", TEXT["info.cold_chain.description"], location_id="convenience_store"),
+    "shelf_collapse": InformationTemplate("shelf_collapse", TEXT["info.shelf_collapse.name"], "location_modifier", TEXT["info.shelf_collapse.description"], location_id="supermarket"),
+    "late_inventory": InformationTemplate("late_inventory", TEXT["info.late_inventory.name"], "location_modifier", TEXT["info.late_inventory.description"], location_id="supermarket"),
+    "lost_nebula_kit": InformationTemplate("lost_nebula_kit", TEXT["info.lost_nebula_kit.name"], "material_reward", TEXT["info.lost_nebula_kit.description"], location_id="county_hospital", reward_ids=("nebula_surgery", "rescue_cart")),
+    "unclaimed_phone": InformationTemplate("unclaimed_phone", TEXT["info.unclaimed_phone.name"], "material_reward", TEXT["info.unclaimed_phone.description"], location_id="convenience_store", reward_ids=("smartphone",)),
+    "disturbing_picture_book": InformationTemplate("disturbing_picture_book", TEXT["info.disturbing_picture_book.name"], "material_reward", TEXT["info.disturbing_picture_book.description"], location_id="supermarket", reward_ids=("nebula_legend",)),
+    "valuable_package": InformationTemplate("valuable_package", TEXT["info.valuable_package.name"], "material_reward", TEXT["info.valuable_package.description"], location_id="courier_station", reward_ids=("gramophone",)),
 }
 
 LOCATION_INFORMATION_MODIFIERS = {
@@ -166,12 +167,12 @@ def register_information_template(
 ) -> None:
     """登记一条动态信息模板；``replace=True`` 时覆盖同 id（内容包优先级用）。"""
     if template.id in INFORMATION_TEMPLATES and not replace:
-        raise ValueError(f"信息模板 ID 重复：{template.id}")
+        raise ValueError(TEXT["data.information.register_information_template.1"].format(p1=template.id))
     INFORMATION_TEMPLATES[template.id] = template
 
 
 def register_location_modifier(template_id: str, modifier: dict[str, float]) -> None:
     """登记一条地点信息修正（须先有对应模板）。"""
     if template_id not in INFORMATION_TEMPLATES:
-        raise ValueError(f"未知信息模板：{template_id}")
+        raise ValueError(TEXT["data.information.register_location_modifier.1"].format(p1=template_id))
     LOCATION_INFORMATION_MODIFIERS[template_id] = dict(modifier)

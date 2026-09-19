@@ -11,15 +11,15 @@
 from __future__ import annotations
 
 import re
+from weiren_game.data.lang import TEXT
 
 # `X因{因为}流失/消耗/受到{N}{单位}。` —— 值层的损失类播报都长这样。
 _LOSS = re.compile(
-    r"^(?P<who>.+?)因(?P<why>.+?)(?:流失|消耗|受到)"
-    r"(?P<amount>\d+(?:\.\d+)?)(?P<unit>[\u4e00-\u9fff]{1,4})"
+    TEXT["log_shape.module.1"]
 )
 # `（前缀：）X的{单位}层数+{N}。` —— 状态/情绪的层数累积。
 _GAIN_LAYERS = re.compile(
-    r"^(?:[^：]{1,8}：)?(?P<who>.+?)的(?P<unit>[\u4e00-\u9fff]{1,4})层数\+(?P<amount>\d+)"
+    TEXT["log_shape.module.2"]
 )
 
 
@@ -38,7 +38,7 @@ def row_from_line(line: str) -> dict | None:
         return {
             "label": match.group("who"),
             "value": "+%s %s" % (match.group("amount"), match.group("unit")),
-            "note": "层数",
+            "note": TEXT["log_shape.row_from_line.1"],
         }
     return None
 

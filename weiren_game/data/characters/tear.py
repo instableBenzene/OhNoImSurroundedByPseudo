@@ -7,20 +7,17 @@ from weiren_game.probability import resolve
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "tear", 3, "ED Tear", "14岁的小男孩，自称是一个“沃尔玛购物袋”。",
-    "keen", "gentle", 2, ("小学生", "12-14岁", "男性", "沃尔玛购物袋"),
-    (A("walmart_bag", "我是一个沃尔玛购物袋",
-       "ED Tear 入住时带来一个「沃尔玛购物袋」。\n"
-       "「沃尔玛购物袋」（金色）【工具】【易损品】\n"
-       "· 持有者可携带物资数 **+5**。"
-       "· 搜索返回后有 **25%** 可能被消耗；携带者为 ED Tear 时概率 **−10%**。\n"
-       "*一个普通的超市购物袋，但对 ED 来说，他即是塑料袋，塑料袋即是他。*"),
+    "tear", 3, TEXT["character.tear.name"], TEXT["character.tear.description"],
+    "keen", "gentle", 2, (TEXT["character.tear.tag.0"], TEXT["character.tear.tag.1"], TEXT["character.tear.tag.2"], TEXT["character.tear.tag.3"]),
+    (A("walmart_bag", TEXT["ability.walmart_bag.name"],
+       TEXT["ability.walmart_bag.description"]),
      # 排版：中英之间加空格、标点后不留空格；倍率写 `×`（`*` 是 mdText 的斜体标记，会被吃掉）。
-     A("needs_bag", "我不能没有购物袋",
-       "若 ED Tear 自身不携带「沃尔玛购物袋」：回合末理智消耗 **×3**，且理智消耗 **+5**。")),
+     A("needs_bag", TEXT["ability.needs_bag.name"],
+       TEXT["ability.needs_bag.description"])),
 )
 
 # ---------------------------------------------------------------- function
@@ -34,7 +31,7 @@ def on_arrival(engine: EngineProtocol, tenant: object) -> None:
     if not engine._passive_available(tenant, "tear.arrival"):
         return
     engine._gain_item("walmart_bag")
-    engine._log("ED Tear带来了沃尔玛购物袋。")
+    engine._log(TEXT["data.characters.tear.on_arrival.1"])
 
 
 def missing_bag_cost(engine: EngineProtocol, tenant: object, cost: float) -> float:
@@ -66,8 +63,8 @@ def _tear_sanity_modifier(context: object):
         return
     missing = not any(v.item_id == "walmart_bag" for v in tenant.inventory.items)
     if missing and engine._passive_available(tenant, "tear.missing_bag"):
-        yield spec("sanityConsume").path("回合末消耗").mul(3).source("角色技能", "ED Tear", "我不能没有购物袋")
-        yield spec("sanityConsume").path("回合末消耗").final().flat(5).source("角色技能", "ED Tear", "我不能没有购物袋")
+        yield spec("sanityConsume").path("turn_end_consume").mul(3).source("ability", "tear", "needs_bag")
+        yield spec("sanityConsume").path("turn_end_consume").final().flat(5).source("ability", "tear", "needs_bag")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regt

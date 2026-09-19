@@ -6,37 +6,38 @@
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
 from weiren_game.condition import StatusDefinition, register_status_definition
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "peach", 12, "青桃", "助人为乐的小道士，带着糯米与符纸。",
-    "gentle", "keen", 3, ("道士", "16-18岁", "女性", "神秘学研究者"),
+    "peach", 12, TEXT["character.peach.name"], TEXT["character.peach.description"],
+    "gentle", "keen", 3, (TEXT["character.peach.tag.0"], TEXT["character.peach.tag.1"], TEXT["character.peach.tag.2"], TEXT["character.peach.tag.3"]),
     # 限制交给 chips（STYLE §12 规则 3）：实现是给**该房客**打一次性状态——即"每人每局一次"，
     # 不是"全场一次"（口径以代码为准）。
-    (A("slow_guard", "持之以缓",
-       "需屋内有青桃。\n房客理智从 **≥50** 跌破 **50** 时：拉回 **50**，并在本回合结束前使其不低于 **50**。",
-       chips=("每名房客每局 1 次",)),
-     A("justice_execution", "正义执行", "当伪人即将突破时，避免这次突破，且该伪人接下来两个回合不会来访。触发后该能力失效。")),
+    (A("slow_guard", TEXT["ability.slow_guard.name"],
+       TEXT["ability.slow_guard.description"],
+       chips=(TEXT["ability.slow_guard.chip.0"],)),
+     A("justice_execution", TEXT["ability.justice_execution.name"], TEXT["ability.justice_execution.description"])),
 )
 
 register_status_definition(
     StatusDefinition(
         "peach_slow_guard",
-        "持之以恒",
+        TEXT["status.peach_slow_guard.label"],
         "other",
         shown=frozenset({"layers"}),
         source_id="passive:peach.slow_guard",
-     description="在它真正出手前，先把伤害一点点拖慢、拖散。")
+     description=TEXT["status.peach_slow_guard.description"])
 )
 register_status_definition(
     StatusDefinition(
         "peach_slow_guard_used",
-        "已被持之以恒保护",
+        TEXT["status.peach_slow_guard_used.label"],
         "other",
         shown=frozenset(),
         source_id="passive:peach.slow_guard",
         permanent=True,
-     description="那份从容已经用掉，剩下的只能硬接。")
+     description=TEXT["status.peach_slow_guard_used.description"])
 )
 
 # ---------------------------------------------------------------- modifier
@@ -64,8 +65,7 @@ def slow_guard_floor(
     )
     tenant.set_status("peach_slow_guard_used", intensity=1, layers=99)
     engine._log(
-        f"青桃的「持之以恒」保护了{engine.character(tenant).name}："
-        f"理智被拉回50且到下一回合结束前不低于50。"
+        TEXT["data.characters.peach.slow_guard_floor.1"].format(p1=engine.character(tenant).name)
     )
     return 50.0
 
@@ -88,7 +88,7 @@ def justice_execution_guard(engine: EngineProtocol) -> bool:
     ):
         ability.disabled = True
         engine._suppress_pseudo(2, ("visit",))
-        engine._log("青桃发动「正义执行」，阻止突破；伪人被压制两回合。")
+        engine._log(TEXT["data.characters.peach.justice_execution_guard.1"])
         return True
     return False
 

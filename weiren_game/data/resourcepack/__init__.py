@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from .._discovery import discover_modules
+from weiren_game.data.lang import TEXT
 
 # 贴图零件：图标 id → <symbol> 内部标记（前端注入 <defs>，`<use href="#id">` 即可用）。
 RESOURCE_SYMBOLS: dict[str, str] = {}
@@ -72,7 +73,7 @@ def register_theme(theme: object, *, allow_locked: bool = False) -> None:
         for key, value in tokens.items():
             key = str(key)
             if not allow_locked and key in LOCKED_TOKENS:
-                print(f"资源包：忽略被锁定的 token {key}（语义/品质/尺寸不随材质变）")
+                print(TEXT["data.resourcepack.__init__.register_theme.1"].format(p1=key))
                 continue
             accepted[key] = str(value)
         RESOURCE_THEME["tokens"].update(accepted)

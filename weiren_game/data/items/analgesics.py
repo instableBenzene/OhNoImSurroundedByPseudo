@@ -1,11 +1,12 @@
 """大类：镇痛剂（原稿未给品质色，按药物层级保守取值）。"""
 
 from ..types import I
+from weiren_game.data.lang import TEXT
 
 ITEMS = {
-    "yuntongqu": I("yuntongqu", "殒痛去", "medical", 1, "≤3级创伤/紊乱免疫额外效果2回合。", ("medical_supply", "anodyne", "durability_consumable"), max_durability=1, use_cost=1, medical_max_intensity=3, source_note="原稿未标品质；按低阶药设为绿色。"),
-    "parecoxib": I("parecoxib", "帕瑞昔布注射液", "medical", 3, "≤6级创伤/紊乱免疫额外效果3回合。", ("medical_supply", "anodyne", "durability_consumable"), max_durability=5, use_cost=1, medical_max_intensity=6, source_note="原稿未标品质；按中阶药设为紫色。"),
-    "morphine": I("morphine", "盐酸吗啡注射液", "medical", 5, "≤9级创伤/紊乱免疫额外效果10回合。", ("medical_supply", "anodyne", "consumable"), consumable=True, medical_max_intensity=9, source_note="原稿未标品质；按最高阶药设为红色。"),
+    "yuntongqu": I("yuntongqu", TEXT["item.yuntongqu.name"], "medical", 1, TEXT["item.yuntongqu.description"], ("medical_supply", "anodyne", "durability_consumable"), max_durability=1, use_cost=1, medical_max_intensity=3, source_note=TEXT["data.items.analgesics.module.1"]),
+    "parecoxib": I("parecoxib", TEXT["item.parecoxib.name"], "medical", 3, TEXT["item.parecoxib.description"], ("medical_supply", "anodyne", "durability_consumable"), max_durability=5, use_cost=1, medical_max_intensity=6, source_note=TEXT["data.items.analgesics.module.2"]),
+    "morphine": I("morphine", TEXT["item.morphine.name"], "medical", 5, TEXT["item.morphine.description"], ("medical_supply", "anodyne", "consumable"), consumable=True, medical_max_intensity=9, source_note=TEXT["data.items.analgesics.module.3"]),
 }
 
 # 镇痛剂持续时间（回合），与各物品说明一致。
@@ -36,23 +37,23 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 
 register_status_definition(
     StatusDefinition(
-        "analgesia_trauma", "镇痛（创伤）", "other",
+        "analgesia_trauma", TEXT["status.analgesia_trauma.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="item:analgesics",
         nodes=frozenset({"status_applied.modify"}),
         suppresses_conditions=("trauma",),
         hook=_suppress,
-     description="伤痛被麻药按住，暂时不再叫嚣。")
+     description=TEXT["status.analgesia_trauma.description"])
 )
 register_status_definition(
     StatusDefinition(
-        "analgesia_disorder", "镇痛（紊乱）", "other",
+        "analgesia_disorder", TEXT["status.analgesia_disorder.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="item:analgesics",
         nodes=frozenset({"status_applied.modify"}),
         suppresses_conditions=("disorder",),
         hook=_suppress,
-     description="被药力压住的杂念，安静得近乎可疑。")
+     description=TEXT["status.analgesia_disorder.description"])
 )
 
 

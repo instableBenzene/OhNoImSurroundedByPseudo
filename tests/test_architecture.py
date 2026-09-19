@@ -25,7 +25,7 @@ from weiren_game.data import personalities as personality_module
 from weiren_game.data import tags as tag_module
 from weiren_game.data.labels import ITEM_TAG_LABELS, LOCATION_GROUP_LABELS
 from weiren_game.config import CONFIG
-from weiren_game.dlc import apply_pack_order, load_single_dlc, reload_dlc
+from weiren_game.dlc import apply_pack_order, load_single_dlc
 from weiren_game.engine import GameEngine
 from weiren_game.global_event import GLOBAL_EVENT_DEFINITIONS, emotion_reveal_event
 from weiren_game import data
@@ -54,7 +54,7 @@ class ArchitectureTests(unittest.TestCase):
         self.assertIs(CONTENT.locations(), data.LOCATIONS)
         self.assertIs(CONTENT.pseudos(), data.PSEUDOS)
         self.assertIn("mcdangdang", CONTENT.items())
-        self.assertIn("surgery_kit", CONTENT.tag_behaviors())
+        self.assertIn("surgery_kit", data.TAG_BEHAVIORS)
         engine = GameEngine.new_game(seed="packs")
         self.assertIn("base", engine.state.meta.packs)
         self.assertEqual(tuple(sorted(engine.state.meta.packs)), CONTENT.manifest())
@@ -222,7 +222,7 @@ class ArchitectureTests(unittest.TestCase):
             self.assertEqual(CHARACTERS["dragon"].name, base_dragon)
             apply_pack_order(["probe2", "base"], root=folder)
             self.assertEqual(_effect_totals(), effects_loaded)   # 重复应用不累积
-            reload_dlc([], root=folder)                # 卸载 → 必须完整还原
+            apply_pack_order([], root=folder)          # 卸载 → 必须完整还原
             self.assertEqual(
                 (
                     set(personality_module.PERSONALITY_MODULES), set(tag_module.TAG_BEHAVIORS),
@@ -275,7 +275,7 @@ class ArchitectureTests(unittest.TestCase):
             self.assertIn("i-avX", RESOURCE_SYMBOLS)                            # 可新增零件
             self.assertIn(".skinned", str(RESOURCE_THEME["css"]))
 
-            reload_dlc([], root=folder)                                          # 卸载 → 全部回滚
+            apply_pack_order([], root=folder)                                    # 卸载 → 全部回滚
             self.assertEqual(RESOURCE_THEME["tokens"]["--amber"], base_amber)
             self.assertNotIn("--my-custom", RESOURCE_THEME["tokens"])
             self.assertNotIn("i-avX", RESOURCE_SYMBOLS)

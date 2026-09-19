@@ -7,23 +7,24 @@
 """
 
 from weiren_game.data.types import I
+from weiren_game.data.lang import pack_text_from_file
+TEXT = pack_text_from_file(__file__)
 
 CATEGORY = "character"
 
 # 风味文本：面向屋主的描写 / 台词，与机制无关。
 FLAVOR = (
-    "STAR专用手枪型能量武器，通过自身供能无需弹药同时共享传感器数据；如同身体的延伸。"
-    "\n“流星信标，校准完毕。交给本人吧。”"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.items.sidearm.FLAVOR"]
 )
 
 ITEMS = {
     "star_sidearm": I(
         "star_sidearm",
-        "流星信标",
+        TEXT["item.star_sidearm.name"],
         CATEGORY,
         4,
         # **只讲物品自己**，不复述技能机制。
-        "STAR 的个人佩枪，满足特定能力的发动条件。",
+        TEXT["item.star_sidearm.description"],
         ("tool", "sidearm"),   # 不打 fragile（否则 keen 的减易损会白给收益）
         searchable=False,      # 只此一把
         flavor=FLAVOR,         # 让定义自描述（当前显示层不读它，见下方说明）

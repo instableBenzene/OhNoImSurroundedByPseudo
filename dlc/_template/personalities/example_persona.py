@@ -1,7 +1,9 @@
 """示例性格：文件名 `example_persona` 即性格键（改名为你要的键）。"""
+from weiren_game.data.lang import pack_text_from_file
+TEXT = pack_text_from_file(__file__)
 
 # 界面显示的中文名（必填；缺省回退为键名）。
-LABEL = "示例性格"
+LABEL = TEXT["dlc._template.personalities.example_persona.LABEL"]
 
 # 羁绊档位阈值；达到即激活该档。也可改用 TIER_AT / ACTIVE_TIERS 自定义。
 TIERS = (2, 5, 8)

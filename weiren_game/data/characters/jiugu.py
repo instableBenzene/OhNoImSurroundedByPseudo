@@ -7,13 +7,14 @@ from weiren_game.probability import resolve
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "jiugu", 9, "久孤", "爱好忍术的中二青年，自称“影之继承者”。",
-    "cheerful", "impatient", 3, ("高中生", "16-18岁", "男性", "忍者（？）"),
-    (A("ninjutsu", "吓我一跳，我释放忍术", "久孤在受到伪人主动技能影响时，有45%可能不受该能力影响。"),
-     A("storm_blade", "岚刀一直切，一刀一刀燃烧刀", "久孤在搜索返回时，必定获得一个紫色及紫色以上品质的物资。")),
+    "jiugu", 9, TEXT["character.jiugu.name"], TEXT["character.jiugu.description"],
+    "cheerful", "impatient", 3, (TEXT["character.jiugu.tag.0"], TEXT["character.jiugu.tag.1"], TEXT["character.jiugu.tag.2"], TEXT["character.jiugu.tag.3"]),
+    (A("ninjutsu", TEXT["ability.ninjutsu.name"], TEXT["ability.ninjutsu.description"]),
+     A("storm_blade", TEXT["ability.storm_blade.name"], TEXT["ability.storm_blade.description"])),
 )
 
 # ---------------------------------------------------------------- function
@@ -27,7 +28,7 @@ def resists_pseudo_active(
     if engine._passive_available(tenant, f"{event_id}.jiugu.passive"):
         from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
 
-        source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+        source = (TEXT["data.characters.jiugu.resists_pseudo_active.1"], TEXT["data.characters.jiugu.resists_pseudo_active.2"], TEXT["data.characters.jiugu.resists_pseudo_active.3"], TEXT["data.characters.jiugu.resists_pseudo_active.4"])
         ctx = {"engine": engine, "tenant": tenant, "event_id": event_id}
         value = calculate_modified_amount(
             0.0, collect_modifiers("chance", source, ctx)
@@ -38,7 +39,7 @@ def resists_pseudo_active(
         )
         engine._skill_outcome(tenant, f"{event_id}.jiugu", success)
         if success:
-            engine._log("久孤释放忍术，避开了伪人的主动能力。")
+            engine._log(TEXT["data.characters.jiugu.resists_pseudo_active.5"])
             return True
         return False
     return False
@@ -73,7 +74,7 @@ def _jiugu_resist_modifier(context: object):
         return
     yield (
         spec("chance").flat(0.45).match("all")
-        .path("抵御", "伪人使用主动能力").source("角色技能", "久孤", "忍术")
+        .path("resist", "pseudo_active").source("ability", "jiugu", "ninjutsu")
     )
 
 

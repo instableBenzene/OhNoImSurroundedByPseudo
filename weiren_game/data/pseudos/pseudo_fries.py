@@ -8,17 +8,18 @@ from typing import Any
 
 from ..types import PseudoDefinition
 from weiren_game.lifecycle import AbilityLaunch
+from weiren_game.data.lang import TEXT
 
 DEFINITION = PseudoDefinition(
     "pseudo_fries",
-    "藏于人群之中的黑手-薯条",
+    TEXT["pseudo.pseudo_fries.name"],
     "fries",
-    "没有固定形态，会绑架搜索者并以完美替身回屋。",
-    "累计潜伏10回合，或单次潜伏5回合；或释放炼狱扳机时屋内房客少于3人。",
-    "累计将替身驱逐三次。",
+    TEXT["pseudo.pseudo_fries.description"],
+    TEXT["pseudo.pseudo_fries.breakthrough"],
+    TEXT["pseudo.pseudo_fries.liberation"],
     enters_house=False,
     mark_field="exposure",
-    mark_label="暴露值",
+    mark_label=TEXT["pseudo.pseudo_fries.mark_label"],
     # 暴露值即「暴露印记-薯条」：由理智溢出体系转化而来，禁止被外界改写。
     mark_externally_locked=True,
 )
@@ -89,7 +90,7 @@ def add_exposure(
         return
     pseudo.exposure += amount
     pseudo.cumulative_exposure += amount
-    engine._log(f"替身因{source}获得{amount:g}暴露值（当前{pseudo.exposure:g}）。")
+    engine._log(TEXT["data.pseudos.pseudo_fries.add_exposure.1"].format(p1=source, p2=amount, p3=pseudo.exposure))
     if not spawn:
         return
     pseudo.milestone_pool += amount
@@ -119,12 +120,12 @@ def create_accusation(engine: object, true_accusation: bool) -> object:
         target = engine._rng(EVENT_IDS["fries.accusation.false"]).choice(humans or targets)
     info_id = engine.state.ids.allocate_information()
     info = Information(
-        info_instance_id=info_id, title="指认房间内的伪人",
-        text=f"一条线索指向{engine.character(target).name}：此人可能是伪装者。",
+        info_instance_id=info_id, title=TEXT["data.pseudos.pseudo_fries.create_accusation.1"],
+        text=TEXT["data.pseudos.pseudo_fries.create_accusation.2"].format(p1=engine.character(target).name),
         status="pending", gained_turn=engine.state.flow.turn,
         expires_turn=engine.state.flow.turn + 5,
         truth=true_accusation and target.is_pseudo, kind="pseudo_inhome",
-        source="未知", target_ids=[target.id],
+        source=TEXT["data.pseudos.pseudo_fries.create_accusation.3"], target_ids=[target.id],
         data={"fries_exposure_generated": True},
     )
     engine.state.house.information.append(info)
@@ -174,7 +175,7 @@ def expel_infiltrator(
     if self_infernal:
         pseudo.expelled_count = 0
         # 重后果（红色）：替身自己走了，玩家的解放进度被清零。
-        engine._log("炼狱扳机自我驱逐：解放进度已重置。", kind="danger")
+        engine._log(TEXT["data.pseudos.pseudo_fries.expel_infiltrator.1"], kind="danger")
     else:
         pseudo.expelled_count += 1
     pseudo.infiltrator_id = None
@@ -190,16 +191,14 @@ def expel_infiltrator(
     pseudo.exposure_ten_milestone = 0
     pseudo.milestone_pool = 0
     engine._log(
-        f"{source}驱逐了替身；被绑架的{engine.character(original).name}归来"
-        f"并损失{penalty}生命、理智。"
-        f"解放进度{pseudo.expelled_count}/3。", kind="danger",
+        TEXT["data.pseudos.pseudo_fries.expel_infiltrator.2"].format(p1=source, p2=engine.character(original).name, p3=penalty, p4=pseudo.expelled_count), kind="danger",
     )
     engine._after_health_changed()
     if original.health < 0:
-        engine._kill_tenant(original, "被绑架期间伤重")
+        engine._kill_tenant(original, TEXT["data.pseudos.pseudo_fries.expel_infiltrator.3"])
     if pseudo.expelled_count >= 3:
         pseudo.liberated = True
-        engine._finish(True, "三名替身先后被识破驱逐，藏于人群中的黑手无处可藏。")
+        engine._finish(True, TEXT["data.pseudos.pseudo_fries.expel_infiltrator.4"])
 
 
 def performance(engine: object) -> None:
@@ -220,19 +219,19 @@ def performance(engine: object) -> None:
         return
     engine._observe_pseudo_skill("performance")
     if engine._skill_respond_skill(
-        "伪装表演", "cast",
+        TEXT["data.pseudos.pseudo_fries.performance.1"], "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     ):
         return
     a, b = engine._rng(EVENT_IDS["fries.performance.targets"]).sample(candidates, 2)
     info_id = engine.state.ids.allocate_information()
     engine.state.house.information.append(Information(
-        info_instance_id=info_id, title="伪装表演-互相怀疑",
-        text=f"{engine.character(a).name}与{engine.character(b).name}都指责对方像伪人。",
+        info_instance_id=info_id, title=TEXT["data.pseudos.pseudo_fries.performance.2"],
+        text=TEXT["data.pseudos.pseudo_fries.performance.3"].format(p1=engine.character(a).name, p2=engine.character(b).name),
         status="pending", gained_turn=engine.state.flow.turn,
         expires_turn=engine.state.flow.turn
         + engine._rng(EVENT_IDS["fries.performance.duration"]).randint(3, 5),
-        truth=False, kind="state", source="伪装", template_id="fries_performance",
+        truth=False, kind="state", source=TEXT["data.pseudos.pseudo_fries.performance.4"], template_id="fries_performance",
         target_ids=[a.id, b.id],
     ))
     pseudo.performance_count += 1
@@ -245,7 +244,7 @@ def mind_play(engine: object) -> None:
     pseudo = engine.state.pseudo_state
     engine._observe_pseudo_skill("mind")
     if engine._skill_respond_skill(
-        "玩弄人心", "cast",
+        TEXT["data.pseudos.pseudo_fries.mind_play.1"], "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     ):
         return
@@ -258,13 +257,13 @@ def mind_play(engine: object) -> None:
     engine._rng(EVENT_IDS["fries.mind.targets"]).shuffle(targets)
     for target in targets[:3]:
         if engine._skill_respond_skill(
-            "玩弄人心", "lock",
+            TEXT["data.pseudos.pseudo_fries.mind_play.2"], "lock",
             mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
             target=target, event="fries.mind",
         ):
             continue
-        engine._strengthen_emotion_set(target, "erosion", 1, 2, "玩弄人心")
-    add_exposure(engine, 3, "玩弄人心")
+        engine._strengthen_emotion_set(target, "erosion", 1, 2, TEXT["data.pseudos.pseudo_fries.mind_play.3"])
+    add_exposure(engine, 3, TEXT["data.pseudos.pseudo_fries.mind_play.4"])
 
 
 def settle_end(engine: object) -> None:
@@ -283,8 +282,8 @@ def settle_end(engine: object) -> None:
         infiltrator.id, 0.0
     )
     if pending_overflow:
-        add_exposure(engine, pending_overflow, "理智回复溢出")
-    add_exposure(engine, 1, "回合结束")
+        add_exposure(engine, pending_overflow, TEXT["data.pseudos.pseudo_fries.settle_end.1"])
+    add_exposure(engine, 1, TEXT["data.pseudos.pseudo_fries.settle_end.2"])
     if engine._rng(EVENT_IDS["fries.mind_play"]).random() < min(
         1.0, (.35 + pseudo.exposure / 100)
     ):
@@ -294,7 +293,7 @@ def settle_end(engine: object) -> None:
         return
     if pseudo.infiltration_turns >= 5 or pseudo.total_infiltration_turns >= 10:
         engine._attempt_breakthrough(
-            "薯条的替身已潜伏足够久，「藏身」突破完成。"
+            TEXT["data.pseudos.pseudo_fries.settle_end.3"]
         )
 
 
@@ -304,9 +303,9 @@ def infernal_trigger(engine: object) -> None:
 
     pseudo = engine.state.pseudo_state
     engine._observe_pseudo_skill("trigger")
-    engine._log("替身暴露值达到25，发动「炼狱扳机」！")
+    engine._log(TEXT["data.pseudos.pseudo_fries.infernal_trigger.1"])
     blocked = engine._skill_respond_skill(
-        "炼狱扳机", "cast",
+        TEXT["data.pseudos.pseudo_fries.infernal_trigger.2"], "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     )
     # AOE 收成一条：明细由 log 层按形状自动归并（weiren_game/log_shape.py），这里只包一层。
@@ -320,20 +319,20 @@ def infernal_trigger(engine: object) -> None:
             engine._rng(EVENT_IDS["fries.trigger"], repeat).shuffle(targets)
             for target in targets[:3]:
                 if not engine._skill_respond_skill(
-                    "炼狱扳机", "lock",
+                    TEXT["data.pseudos.pseudo_fries.infernal_trigger.3"], "lock",
                     mode=AbilityLaunch.PSEUDO_HUMAN,
                     caster=engine.state.pseudo_state,
                     target=target, event=f"fries.trigger.{repeat}",
                 ):
-                    engine._damage_health(target, 5, "炼狱扳机")
-    engine._collect_flush(title="炼狱扳机")
+                    engine._damage_health(target, 5, "infernal_trigger")
+    engine._collect_flush(title=TEXT["data.pseudos.pseudo_fries.infernal_trigger.5"])
     # 突破条件：释放炼狱扳机时屋内房客人数小于 3。
     if len(engine.home_tenants()) < 3:
         if engine._attempt_breakthrough(
-            "炼狱扳机引爆时屋内房客不足三人，薯条完成「黑手」突破。"
+            TEXT["data.pseudos.pseudo_fries.infernal_trigger.6"]
         ):
             return
-    expel_infiltrator(engine, "炼狱扳机自我驱逐", self_infernal=True)
+    expel_infiltrator(engine, TEXT["data.pseudos.pseudo_fries.infernal_trigger.7"], self_infernal=True)
 
 
 def attack_searcher(engine: object, mission: object, tenant: object) -> None:
@@ -356,7 +355,7 @@ def blocks_search_dispatch(engine: object, tenant: object) -> bool:
     pseudo = engine.state.pseudo_state
     if pseudo.infiltrator_id != tenant.id or not tenant.is_pseudo:
         return False
-    engine._log("派遣替身外出搜索令薯条发动「炼狱扳机」。")
+    engine._log(TEXT["data.pseudos.pseudo_fries.blocks_search_dispatch.1"])
     infernal_trigger(engine)
     return True
 
@@ -392,19 +391,63 @@ def on_information_verified(engine: object, *, info: object) -> None:
     if info.truth or not info.data.get("fries_exposure_generated"):
         return
     # 回敬暴露值只推进炼狱扳机，不再触发新的里程碑指认（打断自我放大循环）。
-    add_exposure(engine, 15, "虚假信息被识破", spawn=False)
+    add_exposure(engine, 15, TEXT["data.pseudos.pseudo_fries.on_information_verified.1"], spawn=False)
 
 
-NODE_HOOKS = {"information.verified": on_information_verified}
+def on_sanity_restored(
+    engine: object, *, tenant: object, overflow: float
+) -> None:
+    """理智回复溢出：替身按 **50%** 累积，回合末结算为暴露值。
+
+    使用处：`value_system._restore_sanity` 发出的 `sanity.restored` 节点。
+    （比格小星在同一节点上按 100% 转星之印记——各自实现，核心不掺和。）
+    """
+    if overflow <= 0 or not tenant.is_pseudo or tenant.pseudo_source != "fries":
+        return
+    engine.state.pseudo_state.scenario().overflow[tenant.id] = (
+        engine.state.pseudo_state.scenario().overflow.get(tenant.id, 0.0)
+        + overflow * .5
+    )
+
+
+def on_ability_resolved(
+    engine: object, *, actor: object, ability_id: str, failed: bool
+) -> None:
+    """替身模仿能力的暴露结算：失败 7、成功 3。
+
+    使用处：`ability_system._ability_failed` 发出的 `ability.resolved` 节点。
+    """
+    if actor.is_pseudo and actor.pseudo_source == "fries":
+        add_exposure(engine, 7 if failed else 3, TEXT["data.pseudos.pseudo_fries.ability_fail_resolved.1"])
+
+
+def _mimic_fail_modifier(context: object):
+    """替身模仿他人主动能力时额外失败 +25%（走 `abilityFail` 通道）。"""
+    from weiren_game.modifier_rules import spec
+
+    actor = context["tenant"]  # type: ignore[index]
+    if actor is not None and actor.is_pseudo and actor.pseudo_source == "fries":
+        yield spec("abilityFail").path("ability_fail").flat(0.25).source("pseudo", "fries")
+
+
+from weiren_game.modifier_rules import register_modifier_provider as _regf
+_regf("abilityFail", _mimic_fail_modifier)
+
+
+NODE_HOOKS = {
+    "information.verified": on_information_verified,
+    "sanity.restored": on_sanity_restored,
+    "ability.resolved": on_ability_resolved,
+}
 
 
 def observed_skills(engine: object) -> tuple[str, ...]:
     """薯条场景对外可见的技能（id, 展示名），供信息文本与核验使用。"""
     return (
-        ("infiltrate", "潜伏"),
-        ("mind", "玩弄人心"),
-        ("performance", "表演"),
-        ("trigger", "炼狱扳机"),
+        ("infiltrate", TEXT["data.pseudos.pseudo_fries.observed_skills.1"]),
+        ("mind", TEXT["data.pseudos.pseudo_fries.observed_skills.2"]),
+        ("performance", TEXT["data.pseudos.pseudo_fries.observed_skills.3"]),
+        ("trigger", TEXT["data.pseudos.pseudo_fries.observed_skills.4"]),
     )
 
 
@@ -412,42 +455,8 @@ def progress_text(engine: object) -> str:
     """薯条场景的进度摘要文本。"""
     pseudo = engine.state.pseudo_state
     return (
-        f"驱逐{pseudo.expelled_count}/3，潜伏{pseudo.infiltration_turns}/5，"
-        f"暴露{pseudo.exposure:g}/25"
+        TEXT["data.pseudos.pseudo_fries.progress_text.1"].format(p1=pseudo.expelled_count, p2=pseudo.infiltration_turns, p3=pseudo.exposure)
     )
-
-
-def ability_fail_modifier(
-    engine: object, actor: object, chance: float
-) -> float:
-    """替身模仿他人主动能力时额外失败 +25%。"""
-    if actor.is_pseudo and actor.pseudo_source == "fries":
-        return chance + .25
-    return chance
-
-
-def ability_fail_resolved(
-    engine: object, actor: object, ability_id: str, failed: bool
-) -> None:
-    """替身模仿能力的暴露结算：失败 7、成功 3。"""
-    if actor.is_pseudo and actor.pseudo_source == "fries":
-        add_exposure(engine, 7 if failed else 3, "模仿主动能力")
-
-
-def sanity_overflow_share(
-    engine: object, tenant: object, overflow: float
-) -> None:
-    """理智溢出转化：与比格小星同属「溢出转化」体系的一次性版本。
-
-    比格小星把回复理智超过 100 的部分按 100% 转为【星之印记】；
-    替身则把同样的溢出部分按 50% 累积，在该回合末结算为【暴露印记-薯条】
-    （对外描述仍是「暴露值」）。
-    """
-    if tenant.is_pseudo and tenant.pseudo_source == "fries" and overflow:
-        engine.state.pseudo_state.scenario().overflow[tenant.id] = (
-            engine.state.pseudo_state.scenario().overflow.get(tenant.id, 0.0)
-            + overflow * .5
-        )
 
 
 # 薯条专属信息效果：就近声明「伪装表演」信息的核验/待验证结算。
@@ -472,13 +481,13 @@ def pending_performance_information(
     )
     for target in targets:
         if engine._skill_respond_skill(
-            "薯条表演", "lock",
+            TEXT["data.pseudos.pseudo_fries.pending_performance_information.1"], "lock",
             mode=AbilityLaunch.PSEUDO_HUMAN,
             caster=engine.state.pseudo_state,
             target=target, event=f"fries.performance.pending.{info.info_instance_id}",
         ):
             continue
-        engine._strengthen_emotion_set(target, "erosion", 1, 1, "伪装表演")
+        engine._strengthen_emotion_set(target, "erosion", 1, 1, TEXT["data.pseudos.pseudo_fries.pending_performance_information.2"])
 
 
 from ..information import register_state_effect
@@ -497,16 +506,16 @@ def card_info(engine: object) -> dict:
     ps = engine.state.pseudo_state
     exposure = int(getattr(ps, "exposure", 0))
     return {
-        "liberation": f"无可奈何：累计驱逐替身 {getattr(ps,'expelled_count',0)}/3",
+        "liberation": TEXT["data.pseudos.pseudo_fries.card_info.1"].format(p1=getattr(ps,'expelled_count',0)),
         # 暴露值只在「印记（顶栏）」与「潜伏」技能行显示，避免同一数值在多处堆叠。
-        "breakthrough": "黑手：潜伏累计 10 / 单次 5 回合即突破；暴露值满 25 会自我驱逐",
+        "breakthrough": TEXT["data.pseudos.pseudo_fries.card_info.2"],
         "mark_need": 25,
         "skills": [
-            {"name": "潜伏", "text": "搜索袭击：绑架外出房客，并以「替身」冒名归队。",
-             "mark": {"label": "暴露值", "current": exposure, "need": 25}},
-            {"name": "玩弄人心", "text": "回合末概率强化至多 3 名房客的侵蚀情绪，并累计暴露值。"},
-            {"name": "表演", "text": "回合初概率生成一条虚假的房客状态信息。"},
-            {"name": "炼狱扳机", "text": "随机至多 3 名房客各受 5 点伤害，重复 9 次；替身自我驱逐。"},
+            {"name": TEXT["data.pseudos.pseudo_fries.card_info.3"], "text": TEXT["data.pseudos.pseudo_fries.card_info.4"],
+             "mark": {"label": TEXT["data.pseudos.pseudo_fries.card_info.5"], "current": exposure, "need": 25}},
+            {"name": TEXT["data.pseudos.pseudo_fries.card_info.6"], "text": TEXT["data.pseudos.pseudo_fries.card_info.7"]},
+            {"name": TEXT["data.pseudos.pseudo_fries.card_info.8"], "text": TEXT["data.pseudos.pseudo_fries.card_info.9"]},
+            {"name": TEXT["data.pseudos.pseudo_fries.card_info.10"], "text": TEXT["data.pseudos.pseudo_fries.card_info.11"]},
         ],
     }
 
@@ -528,9 +537,6 @@ HANDLERS: dict[str, object] = {
     "observed_skills": observed_skills,
     "progress_text": progress_text,
     "card_info": card_info,
-    "ability_fail_modifier": ability_fail_modifier,
-    "ability_fail_resolved": ability_fail_resolved,
-    "sanity_overflow_share": sanity_overflow_share,
 }
 
 

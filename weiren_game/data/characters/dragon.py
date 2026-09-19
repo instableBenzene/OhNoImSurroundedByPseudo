@@ -6,13 +6,14 @@
 
 from ..types import A, CharacterDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "dragon", 1, "火龙", "阳光开朗的青春男大，自来熟，走到哪儿都能交朋友。",
-    "cheerful", "steady", 4, ("大学生", "18-24岁", "男性"),
-    (A("party_focus", "派对的焦点", "当火龙在屋内且理智值＞85 时，每回合开始有15%概率令本回合额外增加1名访客来访。"),),
-    (A("call_friends", "呼朋引伴", "消耗 **25 理智**，本回合立即额外增加 **2 名**访客来访。\n*若本局已无更多可来访的访客，改为获得「神秘的补给」。*", chips=("入住 3 回合后解锁", "冷却 4 回合")),),
+    "dragon", 1, TEXT["character.dragon.name"], TEXT["character.dragon.description"],
+    "cheerful", "steady", 4, (TEXT["character.dragon.tag.0"], TEXT["character.dragon.tag.1"], TEXT["character.dragon.tag.2"]),
+    (A("party_focus", TEXT["ability.party_focus.name"], TEXT["ability.party_focus.description"]),),
+    (A("call_friends", TEXT["ability.call_friends.name"], TEXT["ability.call_friends.description"], chips=(TEXT["ability.call_friends.chip.0"], TEXT["ability.call_friends.chip.1"])),),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -24,7 +25,7 @@ def requirements_call_friends(
     使用处：ability_system 的公共技能门槛判定。
     """
     if getattr(actor, "home_turns") < 3 and not bypass:
-        return "火龙需在屋内存活3回合后才能使用能力。"
+        return TEXT["data.characters.dragon.requirements_call_friends.1"]
     return None
 
 
@@ -41,8 +42,8 @@ def use_call_friends(engine: EngineProtocol, actor: object, ability_id: str, *, 
 
     使用处：ability_system.use_ability 的火龙分发分支。
     """
-    engine._queue_human_visitor("火龙喊来了一位访客。", force_supply=True)
-    engine._queue_human_visitor("火龙又喊来一位访客。", force_supply=True)
+    engine._queue_human_visitor(TEXT["data.characters.dragon.use_call_friends.1"], force_supply=True)
+    engine._queue_human_visitor(TEXT["data.characters.dragon.use_call_friends.2"], force_supply=True)
     engine._set_ability_cooldown(actor, ability_id, engine.state.flow.turn + 4)
 
 
@@ -58,7 +59,7 @@ def party_focus(engine: EngineProtocol, tenant: object) -> None:
         success = engine._rng(_event_id("dragon.visitor"), tenant.id).random() < .15
         engine._skill_outcome(tenant, "dragon.party_focus", success)
         if success:
-            engine._queue_human_visitor("火龙的热情吸引了一位额外访客。")
+            engine._queue_human_visitor(TEXT["data.characters.dragon.party_focus.1"])
 
 
 def _event_id(name):

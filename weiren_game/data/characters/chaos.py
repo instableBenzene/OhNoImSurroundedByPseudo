@@ -8,39 +8,37 @@
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
 from weiren_game.condition import StatusDefinition, register_status_definition
+from weiren_game.data.lang import TEXT
 
 register_status_definition(StatusDefinition(
-    "pure_self", "纯真的自我", "other", shown=frozenset({"icon", "description"}),
+    "pure_self", TEXT["status.pure_self.label"], "other", shown=frozenset({"icon", "description"}),
     source_id="passive:chaos.self_lock",
     permanent=True,
- description="守住“我还是我”这一点执念，不被情绪推着走。"))
+ description=TEXT["status.pure_self.description"]))
 register_status_definition(StatusDefinition(
-    "chaos_carry", "混沌携带量", "other", shown=frozenset(),
+    "chaos_carry", TEXT["status.chaos_carry.label"], "other", shown=frozenset(),
     source_id="passive:chaos.self_lock",
     permanent=True,
- description="身上多出的那点分量，提醒着它借来的模样。"))
+ description=TEXT["status.chaos_carry.description"]))
 register_status_definition(StatusDefinition(
-    "permission_shift", "权限转让·启动", "other", shown=frozenset({"icon", "description"}),
+    "permission_shift", TEXT["status.permission_shift.label"], "other", shown=frozenset({"icon", "description"}),
     source_id="ability:permission_transfer@chaos",
     permanent=True,
-    description="权限已在流转——不再需要支付理智。"))
+    description=TEXT["status.permission_shift.description"]))
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "chaos", 15, "混", "思维跳脱，精神状态时常在正反之间横跳。",
-    "dynamic", "dynamic", 1, ("无业游民", "25-30岁", "精神疾病"),
+    "chaos", 15, TEXT["character.chaos.name"], TEXT["character.chaos.description"],
+    "dynamic", "dynamic", 1, (TEXT["character.chaos.tag.0"], TEXT["character.chaos.tag.1"], TEXT["character.chaos.tag.2"]),
     # 注意：判据读的是**情绪「理智」的层数**（`tenant.reason.layers`）——它是**情绪**，不是理智**值**；
     # "理智值很高" 和 "攒够 10 层清醒情绪" 是两件事（玩家真这么误解过：以为有理智就能解锁）。
-    (A("chaotic_personality", "混沌的性格／纯真的自我",
-       "· 回合开始时，主性格与副性格分别在**八个性格**中随机切换；可携带物资数在 **1~4** 之间随机。"
-       "· **清醒情绪 ≥10 层**时，可以**固定**自己的主副性格（主性格权重变为 **2.0**），可携带物资数固定为 **4**。"),
-     A("reason_madness", "情绪显现-清醒／癫狂",
-       "混在屋内时，屋主可以看到所有房客的**清醒情绪与癫狂情绪**的强度、层数（强度固定为 **1**）：\n"
-       "· 理智：回合末消耗理智 **−5**。\n"
-       "· 癫狂：回合末消耗理智 **+10**；层数 **≥10** 时，回合开始消耗所有额外癫狂，转化为同层数的创伤与紊乱。"),
-     A("chaotic_thought", "混沌的思想", "· 回合开始时，屋内有 1 名房客满足下列任一条件，混的**清醒情绪 +1 层**：生命值 **≤60**、理智值 **≤60**、消沉值 **≥25**。"),
-     A("chaotic_atmosphere", "混沌的氛围", "混在屋内时，若有房客理智值≤0，将立刻将理智值恢复至50并使其癫狂层数+5。")),
-    (A("permission_transfer", "权限转让", "**首次**发动时，混消耗 **1 层理智**、换来 **1 层癫狂**；此后不再消耗。发动时二选一：\n· **代你出手**：一名房客付出 **10 生命**与 **10 理智**，使用其主动能力（可无视回合、对局限制）。\n· **收走**一名房客身上的一道伤、或一团乱（层数 **−1**、强度 **−1**）。", "tenant", chips=("每回合 1 次",), options=(("imitate","代我出手","i-hand","让对方用它的主动能力出手"),("trauma","收走那道伤","i-trauma","创伤层数-1、强度-1"),("disorder","收走那点乱","i-disorder","紊乱层数-1、强度-1")), nested_option="imitate", per_turn=True),),
+    (A("chaotic_personality", TEXT["ability.chaotic_personality.name"],
+       TEXT["ability.chaotic_personality.description"]),
+     A("reason_madness", TEXT["ability.reason_madness.name"],
+       TEXT["ability.reason_madness.description"]),
+     A("chaotic_thought", TEXT["ability.chaotic_thought.name"], TEXT["ability.chaotic_thought.description"]),
+     A("chaotic_atmosphere", TEXT["ability.chaotic_atmosphere.name"], TEXT["ability.chaotic_atmosphere.description"])),
+    (A("permission_transfer", TEXT["ability.permission_transfer.name"], TEXT["ability.permission_transfer.description"], "tenant", chips=(TEXT["ability.permission_transfer.chip.0"],), options=(("imitate",TEXT["ability.permission_transfer.option.0"],"i-hand",TEXT["data.characters.chaos.module.1"]),("trauma",TEXT["ability.permission_transfer.option.1"],"i-trauma",TEXT["data.characters.chaos.module.2"]),("disorder",TEXT["ability.permission_transfer.option.2"],"i-disorder",TEXT["data.characters.chaos.module.3"])), nested_option="imitate", per_turn=True),),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -88,8 +86,7 @@ def roll_personality_and_carry(engine: EngineProtocol, tenant: object) -> None:
     tenant.personalities = {primary: 1.0, secondary: 1.0}
     tenant.set_status("chaos_carry", intensity=4, layers=99)
     engine._log(
-        f"混本回合变为{PERSONALITY_LABELS[primary]}-"
-        f"{PERSONALITY_LABELS[secondary]}，携带量4。"
+        TEXT["data.characters.chaos.roll_personality_and_carry.1"].format(p1=PERSONALITY_LABELS[primary], p2=PERSONALITY_LABELS[secondary])
     )
 
 
@@ -137,11 +134,11 @@ def convert_excess_madness(engine: EngineProtocol, tenant: object, *, emotions_a
         return
     excess = tenant.madness.layers - 1
     tenant.madness.intensity = tenant.madness.layers = 1
-    for condition, label in ((tenant.trauma, "创伤"), (tenant.disorder, "紊乱")):
+    for condition, label in ((tenant.trauma, TEXT["data.characters.chaos.convert_excess_madness.1"]), (tenant.disorder, TEXT["data.characters.chaos.convert_excess_madness.2"])):
         condition.intensity = max(1, condition.intensity)
         condition.layers = min(99, condition.layers + excess)
         condition.clamp(intensity_max=10)
-        engine._log(f"癫狂转化：{engine.character(tenant).name}的{label}层数+{excess}。")
+        engine._log(TEXT["data.characters.chaos.convert_excess_madness.3"].format(p1=engine.character(tenant).name, p2=label, p3=excess))
 
 
 def end_turn_sanity_modifier(
@@ -180,21 +177,22 @@ def rescue_sanity(engine: EngineProtocol, tenant: object) -> None:
     tenant.sanity = 50
     tenant.madness.intensity = 1
     tenant.madness.layers = min(99, max(1, tenant.madness.layers + 5))
-    engine._log(f"混沌的氛围将{engine.character(tenant).name}的理智拉回50。")
+    engine._log(TEXT["data.characters.chaos.rescue_sanity.1"].format(p1=engine.character(tenant).name))
 
 
-def lock_personality(engine: EngineProtocol, actor: object) -> None:
-    """混消耗 10 层清醒情绪，固定当前性格与携带量（纯真的自我）。
+def pure_ego_personality(engine: EngineProtocol, tenant: object) -> None:
+    """纯真的自我：清醒情绪达 10 层时**自动**固定性格与携带量（混的私有机制）。
 
-    使用处：personality_system.lock_personality。
+    使用处：`round_effects._settle_tenant_instance_start` 的回合初实例节点
+    （经 `TURN_START_HOOKS` 查表，见本模块 `TURN_START`）。核心不认识这条机制。
     """
-    from weiren_game.exceptions import RuleViolation
-
-    if actor.character_id != "chaos" or actor.reason.layers < 10:
-        raise RuleViolation("混需要至少10层清醒情绪才能固定自我。")
-    actor.set_status("pure_self", intensity=1, layers=99)
-    actor.set_status("chaos_carry", intensity=4, layers=99)
-    engine._log("混固定了本回合的性格：主性格权重变为2.0，携带量固定为4。")
+    if tenant.character_id != "chaos":
+        return
+    if tenant.condition("pure_self").active or tenant.reason.layers < 10:
+        return
+    tenant.set_status("pure_self", intensity=1, layers=99)
+    tenant.set_status("chaos_carry", intensity=4, layers=99)
+    engine._log(TEXT["data.characters.chaos.pure_ego_personality.1"])
 
 
 def use_permission_transfer(
@@ -222,29 +220,28 @@ def use_permission_transfer(
     # 前置的「消耗理智获得癫狂」只在第一次发动时支付一次（外置启动代价）。
     if not actor.condition("permission_shift").active:
         if actor.reason.layers < 1:
-            raise RuleViolation("首次发动权限转让需要1层清醒情绪。")
+            raise RuleViolation(TEXT["data.characters.chaos.use_permission_transfer.1"])
         actor.reason.layers -= 1
         actor.reason.clamp()
         actor.madness.intensity = 1
         actor.madness.layers = max(1, actor.madness.layers + 1)
         actor.set_status("permission_shift", intensity=1, layers=99)
-        engine._log("权限转让启动：混消耗1层理智并获得1层癫狂；此后无需再消耗。")
+        engine._log(TEXT["data.characters.chaos.use_permission_transfer.2"])
     if option == "imitate":
         target_abilities = engine.character(target).actives
         copied = next((value for value in target_abilities if value.id == copied_ability_id), None)
         if copied is None and target_abilities:
             copied = target_abilities[0]
         if not copied or target.character_id == "chaos":
-            raise RuleViolation("目标没有可安全模仿的主动能力。")
+            raise RuleViolation(TEXT["data.characters.chaos.use_permission_transfer.3"])
         if target.health < 10 or target.sanity < 10:
-            raise RuleViolation("被转让权限的房客需要至少10生命和10理智。")
+            raise RuleViolation(TEXT["data.characters.chaos.use_permission_transfer.4"])
         # 前置替代代价由公共能力成本层统一结算（_DEFAULT_FORCED_COST_TERMS），
         # 只对尚未接入公共成本层的技能保留旧的手工扣除路径。
-        if not (
-            engine._ability_has_local_cost(target.character_id, copied.id)
-        ):
-            engine._consume_health(target, 10, "权限转让")
-            engine._consume_sanity(target, 10, "权限转让")
+        copied_module = engine._local_skill_module(target.character_id)
+        if not callable(getattr(copied_module, f"costs_{copied.id}", None)):
+            engine._consume_health(target, 10, "permission_transfer")
+            engine._consume_sanity(target, 10, "permission_transfer")
         saved_cooldowns = {
             state.ability_id: state.cooldown_until for state in target.abilities
         }
@@ -264,7 +261,7 @@ def use_permission_transfer(
                 state.cooldown_until = saved_cooldowns.get(
                     state.ability_id, state.cooldown_until
                 )
-        engine._log(f"混通过「权限转让」调用了{engine.character(target).name}的「{copied.name}」。")
+        engine._log(TEXT["data.characters.chaos.use_permission_transfer.7"].format(p1=engine.character(target).name, p2=copied.name))
         return result
     else:
         chosen = target.trauma if option != "disorder" else target.disorder
@@ -294,7 +291,8 @@ ACTIVE_DISPATCH = {
 
 
 def turn_start(engine: EngineProtocol, tenant: object) -> None:
-    """回合初实例钩子：混沌的性格切换与混沌的思想。"""
+    """回合初实例钩子：先看是否该固定自我，再切换性格与累计思想。"""
+    pure_ego_personality(engine, tenant)
     roll_personality_and_carry(engine, tenant)
     chaotic_thought(engine, tenant)
 
@@ -313,8 +311,8 @@ def _chaos_emotion_visible(context: object) -> object:
     if not any(value.character_id == "chaos" for value in engine.home_tenants()):
         return
     yield (
-        gate("emotion.visible").path("显示情绪", key).match("all")
-        .source("角色", "混", "情绪显现").any()
+        gate("emotion.visible").path("emotion_visible", key).match("all")
+        .source("character", "chaos", "emotion_reveal").any()
     )
 
 
@@ -332,7 +330,6 @@ def carry_override(engine: EngineProtocol, tenant: object):
 HOOKS = {
     "sanity.after_decrease": rescue_sanity,
     "personality.weights": locked_personality_weights,
-    "personality.lock": lock_personality,
     "madness.available": reason_madness_available,
     "madness.convert_excess": convert_excess_madness,
     "end_turn.sanity_modifier": end_turn_sanity_modifier,
@@ -348,9 +345,9 @@ def _chaos_sanity_modifier(context: object):
     if not active:
         return
     if tenant.reason.active:
-        yield spec("sanityConsume").path("回合末消耗").flat(-5).source("角色技能", "混沌", "理智")
+        yield spec("sanityConsume").path("turn_end_consume").flat(-5).source("ability", "dynamic", "sanity")
     if tenant.madness.active:
-        yield spec("sanityConsume").path("回合末消耗").flat(10).source("角色技能", "混沌", "癫狂")
+        yield spec("sanityConsume").path("turn_end_consume").flat(10).source("ability", "dynamic", "madness")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regch
@@ -360,16 +357,6 @@ _regch("sanityConsume", _chaos_sanity_modifier)
 AVATAR = "i-av3"
 
 
-def can_lock_personality(engine: object, tenant: object) -> bool:
-    """是否可在**清醒情绪达 10 层**时固定性格与携带量（供系统通用询问）。"""
-    return (
-        tenant.character_id == "chaos"
-        and not tenant.condition("pure_self").active
-        and tenant.reason.layers >= 10
-    )
-
-
-CAN_LOCK_PERSONALITY = can_lock_personality
 
 
 def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
@@ -385,10 +372,10 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
         "svg": ('<circle cx="12" cy="12" r="9"/><path d="M12 3a4.5 4.5 0 0 1 0 9 '
                 '4.5 4.5 0 0 0 0 9"/><circle cx="12" cy="7.5" r="1.1"/>'
                 '<circle cx="12" cy="16.5" r="1.1"/>'),
-        "label": "纯真的自我" if pure else "混沌",
+        "label": TEXT["data.characters.chaos.detail_slot.1"] if pure else TEXT["data.characters.chaos.detail_slot.2"],
         # 未解锁时把**进度**写出来：混乱值 ≠ 理智值，写清是"清醒情绪层数"才不会再误解。
-        "hint": ("纯真的自我：方向已定。" if pure
-                 else "混沌：清醒情绪 %d/10 层可固定方向与速度。" % tenant.reason.layers),
+        "hint": (TEXT["data.characters.chaos.detail_slot.3"] if pure
+                 else TEXT["data.characters.chaos.detail_slot.4"] % tenant.reason.layers),
         "spin": "cw" if pure else "random",
     }]
 

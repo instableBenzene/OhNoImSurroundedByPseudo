@@ -139,13 +139,10 @@ class InventoryTests(unittest.TestCase):
         tenant = engine._add_tenant("hkw")
         tenant.inventory.add(ItemInstance("B1", "bls_book", durability=25))
         for _ in range(4):
-            engine._settle_books_and_equipment()
+            engine._settle_held_items()
         self.assertFalse(tenant.has_ability("bls"))
-        engine._settle_books_and_equipment()
+        engine._settle_held_items()
         self.assertTrue(tenant.has_ability("bls"))            # 第 5 次结算习得
-        self.assertEqual(GameEngine._item_group_count(["water"] * 8), 1)
-        self.assertEqual(GameEngine._item_group_count(["water"] * 9), 2)
-        self.assertEqual(GameEngine._item_group_count(["flashlight"] * 2), 2)
 
 
 if __name__ == "__main__":

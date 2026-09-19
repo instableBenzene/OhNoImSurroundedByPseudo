@@ -18,6 +18,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .content import CONTENT
+from weiren_game.data.lang import TEXT
 
 _LOADED_RP: set[str] = set()
 
@@ -88,17 +89,12 @@ def load_single_resourcepack(name: str, root: str | Path | None = None) -> None:
 
         if _version_tuple(min_version) > _version_tuple(GAME_VERSION):
             raise ValueError(
-                f"资源包 {name} 要求游戏版本 ≥ {min_version}，当前为 {GAME_VERSION}，无法套用。"
+                TEXT["resourcepack_loader.load_single_resourcepack.1"].format(p1=name, p2=min_version, p3=GAME_VERSION)
             )
     for path in sorted(directory.glob("*.py")):
         module = import_file(path, _dlc_module_name(name, "resourcepack", path.stem))
         CONTENT.register_resource_pack(module, pack=name)
     _LOADED_RP.add(name)
-
-
-def loaded_resourcepacks() -> list[str]:
-    """已套用的资源包名（字典序）。"""
-    return sorted(_LOADED_RP)
 
 
 def apply_resourcepack_order(order: "list[str] | tuple[str, ...]", root: str | Path | None = None) -> list[str]:

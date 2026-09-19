@@ -36,8 +36,8 @@ class StateModelTests(unittest.TestCase):
         erosion = [k for k, v in EMOTION_DEFINITIONS.items() if v.kind == "erosion"]
         awakening = [k for k, v in EMOTION_DEFINITIONS.items() if v.kind == "awakening"]
         self.assertEqual((len(erosion), len(awakening)), (6, 6))
-        self.assertTrue(EMOTION_DEFINITIONS["reason"].is_rare)
-        self.assertFalse(EMOTION_DEFINITIONS["happiness"].is_rare)
+        self.assertEqual(EMOTION_DEFINITIONS["reason"].rarity, "rare")
+        self.assertEqual(EMOTION_DEFINITIONS["happiness"].rarity, "common")
         self.assertEqual(STATUS_DEFINITIONS["shock"].intensity_max, 4)
         self.assertEqual(status_caps("shock"), (4, 99))
         self.assertEqual(status_caps("no_such_status"), (10, 99))
@@ -148,10 +148,6 @@ class StateModelTests(unittest.TestCase):
         ling = engine._add_tenant("zero329")
         engine._gain_mark(ling, "alert", 5)
         self.assertEqual(engine._mark_count(ling, "alert"), 3.0)  # 定义上限
-        erebus = engine._add_tenant("erebus")
-        before = [v.value for v in erebus.marks.instances_of("fate")]
-        self.assertFalse(engine._set_mark_external(erebus, "fate", 5.0))  # 外部锁定
-        self.assertEqual([v.value for v in erebus.marks.instances_of("fate")], before)
 
 
 if __name__ == "__main__":

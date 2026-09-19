@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 from . import data
+from weiren_game.data.lang import TEXT
 
 
 BASE_PACK = "base"
@@ -39,7 +40,7 @@ class ContentManager:
     def ensure_base(self) -> None:
         """校验内置 base 内容包在位；缺失视为启动失败。"""
         if BASE_PACK not in self.packs:
-            raise RuntimeError("内置 base 内容包缺失，无法开始游戏。")
+            raise RuntimeError(TEXT["content.ensure_base.1"])
 
     # ------------------------------------------------------------ registration
     def register_character(self, definition: object, *, replace: bool = False) -> None:
@@ -196,18 +197,6 @@ class ContentManager:
         self._global_events = _clone(GLOBAL_EVENT_DEFINITIONS)
         self._captured = True
 
-    def restore_resourcepack_base(self) -> None:
-        """只把**资源包容器**回滚到 base（外观包可独立于内容包热切换）。"""
-        for container, saved in self._resource_snapshot:
-            if isinstance(container, dict):
-                container.clear()
-                container.update(_clone(saved))
-            elif isinstance(container, list):
-                container[:] = _clone(saved)
-            elif isinstance(container, set):
-                container.clear()
-                container.update(_clone(saved))
-
     def overlay_resourcepack_base(self) -> None:
         """把**内置材质**（``data/resourcepack/``）重新盖到当前资源包容器上。
 
@@ -300,27 +289,9 @@ class ContentManager:
         """房客档案目录（角色 id → 定义）。"""
         return data.CHARACTERS
 
-    def character_modules(self) -> dict:
-        """角色行为模块目录（角色 id → 模块）。"""
-        from .data.characters import CHARACTER_MODULES
-
-        return CHARACTER_MODULES
-
     def items(self) -> dict:
         """物资目录（item_id → 定义）。"""
         return data.ITEMS
-
-    def item_hooks(self) -> dict:
-        """物品生命周期 hook 目录（item_id → node → hooks）。"""
-        from .data.items import ITEM_HOOKS
-
-        return ITEM_HOOKS
-
-    def item_effects(self) -> dict:
-        """指名物 on_use 效果目录（item_id → 效果函数）。"""
-        from .data.items import ITEM_EFFECTS
-
-        return ITEM_EFFECTS
 
     def locations(self) -> dict:
         """地点目录（location_id → 定义）。"""
@@ -329,30 +300,6 @@ class ContentManager:
     def pseudos(self) -> dict:
         """伪人场景目录（场景键 → 定义）。"""
         return data.PSEUDOS
-
-    def scenario_handlers(self) -> dict:
-        """伪人场景处理器目录（场景键 → HANDLERS）。"""
-        return data.SCENARIO_HANDLERS
-
-    def status_definitions(self) -> dict:
-        """状态定义目录（状态 id → 定义）。"""
-        from .condition import STATUS_DEFINITIONS
-
-        return STATUS_DEFINITIONS
-
-    def emotion_definitions(self) -> dict:
-        """情绪定义目录（情绪 id → 定义）。"""
-        from .condition import EMOTION_DEFINITIONS
-
-        return EMOTION_DEFINITIONS
-
-    def tag_behaviors(self) -> dict:
-        """tag 行为模块目录（tag → 模块）。"""
-        return data.TAG_BEHAVIORS
-
-    def event_ids(self) -> dict:
-        """随机事件 ID 表。"""
-        return data.EVENT_IDS
 
     def register_pack(self, name: str) -> None:
         """登记一个已装载的内容包名。"""

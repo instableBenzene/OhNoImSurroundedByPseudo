@@ -15,7 +15,7 @@
 | 语义 | 幅度 / 概率「多少」 | 许可 / 存在「能不能」 |
 | 聚合 | 算术：`flat / percent / mul / final / max / min` | 逻辑：`any`(OR) / `all`(AND) / `veto`(NOT) |
 | 时机 | **结算点**算一次（有 base） | **纯查询**（随时重算、无副作用） |
-| 入口 | `engine._apply_modifiers` / `_apply_chance` | `engine._eval_gate`（拟） |
+| 入口 | `engine._apply_modifiers`（通道）；概率另走 `calculate_modified_amount(collect_modifiers("chance", …))` → 自调 → `resolve(...)` | `engine._eval_gate`（拟） |
 | 注册 | `MODIFIER_REGISTRY` / `MODIFIER_PROVIDERS` | `GATE_REGISTRY` / `GATE_PROVIDERS`（拟） |
 | 值域 | 数值 | 0 / 1 |
 
@@ -52,22 +52,31 @@ gate(是否进入判定)  ×  chance(基础 + 修正 → resolve)  ×  roll(结�
 
 > 新增效果时**只从这里取词**；缺词先补词表，再写声明。避免以后出现"各自造词"导致不完整。
 
+> **令牌一律英文**（2026-09 起；作者要求"程序相关的不使用中文"）。中文只出现在**显示名**里：
+> 调用点传出去的令牌若会被日志渲染，用 `weiren_game/data/lang.py::source_label()` /
+> `token_label()` 换成 `source.<令牌>` / `token.<令牌>` 的文案。
+
 ### 4.1 功能词（`path` 的首令牌）
 
-`显示情绪`、`施加`、`额外效果`、`抵御`、`锁定`、`验证`、`行动`、`伪人行为`、`到访`、
-`搜索`、`易损`、`回合末消耗`、`战时`、`开局`。
+`emotion_visible`、`apply`、`extra_effect`、`resist`、`lock`、`verify`、`action`、`pseudo_behavior`、
+`visit`、`search`、`fragile`、`turn_end_consume`、`wartime`、`setup`、`encounter`、`health_loss`、
+`damage`、`damage_reduce`、`resist`、`luck`、`carry`、`depression`、`restore`、`consume`、`turn`、
+`fate`、`origin`、`passive`、`awakening`、`emotion_reveal`、`pseudo_active`。
 
 ### 4.2 对象词
 
-- 情绪键：`烦躁`、`无聊`、`忧郁`、`恐慌`、`焦虑`、`满足`、`专注`、`信任`、`兴奋`、`快乐`…
-- 生理状态：`创伤`、`紊乱`、`休克`
-- 资源：`生命`、`理智`
+- 情绪 / 生理状态：**用状态 id**（`trauma`、`disorder`、`shock`、`madness`…）与情绪 id
+  （`irritation` 等），不再用中文标签。
+- 资源：`sanity`、`health`、`damage`
 - 行动位：`visit`、`cast`、`breakthrough`、`auto_expel`
-- 其它：品质段（`白/绿/蓝/紫/金/红`）、印记名。
+- 其它：品质段 id（`low`/`blue`/`blue_plus`/`high`/`purple`/`gold`/`gold_plus`/`red`）、印记名。
 
 ### 4.3 出身词（`source` / `spec().source()`）
 
-`角色`、`性格`、`性格羁绊`、`伪人场景`、`物品`、`物品 tag`、`状态`、`全局事件`、`难度`、`技能名`、`地点`。
+`character`、`personality`、`bond`、`pseudo_scene`、`pseudo_ability`、`item`、`status`、
+`global_event`、`difficulty`、`ability`、`ability_passive`、`location`、`persona`、`passive`。
+具体专名（角色 / 物品 / 技能 / 羁绊 / 伪人）**用既有 id**（`benzene`、`fries`、`walmart_bag`、
+`needs_bag`、`keen`、`pseudo_onion`…）——不再写中文名。
 
 ### 4.4 物品 tag 表（`ITEM_TAG_LABELS`，可直接作 source 令牌）
 

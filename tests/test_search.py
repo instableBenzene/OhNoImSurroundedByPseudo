@@ -86,9 +86,11 @@ class SearchTests(unittest.TestCase):
         engine.start_search(tenant.id, engine.state.world.locations.available_locations[0])
         mission = engine.state.world.missions[0]
         sequence, rate, rewards = mission.random_sequence[:], mission.search_success_rate, mission.rewards[:]
-        engine.apply_search_modifier(tenant.id, "success_rate", -.20)
+        mission.search_success_rate = rate - .20
+        engine._recalculate_search(mission)
         self.assertEqual(mission.random_sequence, sequence)
-        engine.apply_search_modifier(tenant.id, "success_rate", rate - mission.search_success_rate)
+        mission.search_success_rate = rate
+        engine._recalculate_search(mission)
         self.assertEqual((mission.random_sequence, mission.rewards), (sequence, rewards))
 
         strict = bare_engine("search-strict")

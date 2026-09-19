@@ -5,6 +5,7 @@ from ..types import PseudoDefinition
 from pathlib import Path
 
 from .._discovery import discover_modules
+from weiren_game.data.lang import TEXT
 
 _DISCOVERED = discover_modules(__name__, Path(__file__).parent, require="DEFINITION")
 
@@ -55,7 +56,7 @@ def register_pseudo(module: object, *, replace: bool = False) -> None:
     """
     definition: PseudoDefinition = module.DEFINITION
     if definition.id in PSEUDOS and not replace:
-        raise ValueError(f"伪人 ID 重复：{definition.id}")
+        raise ValueError(TEXT["data.pseudos.__init__.register_pseudo.1"].format(p1=definition.id))
     PSEUDOS[definition.id] = definition
     PSEUDO_MODULES[definition.id] = module
     SCENARIO_HANDLERS[definition.id] = dict(getattr(module, "HANDLERS", {}))

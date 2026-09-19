@@ -5,15 +5,16 @@
 
 from ..types import A, CharacterDefinition, MarkDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "onion", 5, "葱头", "带着从容与神秘笑容的绿发少女，爱好心理学研究。",
-    "gentle", "steady", 3, ("心理学专业", "研究生", "大学生", "18-24岁", "女性"),
-    (A("irritation_reveal", "情绪显现-烦躁", "洋葱在屋内时，屋主可以看到所有房客的烦躁强度、层数。洋葱免疫烦躁效果。"),
-     A("calm", "平静", "洋葱在屋内时，房客在获得烦躁时，有30%的可能免疫该效果。若触发该效果，洋葱获得1个【共情印记-洋葱】（至多3个）。")),
-    (A("emotion_strip", "情绪剥离", "消耗 **1 个**【共情印记-洋葱】或 **15 理智**，移除 1 名房客的烦躁，并使其本回合不会获得烦躁。\n*若消耗的是印记，则令洋葱和该房客额外回复 **5 理智**。*", "tenant", chips=("冷却 2 回合",)),
-     A("group_counselling", "群体心理疏导", "消耗3个【共情印记-洋葱】，移除所有房客的所有情绪负面效果，并使其消沉值减少75%。*每次对局仅能使用1次。", chips=("每次对局 1 次",))),
+    "onion", 5, TEXT["character.onion.name"], TEXT["character.onion.description"],
+    "gentle", "steady", 3, (TEXT["character.onion.tag.0"], TEXT["character.onion.tag.1"], TEXT["character.onion.tag.2"], TEXT["character.onion.tag.3"], TEXT["character.onion.tag.4"]),
+    (A("irritation_reveal", TEXT["ability.irritation_reveal.name"], TEXT["ability.irritation_reveal.description"]),
+     A("calm", TEXT["ability.calm.name"], TEXT["ability.calm.description"])),
+    (A("emotion_strip", TEXT["ability.emotion_strip.name"], TEXT["ability.emotion_strip.description"], "tenant", chips=(TEXT["ability.emotion_strip.chip.0"],)),
+     A("group_counselling", TEXT["ability.group_counselling.name"], TEXT["ability.group_counselling.description"], chips=(TEXT["ability.group_counselling.chip.0"],))),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -41,7 +42,7 @@ def calm_irritation(engine: EngineProtocol, target: object) -> bool:
             engine._skill_outcome(onion, "onion.calm", success)
             if success:
                 engine._gain_mark(onion, "empathy", 1)
-                engine._log(f"洋葱以「平静」帮助{engine.character(target).name}免疫了烦躁。")
+                engine._log(TEXT["data.characters.onion.calm_irritation.1"].format(p1=engine.character(target).name))
                 return True
     return False
 
@@ -56,8 +57,8 @@ def _irritation_block_gate(context: object) -> object:
     if not blocks_irritation(engine, tenant):
         return
     yield (
-        gate("emotion.apply.block").path("施加", "irritation").match("all")
-        .source("角色", "葱头", "情绪显现-烦躁").any()
+        gate("emotion.apply.block").path("apply", "irritation").match("all")
+        .source("character", "onion", "irritation_reveal").any()
     )
 
 
@@ -82,12 +83,12 @@ def use_emotion_strip(
         if actor.sanity < 15:
             from weiren_game.exceptions import RuleViolation
 
-            raise RuleViolation("需要1层共情印记或15理智。")
+            raise RuleViolation(TEXT["data.characters.onion.use_emotion_strip.1"])
         costs = [T("sanity", 15)]
     engine._pay_ability_costs(actor, costs)
     if used_empathy:
-        engine._restore_sanity(actor, 5, "情绪剥离")
-        engine._restore_sanity(target, 5, "情绪剥离")
+        engine._restore_sanity(actor, 5, "emotion_strip")
+        engine._restore_sanity(target, 5, "emotion_strip")
     target.irritation.clear()
     target.set_status(
         "calm_onion", intensity=1, layers=1
@@ -123,13 +124,13 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 
 register_status_definition(
     StatusDefinition(
-        "calm_onion", "平静-洋葱", "other",
+        "calm_onion", TEXT["status.calm_onion.label"], "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="ability:emotion_strip@onion",
         nodes=frozenset({"status_applied.allow"}),
         blocked_emotions=("irritation",),
         hook=(lambda engine, tenant: tenant.condition("calm_onion").active),
-     description="把翻涌的烦躁按回水底，海面暂时平静。")
+     description=TEXT["status.calm_onion.description"])
 )
 
 
@@ -160,8 +161,8 @@ def _onion_emotion_visible(context: object) -> object:
     if not any(value.character_id == "onion" for value in engine.home_tenants()):
         return
     yield (
-        gate("emotion.visible").path("显示情绪", "irritation").match("all")
-        .source("角色", "葱头", "情绪显现-烦躁").any()
+        gate("emotion.visible").path("emotion_visible", "irritation").match("all")
+        .source("character", "onion", "irritation_reveal").any()
     )
 
 
@@ -177,15 +178,15 @@ register_gate_provider("emotion.visible", _onion_emotion_visible)
 MARKS = (
     MarkDefinition(
         id="empathy",
-        label="共情印记-洋葱",
-        acquisition="洋葱触发「平静」免疫烦躁时获得 1 层。",
+        label=TEXT["mark.empathy.label"],
+        acquisition=TEXT["mark.empathy.acquisition"],
         minimum=0,
         maximum=3,
         # 1 = 够付一次「平静」；3 = 大招代价。
-        bar_tiers=((1, "可平静", "danger"), (3, "大招", "warn")),
+        bar_tiers=((1, TEXT["data.characters.onion.module.1"], "danger"), (3, TEXT["data.characters.onion.module.2"], "warn")),
         triggers=("status_applied.allow",),
         hooks=(calm_irritation,),
-     description="对他人情绪的共鸣，攒够了便能反过来安抚自己。"),
+     description=TEXT["mark.empathy.description"]),
 )
 
 

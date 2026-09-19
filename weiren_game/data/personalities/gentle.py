@@ -1,12 +1,13 @@
 """性格·温和：性格/羁绊效果全部集中在本文件。"""
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def end_health_loss(engine: EngineProtocol, tenant: object) -> None:
     """温和性格：回合末额外流失 2 生命。"""
     if engine._is_personality(tenant, "gentle"):
-        engine._loss_health(tenant, 2, "温和性格")
+        engine._loss_health(tenant, 2, "gentle_personality")
 
 
 def scheduled_extra_interval(engine: EngineProtocol) -> int | None:
@@ -25,25 +26,25 @@ def accept_healing(engine: EngineProtocol, accepted: object) -> None:
     home = engine.home_tenants()
     for tenant in home:
         if engine._is_personality(tenant, "gentle"):
-            engine._restore_health(tenant, 5, "温和")
+            engine._restore_health(tenant, 5, "gentle")
     if gentle == 3:
         for tenant in home:
             if engine._is_personality(tenant, "gentle"):
-                engine._restore_health(tenant, 5, "温和羁绊")
-                engine._restore_sanity(tenant, 5, "温和羁绊")
+                engine._restore_health(tenant, 5, "gentle_bond")
+                engine._restore_sanity(tenant, 5, "gentle_bond")
     elif gentle == 6:
         for tenant in home:
-            engine._restore_health(tenant, 5, "温和羁绊")
-            engine._restore_sanity(tenant, 5, "温和羁绊")
+            engine._restore_health(tenant, 5, "gentle_bond")
+            engine._restore_sanity(tenant, 5, "gentle_bond")
             if engine._is_personality(tenant, "gentle") or (
                 accepted and tenant.id == accepted.id
             ):
-                engine._restore_health(tenant, 5, "温和羁绊额外效果")
-                engine._restore_sanity(tenant, 10, "温和羁绊额外效果")
+                engine._restore_health(tenant, 5, "gentle_bond_extra")
+                engine._restore_sanity(tenant, 10, "gentle_bond_extra")
     elif gentle >= 9:
         for tenant in home:
-            engine._restore_health(tenant, 15, "温和羁绊")
-            engine._restore_sanity(tenant, 15, "温和羁绊")
+            engine._restore_health(tenant, 15, "gentle_bond")
+            engine._restore_sanity(tenant, 15, "gentle_bond")
     engine._after_health_changed()
 
 

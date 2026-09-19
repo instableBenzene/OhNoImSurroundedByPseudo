@@ -63,6 +63,8 @@ from .items import (
     ITEM_HOOKS,
     ITEM_EFFECTS,
     START_LOOT_TABLE,
+    START_LOOT_CATEGORIES,
+    START_LOOT_RECIPE,
     apply_item_tags,
     category_of,
     items_of_category,
@@ -92,6 +94,7 @@ from .resourcepack import (
     register_theme,
 )
 from .tags import TAG_BEHAVIORS, register_tag_module
+from weiren_game.data.lang import TEXT
 
 GAME_VERSION = "2.1.0"
 # 默认伪人：由伪人模块自声明 DEFAULT_PSEUDO，否则取首个可用。
@@ -211,10 +214,10 @@ EVENT_IDS.update({
     "emotion.select": 9222,
 })
 
-QUALITY_NAMES = ("白色", "绿色", "蓝色", "紫色", "金色", "红色")
+QUALITY_NAMES = (TEXT["data.__init__.QUALITY_NAMES.0"], TEXT["data.__init__.QUALITY_NAMES.1"], TEXT["data.__init__.QUALITY_NAMES.2"], TEXT["data.__init__.QUALITY_NAMES.3"], TEXT["data.__init__.QUALITY_NAMES.4"], TEXT["data.__init__.QUALITY_NAMES.5"])
 
 # 搜索返程规则说明（供界面展示；与 search_system._resolve_search_return 的实际结算对应）。
-SEARCH_RETURN_NOTE = "返程：基础 10 生命伤害 / 10 理智伤害；既有创伤、紊乱与侵蚀情绪会恶化并延长。"
+SEARCH_RETURN_NOTE = TEXT["data.__init__.SEARCH_RETURN_NOTE"]
 QUALITY_WEIGHTS = (20.0, 30.0, 30.0, 15.0, 4.5, 0.5)
 
 # 情绪定义与中文名的唯一来源在 weiren_game/condition.py（EMOTION_DEFINITIONS）。
@@ -293,14 +296,14 @@ _NEGATIVE_TOKENS: dict[int, dict[str, object]] = {
     10: {"trauma_disorder_immunity": 1},
 }
 _DIFFICULTY_LABELS = {
-    1: "高压消耗", 2: "重创来袭", 3: "高频来袭", 4: "流年不利",
-    5: "冷清开局", 6: "行程紧张", 7: "补给紧缺", 8: "虚弱开局",
-    9: "心绪低沉", 10: "带伤开局",
+    1: TEXT["data.__init__._DIFFICULTY_LABELS.1"], 2: TEXT["data.__init__._DIFFICULTY_LABELS.2"], 3: TEXT["data.__init__._DIFFICULTY_LABELS.3"], 4: TEXT["data.__init__._DIFFICULTY_LABELS.4"],
+    5: TEXT["data.__init__._DIFFICULTY_LABELS.5"], 6: TEXT["data.__init__._DIFFICULTY_LABELS.6"], 7: TEXT["data.__init__._DIFFICULTY_LABELS.7"], 8: TEXT["data.__init__._DIFFICULTY_LABELS.8"],
+    9: TEXT["data.__init__._DIFFICULTY_LABELS.9"], 10: TEXT["data.__init__._DIFFICULTY_LABELS.10"],
 }
 _DIFFICULTY_LABELS_NEGATIVE = {
-    1: "低压消耗", 2: "钝化创伤", 3: "缓步来袭", 4: "时来运转",
-    5: "热闹开局", 6: "行程宽裕", 7: "补给充裕", 8: "康健开局",
-    9: "心境明快", 10: "百毒不侵",
+    1: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.1"], 2: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.2"], 3: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.3"], 4: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.4"],
+    5: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.5"], 6: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.6"], 7: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.7"], 8: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.8"],
+    9: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.9"], 10: TEXT["data.__init__._DIFFICULTY_LABELS_NEGATIVE.10"],
 }
 
 
@@ -318,7 +321,7 @@ def _merge_tokens(target: dict[str, object], token: dict[str, object]) -> None:
 _MAX_DIFFICULTY_LEVEL = max(
     max(_POSITIVE_TOKENS, default=0), max(_NEGATIVE_TOKENS, default=0)
 )
-DIFFICULTIES: dict[str, dict[str, object]] = {"a0": dict(_DIFFICULTY_BASE, label="标准")}
+DIFFICULTIES: dict[str, dict[str, object]] = {"a0": dict(_DIFFICULTY_BASE, label=TEXT["data.__init__.module.1"])}
 for level in range(1, _MAX_DIFFICULTY_LEVEL + 1):
     positive = dict(_DIFFICULTY_BASE)
     negative = dict(_DIFFICULTY_BASE)
@@ -339,21 +342,21 @@ STATUS_PRIMARY_LOSS = (0, 1, 2, 5, 10, 15, 20, 30, 40, 60, 80)
 STATUS_SECONDARY_LOSS = (0, 0, 0, 0, 5, 10, 20, 30, 40, 80, 100)
 
 _DIFFICULTY_TOKEN_TEXT = {
-    "end_sanity_bonus": lambda v: f"回合结束理智 {v:+g}",
-    "damage_multiplier": lambda v: f"受到伤害 ×{v:g}",
-    "pseudo_start_chance": lambda v: f"伪人首次到访概率 {v:.0%}",
-    "pseudo_step": lambda v: f"伪人后续到访概率 {v:.0%}",
-    "fortune_delta": lambda v: f"幸运 {v:+g}",
-    "start_tenants_delta": lambda v: f"初始房客 {v:+g}",
-    "search_turn_delta": lambda v: f"搜索耗时 {v:+g} 回合",
-    "search_behavior_delta": lambda v: f"搜索期间行为 {v:+g}",
-    "start_fortune_delta": lambda v: f"开局物资时运 {v:+g}",
-    "start_loot_draws": lambda v: f"开局掉落次数 {v:+g}",
-    "start_vital_pct": lambda v: f"开局房客生命/理智 {v:+.0%}",
-    "start_vital_max_pct": lambda v: f"开局房客最大生命/理智 {v:+.0%}",
-    "start_depression_delta": lambda v: f"开局消沉值 {v:+g}",
-    "start_condition_trauma_disorder": lambda v: "房客被接纳时附带 1/99 的创伤或紊乱",
-    "trauma_disorder_immunity": lambda v: "房客常驻免疫创伤与紊乱",
+    "end_sanity_bonus": lambda v: TEXT["data.__init__.module.2"].format(p1=v),
+    "damage_multiplier": lambda v: TEXT["data.__init__.module.3"].format(p1=v),
+    "pseudo_start_chance": lambda v: TEXT["data.__init__.module.4"].format(p1=v),
+    "pseudo_step": lambda v: TEXT["data.__init__.module.5"].format(p1=v),
+    "fortune_delta": lambda v: TEXT["data.__init__.module.6"].format(p1=v),
+    "start_tenants_delta": lambda v: TEXT["data.__init__.module.7"].format(p1=v),
+    "search_turn_delta": lambda v: TEXT["data.__init__.module.8"].format(p1=v),
+    "search_behavior_delta": lambda v: TEXT["data.__init__.module.9"].format(p1=v),
+    "start_fortune_delta": lambda v: TEXT["data.__init__.module.10"].format(p1=v),
+    "start_loot_draws": lambda v: TEXT["data.__init__.module.11"].format(p1=v),
+    "start_vital_pct": lambda v: TEXT["data.__init__.module.12"].format(p1=v),
+    "start_vital_max_pct": lambda v: TEXT["data.__init__.module.13"].format(p1=v),
+    "start_depression_delta": lambda v: TEXT["data.__init__.module.14"].format(p1=v),
+    "start_condition_trauma_disorder": lambda v: TEXT["data.__init__.module.15"],
+    "trauma_disorder_immunity": lambda v: TEXT["data.__init__.module.16"],
 }
 _DIFFICULTY_ORDER = (
     [f"a-{n}" for n in range(_MAX_DIFFICULTY_LEVEL, 0, -1)]
@@ -390,14 +393,14 @@ for _key in _DIFFICULTY_ORDER:
 
 
 BOND_DESCRIPTIONS = {
-    "cheerful": "2/5/8：降低理智消耗、全员回复理智并强化开朗房客昂扬。",
-    "loner": "仅1或≥5：孤僻房客搜索更快且必定成功，高层级排斥非孤僻房客。",
-    "keen": "2/4：降低易损概率，提高紫色与金色以上物资权重。",
-    "stubborn": "恰好4/7/10：增加容量、成功率并给予蓝/紫品质必得物资。",
-    "steady": "2/5/8：降低生命消耗与伤害，最高层级会重分配部分伤害。",
-    "impatient": "2/4/6/8：搜索更快但更危险；首次激活各档获得强心剂。",
-    "gentle": "3/6/9：更频繁来访，接纳时治疗更多房客。",
-    "suspicious": "2/4/8：取得并识破更多信息。",
+    "cheerful": TEXT["data.__init__.BOND_DESCRIPTIONS.cheerful"],
+    "loner": TEXT["data.__init__.BOND_DESCRIPTIONS.loner"],
+    "keen": TEXT["data.__init__.BOND_DESCRIPTIONS.keen"],
+    "stubborn": TEXT["data.__init__.BOND_DESCRIPTIONS.stubborn"],
+    "steady": TEXT["data.__init__.BOND_DESCRIPTIONS.steady"],
+    "impatient": TEXT["data.__init__.BOND_DESCRIPTIONS.impatient"],
+    "gentle": TEXT["data.__init__.BOND_DESCRIPTIONS.gentle"],
+    "suspicious": TEXT["data.__init__.BOND_DESCRIPTIONS.suspicious"],
 }
 
 
@@ -418,7 +421,7 @@ def validate_catalogue() -> None:
 from .personalities import PERSONALITIES, PERSONALITY_LABELS  # noqa: F401
 
 # 展示用的特殊性格键（不属于常规性格、不参与羁绊）。
-PERSONALITY_LABELS.update({"dynamic": "混沌", "unknown": "未定"})
+PERSONALITY_LABELS.update({"dynamic": TEXT["data.__init__.module.17"], "unknown": TEXT["data.__init__.module.18"]})
 
 
 validate_catalogue()

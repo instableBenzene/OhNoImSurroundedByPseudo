@@ -9,16 +9,17 @@ from dataclasses import dataclass
 
 from ..types import PseudoDefinition
 from weiren_game.lifecycle import AbilityLaunch
+from weiren_game.data.lang import TEXT
 
 DEFINITION = PseudoDefinition(
     "pseudo_onion",
-    "深潜者祭司-洋葱",
+    TEXT["pseudo.pseudo_onion.name"],
     "onion",
-    "绿发遮眼，笑容不自然，低语仿佛来自深海。",
-    "来访时屋内烦躁房客占比≥15%×来访次数（上限75%）。",
-    "连续两次低语无人获得烦躁，或连续四次低语无人因技能损失生命。",
+    TEXT["pseudo.pseudo_onion.description"],
+    TEXT["pseudo.pseudo_onion.breakthrough"],
+    TEXT["pseudo.pseudo_onion.liberation"],
     mark_field="whisper_marks",
-    mark_label="低语印记-洋葱",
+    mark_label=TEXT["pseudo.pseudo_onion.mark_label"],
 )
 
 
@@ -59,13 +60,13 @@ def visit(engine: object) -> None:
     # 越打越难：突破线随来访次数上升，15%/次、上限 75%。
     threshold = min(.75, .15 * pseudo.visit_count) + adjustment * .10
     threshold = min(.95, max(0.0, threshold))
-    engine._log(f"狂喜的邀约：烦躁房客占比{ratio:.0%}，突破线{threshold:.0%}。")
+    engine._log(TEXT["data.pseudos.pseudo_onion.visit.1"].format(p1=ratio, p2=threshold))
     if ratio >= threshold:
         if engine._attempt_breakthrough(
-            "烦躁情绪达到邀约条件，深潜者祭司完成突破。"
+            TEXT["data.pseudos.pseudo_onion.visit.2"]
         ):
             return
-    engine._log("洋葱本次到访未突破；低语仍只会在低语印记达到阈值时发动。")
+    engine._log(TEXT["data.pseudos.pseudo_onion.visit.3"])
 
 
 def cast_whisper(engine: object) -> None:
@@ -85,7 +86,7 @@ def cast_whisper(engine: object) -> None:
     irritation_gained = False
     health_lost = False
     blocked = engine._skill_respond_skill(
-        "不可名状的低语", "cast",
+        TEXT["data.pseudos.pseudo_onion.cast_whisper.1"], "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     )
     if blocked:
@@ -94,19 +95,19 @@ def cast_whisper(engine: object) -> None:
     engine._collect_start()
     for target in targets:
         if engine._skill_respond_skill(
-            "不可名状的低语", "lock",
+            TEXT["data.pseudos.pseudo_onion.cast_whisper.2"], "lock",
             mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
             target=target, event="onion.whisper",
         ):
             continue
         before_i = target.irritation.intensity + target.irritation.layers
         before_h = target.health
-        engine._apply_emotion(target, "irritation", 2, 5, "深潜低语")
+        engine._apply_emotion(target, "irritation", 2, 5, TEXT["data.pseudos.pseudo_onion.cast_whisper.3"])
         irritation_gained |= target.irritation.intensity + target.irritation.layers > before_i
         if target.irritation.intensity >= 5:
-            engine._damage_health(target, 10, "深潜低语")
+            engine._damage_health(target, 10, "deep_whisper")
         health_lost |= target.health < before_h
-    engine._collect_flush(title="不可名状的低语")
+    engine._collect_flush(title=TEXT["data.pseudos.pseudo_onion.cast_whisper.5"])
     pseudo.safe_irritation_whispers = (
         0 if irritation_gained else pseudo.safe_irritation_whispers + 1
     )
@@ -114,10 +115,9 @@ def cast_whisper(engine: object) -> None:
         0 if health_lost else pseudo.safe_health_whispers + 1
     )
     pseudo.resolving_skill = False
-    engine._log("洋葱发动「不可名状的低语」。")
+    engine._log(TEXT["data.pseudos.pseudo_onion.cast_whisper.6"])
     engine._log(
-        f"理智的裂隙：连续无烦躁{pseudo.safe_irritation_whispers}/2，"
-        f"连续无生命损失{pseudo.safe_health_whispers}/4。"
+        TEXT["data.pseudos.pseudo_onion.cast_whisper.7"].format(p1=pseudo.safe_irritation_whispers, p2=pseudo.safe_health_whispers)
     )
     if pseudo.safe_irritation_whispers >= 2 or pseudo.safe_health_whispers >= 4:
         pseudo.liberated = True
@@ -125,7 +125,7 @@ def cast_whisper(engine: object) -> None:
         engine._consume_global_event(REVEAL_IRRITATION_EVENT)
         engine._finish(
             True,
-            "房客们守住心智，来自深海的低语失去回响；理智的裂隙闭合，洋葱得到解放。",
+            TEXT["data.pseudos.pseudo_onion.cast_whisper.8"],
         )
 
 
@@ -156,20 +156,20 @@ def start_passive(engine: object) -> None:
                     target = engine._rng(
                         EVENT_IDS["onion.low_sanity.target"], tenant.id
                     ).choice(others)
-                    engine._worsen_condition(target, target.irritation, 1, "先兆低语")
+                    engine._worsen_condition(target, target.irritation, 1, TEXT["data.pseudos.pseudo_onion.start_passive.1"])
             else:
-                engine._extend_condition(tenant, tenant.irritation, 1, "先兆低语")
+                engine._extend_condition(tenant, tenant.irritation, 1, TEXT["data.pseudos.pseudo_onion.start_passive.2"])
 
 
 def attack_searcher(engine: object, mission: object, tenant: object) -> None:
     """搜索袭击：洋葱「潮汐的诱惑」（烦躁层数与低生命伤害）。"""
     engine._observe_pseudo_skill("tide")
     already = tenant.irritation.active
-    engine._apply_emotion(tenant, "irritation", 0, 1, "潮汐的诱惑")
+    engine._apply_emotion(tenant, "irritation", 0, 1, TEXT["data.pseudos.pseudo_onion.attack_searcher.1"])
     if already:
-        engine._damage_health(tenant, 5, "潮汐的诱惑")
-        engine._worsen_condition(tenant, tenant.irritation, 1, "潮汐的诱惑")
-    engine.defer_search_report(mission, f"伪人袭击：{engine.character(tenant).name}听见了海潮般的诱惑。")
+        engine._damage_health(tenant, 5, "tidal_lure")
+        engine._worsen_condition(tenant, tenant.irritation, 1, TEXT["data.pseudos.pseudo_onion.attack_searcher.3"])
+    engine.defer_search_report(mission, TEXT["data.pseudos.pseudo_onion.attack_searcher.4"].format(p1=engine.character(tenant).name))
 
 
 # 场景处理器注册表（供伪人协调器查表调用）。
@@ -216,21 +216,20 @@ def emotion_end_extra(
         return
     chance = resolve(condition.intensity * .05)
     if engine._rng(EVENT_IDS["onion.irritation.extra"], tenant.id).random() < chance:
-        engine._worsen_condition(tenant, condition, 1, "情绪显现-烦躁")
-        engine._extend_condition(tenant, condition, 1, "情绪显现-烦躁")
+        engine._worsen_condition(tenant, condition, 1, TEXT["data.pseudos.pseudo_onion.emotion_end_extra.1"])
+        engine._extend_condition(tenant, condition, 1, TEXT["data.pseudos.pseudo_onion.emotion_end_extra.2"])
 
 
 def observed_skills(engine: object) -> tuple[str, ...]:
     """洋葱场景对外可见的技能（id, 展示名），供信息文本与核验使用。"""
-    return (("whisper", "不可名状的低语"), ("tide", "潮汐的诱惑"))
+    return (("whisper", TEXT["data.pseudos.pseudo_onion.observed_skills.1"]), ("tide", TEXT["data.pseudos.pseudo_onion.observed_skills.2"]))
 
 
 def progress_text(engine: object) -> str:
     """洋葱场景的进度摘要文本。"""
     pseudo = engine.state.pseudo_state
     return (
-        f"低语印记{pseudo.whisper_marks}，安全路线"
-        f"{pseudo.safe_irritation_whispers}/2或{pseudo.safe_health_whispers}/4"
+        TEXT["data.pseudos.pseudo_onion.progress_text.1"].format(p1=pseudo.whisper_marks, p2=pseudo.safe_irritation_whispers, p3=pseudo.safe_health_whispers)
     )
 
 
@@ -268,8 +267,8 @@ def _onion_reveal_gate(context: object) -> object:
     if not engine._global_event_active(REVEAL_IRRITATION_EVENT):
         return
     yield (
-        gate("emotion.visible").path("显示情绪", "irritation").match("all")
-        .source("伪人场景", "洋葱", "情绪显现").any()
+        gate("emotion.visible").path("emotion_visible", "irritation").match("all")
+        .source("pseudo_scene", "pseudo_onion", "emotion_reveal").any()
     )
 
 
@@ -290,16 +289,16 @@ def card_info(engine: object) -> dict:
     need_pct = min(75, 15 * visits)
     need_marks = max(4, 12 - visits)
     return {
-        "liberation": f"理智的裂隙：连续无烦躁 {getattr(ps,'safe_irritation_whispers',0)}/2 · 连续无生命损失 {getattr(ps,'safe_health_whispers',0)}/4",
-        "breakthrough": f"狂喜的邀约：烦躁占比 {pct}%/{need_pct}%（已到访 {visits} 次）",
+        "liberation": TEXT["data.pseudos.pseudo_onion.card_info.1"].format(p1=getattr(ps,'safe_irritation_whispers',0), p2=getattr(ps,'safe_health_whispers',0)),
+        "breakthrough": TEXT["data.pseudos.pseudo_onion.card_info.2"].format(p1=pct, p2=need_pct, p3=visits),
         "mark_need": int(need_marks),
         "skills": [
-            {"name": "不可名状的低语", "text": "消耗低语印记：向约 ceil(印记/4) 名房客施加烦躁并推进解放。",
-             "mark": {"label": "低语印记", "current": int(getattr(ps, "whisper_marks", 0)), "need": int(need_marks)}},
-            {"name": "潮汐的诱惑", "text": "搜索袭击：施加烦躁层数并造成少量生命伤害。"},
-            {"name": "情绪显现-烦躁", "text": "初访后屋主可见所有房客的烦躁；烦躁每回合可能恶化/延长。"},
-            {"name": "旧日的回声", "text": "每有 1 名烦躁房客，全员回合末理智消耗 +5%。"},
-            {"name": "先兆低语", "text": "回合初，理智 ≤30 的房客可能被先兆性施加/加重烦躁。"},
+            {"name": TEXT["data.pseudos.pseudo_onion.card_info.3"], "text": TEXT["data.pseudos.pseudo_onion.card_info.4"],
+             "mark": {"label": TEXT["data.pseudos.pseudo_onion.card_info.5"], "current": int(getattr(ps, "whisper_marks", 0)), "need": int(need_marks)}},
+            {"name": TEXT["data.pseudos.pseudo_onion.card_info.6"], "text": TEXT["data.pseudos.pseudo_onion.card_info.7"]},
+            {"name": TEXT["data.pseudos.pseudo_onion.card_info.8"], "text": TEXT["data.pseudos.pseudo_onion.card_info.9"]},
+            {"name": TEXT["data.pseudos.pseudo_onion.card_info.10"], "text": TEXT["data.pseudos.pseudo_onion.card_info.11"]},
+            {"name": TEXT["data.pseudos.pseudo_onion.card_info.12"], "text": TEXT["data.pseudos.pseudo_onion.card_info.13"]},
         ],
     }
 
@@ -330,7 +329,7 @@ def _old_echo_sanity_modifier(context: object):
     engine = context["engine"]; tenant = context["tenant"]  # type: ignore[index]
     irritated = sum(1 for value in engine.home_tenants() if value.irritation.active)
     if irritated:
-        yield spec("sanityConsume").path("回合末消耗").percent(0.05 * irritated).source("伪人技能", "伪人洋葱", "旧日的回声")
+        yield spec("sanityConsume").path("turn_end_consume").percent(0.05 * irritated).source("pseudo_ability", "pseudo_onion", "echo_of_the_past")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _rego

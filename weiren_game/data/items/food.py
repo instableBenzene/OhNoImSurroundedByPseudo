@@ -1,27 +1,28 @@
 """大类：食物／零食／饮品（含具名食品）。"""
 
 from ..types import I
+from weiren_game.data.lang import TEXT
 
 ITEMS = {
-    "simple_food": I("simple_food", "简陋的食物", "food", 0, "回复5生命。", ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="simple_food"),
-    "common_food": I("common_food", "常见的食物", "food", 1, "回复8生命。", ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="common_food"),
-    "tasty_food": I("tasty_food", "美味的食物", "food", 2, "回复12生命、3理智。", ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="tasty_food"),
-    "delicate_food": I("delicate_food", "精致的食物", "food", 3, "回复20生命、5理智。", ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="delicate_food"),
-    "quality_food": I("quality_food", "优质的食物", "food", 4, "回复30生命、10理智。", ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="quality_food"),
-    "mcdangdang": I("mcdangdang", "麦当当", "food", 4, "回复20生命、5理智；之后3回合开始额外回复3理智。", ("food", "durability_consumable"), max_durability=5, use_cost=1, on_use="mcdangdang"),
-    "garlic": I("garlic", "蒜瓣", "food", 2, "回复3生命、5理智；持有时强化其他食物，触发后10%消耗。", ("food", "seasoning", "consumable", "fragile"), consumable=True, fragile_chance=.10, stack_size=32, on_use="garlic"),
-    "pancake": I("pancake", "松饼", "food", 2, "回复5生命、3理智。", ("food", "durability_consumable"), max_durability=3, use_cost=1, on_use="pancake"),
-    "cola": I("cola", "无糖可乐", "food", 1, "回复1生命、3理智；下一次搜索成功率+5%。", ("food", "drink", "consumable"), consumable=True, stack_size=8, on_use="cola"),
-    "water": I("water", "矿泉水", "food", 1, "回复1生命；50%概率令紊乱层数-1。", ("food", "drink", "consumable"), consumable=True, stack_size=8, on_use="water"),
-    "luncheon_meat": I("luncheon_meat", "午餐肉罐头", "food", 3, "回复8生命。", ("food", "can", "durability_consumable"), max_durability=5, use_cost=1, on_use="luncheon_meat"),
-    "chocolate_bar": I("chocolate_bar", "巧克力棒", "food", 2, "回复2生命并使≤3级侵蚀情绪-1/-1。", ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="chocolate_bar"),
-    "gum": I("gum", "口香糖", "food", 1, "使≤3级侵蚀情绪-1/-1。", ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="gum"),
-    "double_mint": I("double_mint", "Double劲爆薄荷糖", "food", 1, "回复1理智，觉醒情绪层数+1。", ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="double_mint"),
-    "weird_beans": I("weird_beans", "奇趣怪味豆", "food", 2, "70%正面恢复并减轻侵蚀情绪；30%增加侵蚀情绪层数。", ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="weird_beans"),
-    "chips": I("chips", "咔嚓薯片-孜然牛肉味", "food", 3, "回复3生命、5理智，使≤6级侵蚀情绪-1/-2。", ("food", "snack", "durability_consumable"), max_durability=3, use_cost=1, on_use="chips"),
-    "cookies": I("cookies", "曲多多曲奇", "food", 3, "回复3生命、5理智；非负消沉减少5%，至少减少20。", ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="cookies"),
-    "spicy_beef": I("spicy_beef", "香辣牛肉干", "food", 3, "回复5生命、5理智，侵蚀情绪-2/-2，强化昂扬。", ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="spicy_beef"),
-    "fiji_chocolate": I("fiji_chocolate", "斐济巧克力", "food", 4, "回复5生命、10理智，侵蚀情绪-3/-3；3回合消沉获取-20%。", ("food", "snack", "consumable"), consumable=True, stack_size=8, on_use="fiji_chocolate"),
+    "simple_food": I("simple_food", TEXT["item.simple_food.name"], "food", 0, TEXT["item.simple_food.description"], ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="simple_food"),
+    "common_food": I("common_food", TEXT["item.common_food.name"], "food", 1, TEXT["item.common_food.description"], ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="common_food"),
+    "tasty_food": I("tasty_food", TEXT["item.tasty_food.name"], "food", 2, TEXT["item.tasty_food.description"], ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="tasty_food"),
+    "delicate_food": I("delicate_food", TEXT["item.delicate_food.name"], "food", 3, TEXT["item.delicate_food.description"], ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="delicate_food"),
+    "quality_food": I("quality_food", TEXT["item.quality_food.name"], "food", 4, TEXT["item.quality_food.description"], ("food", "consumable", "placeholder"), consumable=True, stack_size=16, on_use="quality_food"),
+    "mcdangdang": I("mcdangdang", TEXT["item.mcdangdang.name"], "food", 4, TEXT["item.mcdangdang.description"], ("food", "durability_consumable"), max_durability=5, use_cost=1, on_use="mcdangdang"),
+    "garlic": I("garlic", TEXT["item.garlic.name"], "food", 2, TEXT["item.garlic.description"], ("food", "seasoning", "consumable", "fragile"), consumable=True, fragile_chance=.10, stack_size=32, on_use="garlic"),
+    "pancake": I("pancake", TEXT["item.pancake.name"], "food", 2, TEXT["item.pancake.description"], ("food", "durability_consumable"), max_durability=3, use_cost=1, on_use="pancake"),
+    "cola": I("cola", TEXT["item.cola.name"], "food", 1, TEXT["item.cola.description"], ("food", "drink", "consumable"), consumable=True, stack_size=8, on_use="cola"),
+    "water": I("water", TEXT["item.water.name"], "food", 1, TEXT["item.water.description"], ("food", "drink", "consumable"), consumable=True, stack_size=8, on_use="water"),
+    "luncheon_meat": I("luncheon_meat", TEXT["item.luncheon_meat.name"], "food", 3, TEXT["item.luncheon_meat.description"], ("food", "can", "durability_consumable"), max_durability=5, use_cost=1, on_use="luncheon_meat"),
+    "chocolate_bar": I("chocolate_bar", TEXT["item.chocolate_bar.name"], "food", 2, TEXT["item.chocolate_bar.description"], ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="chocolate_bar"),
+    "gum": I("gum", TEXT["item.gum.name"], "food", 1, TEXT["item.gum.description"], ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="gum"),
+    "double_mint": I("double_mint", TEXT["item.double_mint.name"], "food", 1, TEXT["item.double_mint.description"], ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="double_mint"),
+    "weird_beans": I("weird_beans", TEXT["item.weird_beans.name"], "food", 2, TEXT["item.weird_beans.description"], ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="weird_beans"),
+    "chips": I("chips", TEXT["item.chips.name"], "food", 3, TEXT["item.chips.description"], ("food", "snack", "durability_consumable"), max_durability=3, use_cost=1, on_use="chips"),
+    "cookies": I("cookies", TEXT["item.cookies.name"], "food", 3, TEXT["item.cookies.description"], ("food", "snack", "consumable"), consumable=True, stack_size=32, on_use="cookies"),
+    "spicy_beef": I("spicy_beef", TEXT["item.spicy_beef.name"], "food", 3, TEXT["item.spicy_beef.description"], ("food", "snack", "consumable"), consumable=True, stack_size=16, on_use="spicy_beef"),
+    "fiji_chocolate": I("fiji_chocolate", TEXT["item.fiji_chocolate.name"], "food", 4, TEXT["item.fiji_chocolate.description"], ("food", "snack", "consumable"), consumable=True, stack_size=8, on_use="fiji_chocolate"),
 }
 
 
@@ -29,7 +30,7 @@ def mcdangdang_aftertaste(engine: object, tenant: object) -> None:
     """麦当当余味：condition 存在期间回合初 +3 理智。"""
     condition = tenant.condition("mcdangdang_aftertaste")
     if condition.active:
-        engine._restore_sanity(tenant, 3, "麦当当余味")
+        engine._restore_sanity(tenant, 3, "mcdangdang_aftertaste")
 
 
 from weiren_game.condition import StatusDefinition, register_status_definition
@@ -37,13 +38,13 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 register_status_definition(
     StatusDefinition(
         "mcdangdang_aftertaste",
-        "麦当当的余味",
+        TEXT["status.mcdangdang_aftertaste.label"],
         "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="item:mcdangdang",
         nodes=frozenset({"turn_start.status_effects"}),
         hook=mcdangdang_aftertaste,
-     description="油腻的香味还留在舌尖，胃里却泛起一点说不清的暖。")
+     description=TEXT["status.mcdangdang_aftertaste.description"])
 )
 
 
@@ -51,8 +52,8 @@ def _garlic_seasoning(engine: object, tenant: object, seasoning: object) -> None
     """蒜瓣（调味品）：食物被食用后强化 +1/+1，并按易损概率消耗蒜瓣。"""
     from weiren_game.data import EVENT_IDS, ITEMS
 
-    engine._restore_health(tenant, 1, "蒜瓣搭配")
-    engine._restore_sanity(tenant, 1, "蒜瓣搭配")
+    engine._restore_health(tenant, 1, "garlic_pairing")
+    engine._restore_sanity(tenant, 1, "garlic_pairing")
     fragile = ITEMS[seasoning.item_id].fragile_chance
     if (
         engine._rng(EVENT_IDS["garlic.passive"], tenant.id).random()
@@ -242,7 +243,7 @@ def _fiji_depression_modifier(context: object):
         return
     afterglow = tenant.condition("fiji_afterglow")
     if afterglow.active:
-        yield spec("depressionChange").path("消沉").mul(0.8).source("物品", "食物", "斐济巧克力")
+        yield spec("depressionChange").path("depression").mul(0.8).source("item", "food", "fiji_chocolate")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regfd

@@ -36,6 +36,7 @@ from typing import Any, Sequence
 
 from .content import CONTENT
 from .content import BASE_PACK
+from weiren_game.data.lang import TEXT
 
 
 _LOADED: set[str] = set()
@@ -109,7 +110,7 @@ def load_item_file(path: Path, *, replace: bool = False) -> None:
     module = import_file(path, _dlc_module_name(dlc_name, "items", path.stem))
     category = getattr(module, "CATEGORY", None)
     if category is None:
-        raise ValueError(f"{path.name} 缺少 CATEGORY")
+        raise ValueError(TEXT["dlc.load_item_file.1"].format(p1=path.name))
     for definition in module.ITEMS.values():
         CONTENT.register_item(definition, category=category, replace=replace)
     hooks = getattr(module, "ITEM_HOOKS", None)
@@ -177,14 +178,22 @@ def load_codex_file(path: Path) -> None:
         codex_pack.register_section(section)
 
 
-def load_codex_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 codex/*.py（DLC 提供的图鉴分节）。"""
-    codex_dir = dlc_dir / "codex"
+def _load_dir(dlc_dir: Path, subdir: str, loader, *, pattern: str = "*.py",
+              replace: bool | None = None) -> list[str]:
+    """装载 ``<包>/<subdir>/<pattern>``：逐文件交给 ``loader``，返回文件名（去扩展名）列表。
+
+    ``replace=None`` 时按单参调用 loader，否则 ``loader(path, replace=replace)``。
+    所有 ``load_*_dir`` 都是这一个循环，别再各写一份。
+    """
+    directory = dlc_dir / subdir
+    if not directory.is_dir():
+        return []
     loaded: list[str] = []
-    if not codex_dir.is_dir():
-        return loaded
-    for path in sorted(codex_dir.glob("*.py")):
-        load_codex_file(path)
+    for path in sorted(directory.glob(pattern)):
+        if replace is None:
+            loader(path)
+        else:
+            loader(path, replace=replace)
         loaded.append(path.stem)
     return loaded
 
@@ -195,35 +204,11 @@ def load_tag_file(path: Path) -> None:
     CONTENT.apply_item_tags(path.stem, entries or ())
 
 
-def load_character_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = False) -> list[str]:
-    """装载 characters/*.py，返回角色 id 列表。"""
-    character_dir = dlc_dir / "characters"
-    ids: list[str] = []
-    if not character_dir.is_dir():
-        return ids
-    for path in sorted(character_dir.glob("*.py")):
-        load_character_file(path, path.stem, replace=replace)
-        ids.append(path.stem)
-    return ids
-
-
 def load_personality_file(path: Path) -> None:
     """注册一个 DLC 性格（羁绊）模块：文件名即性格键。"""
     dlc_name = path.parent.parent.name
     module = import_file(path, _dlc_module_name(dlc_name, "personalities", path.stem))
     CONTENT.register_personality_module(path.stem, module)
-
-
-def load_personality_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 personalities/*.py，返回性格键列表。"""
-    directory = dlc_dir / "personalities"
-    loaded: list[str] = []
-    if not directory.is_dir():
-        return loaded
-    for path in sorted(directory.glob("*.py")):
-        load_personality_file(path)
-        loaded.append(path.stem)
-    return loaded
 
 
 def load_status_file(path: Path) -> None:
@@ -236,18 +221,6 @@ def load_status_file(path: Path) -> None:
         CONTENT.register_emotion_definition(definition)
 
 
-def load_status_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 statuses/*.py（状态与情绪定义），返回文件列表。"""
-    directory = dlc_dir / "statuses"
-    loaded: list[str] = []
-    if not directory.is_dir():
-        return loaded
-    for path in sorted(directory.glob("*.py")):
-        load_status_file(path)
-        loaded.append(path.stem)
-    return loaded
-
-
 def load_resourcepack_file(path: Path) -> None:
     """注册一个资源包文件（贴图零件 ``SYMBOLS`` / 主题 ``THEME``）。"""
     dlc_name = path.parent.parent.name
@@ -255,75 +228,11 @@ def load_resourcepack_file(path: Path) -> None:
     CONTENT.register_resource_pack(module, pack=dlc_name)
 
 
-def load_resourcepack_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 resourcepack/*.py（材质 / 字体 / 贴图零件），返回文件列表。
-
-    与其它资源包同一条注册路径：同名 token / 贴图 id **覆盖**内置
-    （装载顺序 = 包优先级；base 覆盖它下方的包）。
-    """
-    directory = dlc_dir / "resourcepack"
-    loaded: list[str] = []
-    if not directory.is_dir():
-        return loaded
-    for path in sorted(directory.glob("*.py")):
-        load_resourcepack_file(path)
-        loaded.append(path.stem)
-    return loaded
-
-
-def load_items_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = False) -> list[str]:
-    """装载 items/*.py，返回文件列表。"""
-    items_dir = dlc_dir / "items"
-    loaded: list[str] = []
-    if not items_dir.is_dir():
-        return loaded
-    for path in sorted(items_dir.glob("*.py")):
-        load_item_file(path, replace=replace)
-        loaded.append(path.stem)
-    return loaded
-
-
-def load_tags_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 tags/*.json（把条目合并进物品）。"""
-    tag_dir = dlc_dir / "tags"
-    loaded: list[str] = []
-    if not tag_dir.is_dir():
-        return loaded
-    for path in sorted(tag_dir.glob("*.json")):
-        load_tag_file(path)
-        loaded.append(path.stem)
-    return loaded
-
-
 def load_tag_behavior_file(path: Path) -> None:
     """注册一个 tag 行为模块（文件名即 tag）。"""
     dlc_name = path.parent.parent.name
     module = import_file(path, _dlc_module_name(dlc_name, "tags", path.stem))
     CONTENT.register_tag_module(path.stem, module)
-
-
-def load_tag_behaviors_dir(dlc_dir: Path, module_prefix: str) -> list[str]:
-    """装载 tags/*.py（tag 行为模块），返回 tag 列表。"""
-    tag_dir = dlc_dir / "tags"
-    loaded: list[str] = []
-    if not tag_dir.is_dir():
-        return loaded
-    for path in sorted(tag_dir.glob("*.py")):
-        load_tag_behavior_file(path)
-        loaded.append(path.stem)
-    return loaded
-
-
-def load_locations_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = False) -> list[str]:
-    """装载 locations/*.py（含可选 MAP_GROUPS 新分组）。"""
-    locations_dir = dlc_dir / "locations"
-    loaded: list[str] = []
-    if not locations_dir.is_dir():
-        return loaded
-    for path in sorted(locations_dir.glob("*.py")):
-        load_location_file(path, replace=replace)
-        loaded.append(path.stem)
-    return loaded
 
 
 def load_maps_dir(dlc_dir: Path) -> list[str]:
@@ -339,18 +248,6 @@ def load_maps_dir(dlc_dir: Path) -> list[str]:
         return []
     load_map_dirs(directory)
     return sorted(path.parent.name for path in directory.glob("*/map.py"))
-
-
-def load_information_dir(dlc_dir: Path, module_prefix: str, *, replace: bool = False) -> list[str]:
-    """装载 information/*.py。"""
-    info_dir = dlc_dir / "information"
-    loaded: list[str] = []
-    if not info_dir.is_dir():
-        return loaded
-    for path in sorted(info_dir.glob("*.py")):
-        load_information_file(path, replace=replace)
-        loaded.append(path.stem)
-    return loaded
 
 
 def load_single_dlc(
@@ -375,8 +272,7 @@ def load_single_dlc(
 
         if _version_tuple(min_version) > _version_tuple(GAME_VERSION):
             raise ValueError(
-                f"DLC {name} 要求游戏版本 ≥ {min_version}，"
-                f"当前为 {GAME_VERSION}，无法装载。"
+                TEXT["dlc.load_single_dlc.1"].format(p1=name, p2=min_version, p3=GAME_VERSION)
             )
     module_prefix = _dlc_module_name(name)
     init_path = dlc_dir / "__init__.py"
@@ -385,16 +281,19 @@ def load_single_dlc(
         register = getattr(package, "register", None)
         if register:
             register(CONTENT)
-    load_character_dir(dlc_dir, module_prefix, replace=replace)
-    load_personality_dir(dlc_dir, module_prefix)
-    load_status_dir(dlc_dir, module_prefix)
-    load_items_dir(dlc_dir, module_prefix, replace=replace)
-    load_tags_dir(dlc_dir, module_prefix)
-    load_tag_behaviors_dir(dlc_dir, module_prefix)
-    load_codex_dir(dlc_dir, module_prefix)
-    load_resourcepack_dir(dlc_dir, module_prefix)
-    load_locations_dir(dlc_dir, module_prefix, replace=replace)
-    load_information_dir(dlc_dir, module_prefix, replace=replace)
+    # 顺序即注册顺序（同名覆盖靠包优先级，别打乱）。
+    _load_dir(dlc_dir, "characters",
+              lambda path, replace=False: load_character_file(path, path.stem, replace=replace),
+              replace=replace)
+    _load_dir(dlc_dir, "personalities", load_personality_file)
+    _load_dir(dlc_dir, "statuses", load_status_file)
+    _load_dir(dlc_dir, "items", load_item_file, replace=replace)
+    _load_dir(dlc_dir, "tags", load_tag_file, pattern="*.json")
+    _load_dir(dlc_dir, "tags", load_tag_behavior_file)
+    _load_dir(dlc_dir, "codex", load_codex_file)
+    _load_dir(dlc_dir, "resourcepack", load_resourcepack_file)
+    _load_dir(dlc_dir, "locations", load_location_file, replace=replace)
+    _load_dir(dlc_dir, "information", load_information_file, replace=replace)
     load_maps_dir(dlc_dir)
 
     pseudo_dir = dlc_dir / "pseudos"
@@ -454,36 +353,9 @@ def apply_pack_order(order: Sequence[str], root: str | Path | None = None) -> li
     return list(CONTENT.pack_order())
 
 
-def reload_dlc(names: Sequence[str], root: str | Path | None = None) -> list[str]:
-    """兼容入口：把 ``names`` 视为"base 之上的启用包"（默认 base 优先级最高）。
-
-    需要让某个包覆盖内置内容时改用 :func:`apply_pack_order`，把它排在 ``base`` 之前。
-    """
-    return apply_pack_order([BASE_PACK, *[str(name) for name in names]], root=root)
-
-
 def loaded_dlcs() -> list[str]:
     """返回已装载成功的 DLC 名列表。"""
     return sorted(_LOADED)
-
-
-def load_dlcs(root: str | Path | None = None) -> list[str]:
-    """按名称顺序装载全部 DLC（base 恒为最高优先级），返回本次新装载的名单。"""
-    loaded: list[str] = []
-    for dlc_dir in available_dlcs(root):
-        if dlc_dir.name in _LOADED:
-            continue
-        load_single_dlc(dlc_dir.name, root=root)
-        loaded.append(dlc_dir.name)
-    from .content import CONTENT
-
-    CONTENT.set_packs([BASE_PACK, *sorted(_LOADED)])
-    return loaded
-
-
-def load_dlc(root: str | Path | None = None) -> list[str]:
-    """兼容入口：装载全部 DLC，返回本次新装载的名单（load_dlcs 别名）。"""
-    return load_dlcs(root)
 
 
 def load_configured_dlc() -> list[str]:

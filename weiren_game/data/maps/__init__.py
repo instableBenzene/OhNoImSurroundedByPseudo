@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 from ..types import MapDefinition
+from weiren_game.data.lang import TEXT
 
 MAPS: dict[str, MapDefinition] = {}
 # 默认地图的 id：没选地图时用它（= 城郊小镇）。
@@ -41,7 +42,7 @@ def _load_file(path: Path):
 def register_map(definition: MapDefinition, *, replace: bool = False) -> None:
     """登记一张地图（同 id 需要 ``replace=True`` 才覆盖，供内容包优先级用）。"""
     if definition.id in MAPS and not replace:
-        raise ValueError(f"地图 ID 重复：{definition.id}")
+        raise ValueError(TEXT["data.maps.__init__.register_map.1"].format(p1=definition.id))
     MAPS[definition.id] = definition
 
 

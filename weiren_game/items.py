@@ -121,11 +121,6 @@ class Inventory:
             slot += 1
         return slot
 
-    def plot_of(self, instance_id: str) -> int | None:
-        """返回指定实例所在的槽位编号，未找到返回 None。"""
-        item = self.instance(instance_id)
-        return item.plot if item else None
-
     def instance(self, instance_id: str) -> ItemInstance | None:
         """按实例 ID 查找物品，未找到返回 None。"""
         return next((value for value in self.items if value.item_instance_id == instance_id), None)

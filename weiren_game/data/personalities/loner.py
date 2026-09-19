@@ -1,6 +1,7 @@
 """性格·孤僻：性格/羁绊效果全部集中在本文件。"""
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def health_protection(
@@ -27,7 +28,7 @@ def end_sanity_cost(
     if loner_level < 5:
         return cost
     if engine._is_personality(tenant, "loner"):
-        engine._restore_sanity(tenant, 10, "孤僻羁绊")
+        engine._restore_sanity(tenant, 10, "loner_bond")
         return 0.0
     return cost + 3
 
@@ -94,7 +95,7 @@ def _loner_turn_modifier(context: object):
     level = engine.bond_levels().get("loner", 0)
     if level != 1 and level < 5:
         return
-    yield spec("search").path("回合").flat(-2 if level >= 5 else -1).source("羁绊", "孤僻")
+    yield spec("search").path("turn").flat(-2 if level >= 5 else -1).source("bond", "loner")
 
 
 def _loner_success_modifier(context: object):
@@ -105,7 +106,7 @@ def _loner_success_modifier(context: object):
     level = engine.bond_levels().get("loner", 0)
     if level != 1 and level < 5:
         return
-    yield spec("chance").certain(1.0).path("搜索").source("羁绊", "孤僻")
+    yield spec("chance").certain(1.0).path("search").source("bond", "loner")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regl
@@ -119,10 +120,10 @@ def _loner_sanity_modifier(context: object):
     if engine.bond_levels().get("loner", 0) < 5:
         return
     if engine._is_personality(tenant, "loner"):
-        engine._restore_sanity(tenant, 10, "孤僻羁绊")
-        yield spec("sanityConsume").path("回合末消耗").final().max(0).source("羁绊", "孤僻")
+        engine._restore_sanity(tenant, 10, "loner_bond")
+        yield spec("sanityConsume").path("turn_end_consume").final().max(0).source("bond", "loner")
     else:
-        yield spec("sanityConsume").path("回合末消耗").flat(3).source("羁绊", "孤僻")
+        yield spec("sanityConsume").path("turn_end_consume").flat(3).source("bond", "loner")
 
 
 def _loner_depression_modifier(context: object):
@@ -134,7 +135,7 @@ def _loner_depression_modifier(context: object):
     level = engine.bond_levels().get("loner", 0)
     if level in {1} or level >= 5:
         return
-    yield spec("depressionChange").path("消沉").mul(1.20).source("性格", "孤僻")
+    yield spec("depressionChange").path("depression").mul(1.20).source("personality", "loner")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _reglo

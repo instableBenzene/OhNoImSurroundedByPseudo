@@ -9,6 +9,7 @@ from weiren_game.data import (
     EVENT_IDS,
     PERSONALITY_LABELS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -30,12 +31,12 @@ class VisitorSystemMixin:
                 tenant.return_event_pending = True
                 definition = self.character(tenant)
                 self.state.world.events.door_events.append(DoorEvent(
-                    "human", f"离开的访客返回：{definition.name}",
-                    f"{definition.name}在黑暗里徘徊许久后再次敲门，必须重新决定是否接纳。",
+                    "human", TEXT["systems.visitor_system._return_departed_tenants.1"].format(p1=definition.name),
+                    TEXT["systems.visitor_system._return_departed_tenants.2"].format(p1=definition.name),
                     visitor_id=definition.tenant_id,
                     metadata={"returning_tenant_id": tenant.id},
                 ))
-                self._log(f"曾离开的{definition.name}再次来到门外。")
+                self._log(TEXT["systems.visitor_system._return_departed_tenants.3"].format(p1=definition.name))
 
     # --------------------------------------------------------------- door events
     def _queue_scheduled_visitors(self) -> None:
@@ -53,7 +54,7 @@ class VisitorSystemMixin:
             for _ in range(count):
                 definition = PSEUDOS[pseudo.scenario_id]
                 self.state.world.events.door_events.append(DoorEvent(
-                    "pseudo", f"伪人到访：{definition.name}", definition.description,
+                    "pseudo", TEXT["systems.visitor_system._queue_scheduled_visitors.1"].format(p1=definition.name), definition.description,
                     pseudo_id=pseudo.scenario_id,
                 ))
             self.state.world.visitors.next_pseudo_turn = self._roll_next_pseudo_visit(self.state.flow.turn)
@@ -72,18 +73,18 @@ class VisitorSystemMixin:
         if interval and self.state.flow.turn % interval == 0:
             extra += 1
         for _ in range(extra):
-            self._queue_human_visitor("额外访客来到了门前。")
+            self._queue_human_visitor(TEXT["systems.visitor_system._queue_scheduled_visitors.2"])
 
     def _queue_human_visitor(self, reason: str | None = None, *, force_supply: bool = False) -> None:
         """从访客名册排队一位人类访客；名册为空时视规则改为补给事件。"""
         if self._global_event_active("visitor.suppress"):
-            self._log("下一次访客来访被取消。")
+            self._log(TEXT["systems.visitor_system._queue_human_visitor.1"])
             return
         if self._global_event_active("visitor.supply"):
             white_only = self._global_event_value("visitor.supply", 1.0) >= 2
             self._consume_global_event("visitor.supply")
             self.state.world.events.door_events.append(DoorEvent(
-                "supply", "神秘的补给", "门外无人，只有一个无署名纸箱。",
+                "supply", TEXT["systems.visitor_system._queue_human_visitor.2"], TEXT["systems.visitor_system._queue_human_visitor.3"],
                 metadata={"white_only": white_only},
             ))
             return
@@ -92,8 +93,8 @@ class VisitorSystemMixin:
             definition = CHARACTERS[character_id]
             personalities = f"{PERSONALITY_LABELS[definition.primary]}-{PERSONALITY_LABELS[definition.secondary]}"
             self.state.world.events.door_events.append(DoorEvent(
-                "human", f"访客：{definition.name}",
-                f"{definition.description} 性格：{personalities}；携带能力：{definition.carry}。",
+                "human", TEXT["systems.visitor_system._queue_human_visitor.4"].format(p1=definition.name),
+                TEXT["systems.visitor_system._queue_human_visitor.5"].format(p1=definition.description, p2=personalities, p3=definition.carry),
                 visitor_id=character_id,
             ))
             if reason:
@@ -110,7 +111,7 @@ class VisitorSystemMixin:
             # acceptance trigger.
             if force_supply or supply_active:
                 self.state.world.events.door_events.append(DoorEvent(
-                    "supply", "神秘的补给", "访客名册已经空了，门口留下一个无署名纸箱。",
+                    "supply", TEXT["systems.visitor_system._queue_human_visitor.6"], TEXT["systems.visitor_system._queue_human_visitor.7"],
                     metadata={"counts_as_accept": supply_active},
                 ))
                 if reason:
@@ -120,14 +121,14 @@ class VisitorSystemMixin:
         """处理门口首个事件：按类型结算人类接纳/拒绝、补给领取或伪人到访。"""
         self._require_no_pending_choice()
         if not self.state.world.events.door_events:
-            raise RuleViolation("门外目前没有待处理事件。")
+            raise RuleViolation(TEXT["systems.visitor_system.handle_next_door_event.1"])
         event = self.state.world.events.door_events[0]
         if event.kind == "human":
             if decision not in {"accept", "reject"}:
-                raise RuleViolation("人类访客必须选择 accept（接纳）或 reject（拒绝）。")
+                raise RuleViolation(TEXT["systems.visitor_system.handle_next_door_event.2"])
             returning_id = event.metadata.get("returning_tenant_id")
             if decision == "accept" and not returning_id and len(self.living_tenants()) >= 10:
-                raise RuleViolation("屋内最多容纳10名房客；请拒绝这位访客或先腾出位置。")
+                raise RuleViolation(TEXT["systems.visitor_system.handle_next_door_event.3"])
             self.state.world.events.door_events.pop(0)
             self._visitor_arrived(counts_as_visit=True)
             definition = CHARACTERS[event.visitor_id or ""]
@@ -140,15 +141,15 @@ class VisitorSystemMixin:
                 if returning_id:
                     tenant = self.state.house.tenants.get(returning_id)
                     if not tenant or not tenant.alive:
-                        raise RuleViolation("这位返回者已经无法再次入住。")
+                        raise RuleViolation(TEXT["systems.visitor_system.handle_next_door_event.4"])
                     tenant.at_home = True
                     tenant.temporarily_away = False
                     tenant.return_event_pending = False
-                    self._log(f"{definition.name}被重新接纳（房客编号{tenant.id}）。")
+                    self._log(TEXT["systems.visitor_system.handle_next_door_event.5"].format(p1=definition.name, p2=tenant.id))
                     self._on_accept_healing(tenant)
                 else:
                     tenant = self._add_tenant(definition.tenant_id)
-                    self._log(f"{definition.name}被接纳，房客编号{tenant.id}。")
+                    self._log(TEXT["systems.visitor_system.handle_next_door_event.6"].format(p1=definition.name, p2=tenant.id))
                     self._on_tenant_accepted(tenant)
                 self.state.world.visitors.visitor_rejections[definition.tenant_id] = 0
                 self._pseudo_visitor_mark()
@@ -183,8 +184,8 @@ class VisitorSystemMixin:
                             tenant.alive = False
                 elif rejected < 2:
                     self.state.world.visitors.visitor_pool.append(definition.tenant_id)
-                suffix = "；连续拒绝两次后将不再来访" if rejected >= 2 else "；他/她以后还会再尝试一次"
-                self._log(f"{definition.name}被拒绝，脚步声消失在黑暗中{suffix}。")
+                suffix = TEXT["systems.visitor_system.handle_next_door_event.7"] if rejected >= 2 else TEXT["systems.visitor_system.handle_next_door_event.8"]
+                self._log(TEXT["systems.visitor_system.handle_next_door_event.9"].format(p1=definition.name, p2=suffix))
                 self._emit_node(
                     "door.reject",
                     kind="human",
@@ -219,7 +220,7 @@ class VisitorSystemMixin:
                 ]
             for item_id in rewards:
                 self._gain_item(item_id)
-            self._log("补给入库：" + "、".join(ITEMS[item_id].name for item_id in rewards) + "。")
+            self._log(TEXT["systems.visitor_system.handle_next_door_event.10"] + "、".join(ITEMS[item_id].name for item_id in rewards) + "。")
             if counts_as_accept:
                 self._pseudo_visitor_mark()
                 self._on_accept_healing(None)
@@ -231,7 +232,7 @@ class VisitorSystemMixin:
             self._record_action("door", kind="pseudo", pseudo=event.pseudo_id)
             self._resolve_pseudo_visit()
             return
-        raise RuleViolation(f"未知门口事件：{event.kind}")
+        raise RuleViolation(TEXT["systems.visitor_system.handle_next_door_event.11"].format(p1=event.kind))
 
     def _visitor_arrived(self, *, counts_as_visit: bool = False) -> None:
         """访客到达的统一结算：按条件累计伪人恐惧印记。"""
@@ -266,7 +267,7 @@ class VisitorSystemMixin:
                 else "disorder"
             )
             tenant.set_status(condition_id, intensity=1, layers=99)
-            self._log(f"{self.character(tenant).name}带着难以言说的伤痛入住。")
+            self._log(TEXT["systems.visitor_system._on_tenant_accepted.1"].format(p1=self.character(tenant).name))
         # 入住即结算免疫：a-10 一次性获得 99 点常驻充能；高生命给 1 点。
         from weiren_game.effects.health_sanity import (
             grant_permanent_trauma_disorder_immunity,

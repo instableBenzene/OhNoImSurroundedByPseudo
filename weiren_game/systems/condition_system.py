@@ -17,6 +17,7 @@ from weiren_game.data import (
     STATUS_SECONDARY_LOSS,
     WORSEN_PROBABILITIES,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -170,11 +171,6 @@ class ConditionSystemMixin:
         condition.layers -= requested - removable
         condition.clamp(intensity_max=10)
 
-    @staticmethod
-    def _reduce_condition(condition: Condition, intensity: int, layers: int) -> None:
-        """削减创伤/紊乱的静态入口，将削减量转发给 _recover_condition。"""
-        GameEngine._recover_condition(condition, layers, intensity)
-
     def _emotion_application_blocked(self, tenant: Tenant, key: str, source: str) -> bool:
         """判断该情绪施加是否被拦截。
 
@@ -196,7 +192,7 @@ class ConditionSystemMixin:
                 return True
         if self._eval_gate(
             "emotion.apply.block",
-            source=("施加", key),
+            source=("apply", key),
             context={"tenant": tenant, "key": key, "source": source},
         ):
             return True
@@ -211,7 +207,7 @@ class ConditionSystemMixin:
     def _awakening_gain_multiplier(self, tenant: Tenant) -> float:
         """返回该性格性格及其羁绊档位对觉醒情绪获取量的放大系数。"""
         return self._apply_modifiers(
-            "awakeningGain", 1.0, ("觉醒", tenant.character_id), {"tenant": tenant}
+            "awakeningGain", 1.0, ("awakening", tenant.character_id), {"tenant": tenant}
         )
 
     def _apply_emotion(

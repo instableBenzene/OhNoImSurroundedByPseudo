@@ -22,9 +22,14 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCAN_DIRS = (ROOT / "weiren_game", ROOT / "dlc")
 
+sys.path.insert(0, str(ROOT))
+from weiren_game.data.lang import TEXT  # noqa: E402
+
 # 可见播报：`_log(`，且前一个字符不是单词字符（这样 `_record_log(` 不会被命中）
 CALL = re.compile(r"(?<![\w])_log\(")
 STRUCT = re.compile(r"[=\-]{4,}")
+TEXT_KEY = re.compile(r'TEXT\[\s*["\']([^"\']+)["\']\s*\]')
+PLACEHOLDER = re.compile(r"\{[^{}]*\}")
 
 END_OK = ("\u3002", "\uff01", "\uff1f")                                   # 。！？
 HAZY = ("\u4f3c\u4e4e", "\u597d\u50cf", "\u4e5f\u8bb8", "\u5927\u6982")   # 似乎/好像/也许/大概
@@ -143,7 +148,13 @@ def scan(path: pathlib.Path) -> list[tuple[str, str, str]]:
         argument = _argument(text, match.end())
         sentence, braces, last_literal = _parts(argument)
         if not sentence:
-            continue                                     # 全是占位符 / 表达式，没有可审的文字
+            # 文案已进 lang 表：`_log(TEXT["key"]...)` → 取表里的模板继续审。
+            found = TEXT_KEY.match(argument.strip())
+            if found is None or found.group(1) not in TEXT:
+                continue                                 # 全是占位符 / 表达式，没有可审的文字
+            sentence = TEXT[found.group(1)]
+            braces = len(PLACEHOLDER.findall(sentence))
+            last_literal = not sentence.rstrip().endswith("}")
         if STRUCT.search(sentence):
             continue                                     # 结构行（回合分隔）不按句子的规则要求
         if not sentence.endswith(END_OK):

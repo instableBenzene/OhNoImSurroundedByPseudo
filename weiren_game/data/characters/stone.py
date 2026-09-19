@@ -9,14 +9,15 @@ definition / modifier / function 三节补在本文件即可。
 """
 
 from ..types import CharacterDefinition
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "stone", 16, "古雕塑",
-    "像一尊古雕塑的职场白领，习惯长时间不动与沉默，情绪极少外露，但工作一丝不苟。",
-    "steady", "loner", 3, ("职场白领", "22岁", "公司文员", "像古雕塑"),
+    "stone", 16, TEXT["character.stone.name"],
+    TEXT["character.stone.description"],
+    "steady", "loner", 3, (TEXT["character.stone.tag.0"], TEXT["character.stone.tag.1"], TEXT["character.stone.tag.2"], TEXT["character.stone.tag.3"]),
     available=False,
-    source_note="16 号创作性补位：白板角色，暂无技能；暂不进入房客池。",
+    source_note=TEXT["data.characters.stone.module.1"],
 )
 
 # 暂无 modifier / function（白板角色没有技能，本节留空待后续补充）。

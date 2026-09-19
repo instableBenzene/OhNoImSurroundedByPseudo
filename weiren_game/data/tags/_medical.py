@@ -18,6 +18,7 @@ from weiren_game.probability import resolve
 import math
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def treatment_params(item: object, target: object) -> tuple[float, int]:
@@ -36,6 +37,7 @@ def treatment_params(item: object, target: object) -> tuple[float, int]:
 def use_medical(
     engine: EngineProtocol, item: object, tenant: object,
     inventory: object = None, spot: object = None,
+    *, condition: str | None = None,          # 目标由 item.medical_target 决定，这里不用
 ) -> None:
     """执行一次医疗物资治疗：判成功、结算耐久并按结果削减状态。"""
     from weiren_game.exceptions import RuleViolation
@@ -44,7 +46,7 @@ def use_medical(
     target = tenant.trauma if item.medical_target == "trauma" else tenant.disorder
     if not target.active:
         raise RuleViolation(
-            f"目标没有{('创伤' if item.medical_target == 'trauma' else '紊乱')}。"
+            TEXT["data.tags._medical.use_medical.1"].format(p1='创伤' if item.medical_target == 'trauma' else '紊乱')
         )
     base_success, cost = treatment_params(item, target)
     # 目标已在药物可处理范围内且未被低生命惩罚时，本次治疗为「必定成功」。
@@ -55,9 +57,9 @@ def use_medical(
         success = base_success
         if tenant.health <= 50:
             success -= (50 - tenant.health) / 100
-        kind = "手术包" if item.medical_target == "trauma" else "药箱"
-        target_kind = "创伤" if item.medical_target == "trauma" else "紊乱"
-        event_source = ("医疗", "治疗", "医疗物资", kind, item.name, target_kind)
+        kind = TEXT["data.tags._medical.use_medical.2"] if item.medical_target == "trauma" else TEXT["data.tags._medical.use_medical.3"]
+        target_kind = TEXT["data.tags._medical.use_medical.4"] if item.medical_target == "trauma" else TEXT["data.tags._medical.use_medical.5"]
+        event_source = (TEXT["data.tags._medical.use_medical.6"], TEXT["data.tags._medical.use_medical.7"], TEXT["data.tags._medical.use_medical.8"], kind, item.name, target_kind)
         context = {"engine": engine, "tenant": tenant, "item": item}
         modifiers = collect_modifiers("chance", event_source, context)
         success = resolve(calculate_modified_amount(success, modifiers))
@@ -67,11 +69,9 @@ def use_medical(
     if engine._rng(EVENT_IDS["medical"], item.item_id, tenant.id).random() < success:
         engine._recover_condition(target, item.reduce_layers, item.reduce_intensity)
         engine._log(
-            f"{engine.character(tenant).name}使用{item.name}成功，"
-            f"目标状态-{item.reduce_intensity}/-{item.reduce_layers}。"
+            TEXT["data.tags._medical.use_medical.9"].format(p1=engine.character(tenant).name, p2=item.name, p3=item.reduce_intensity, p4=item.reduce_layers)
         )
     else:
         engine._log(
-            f"{engine.character(tenant).name}使用{item.name}失败"
-            f"（成功率{success:.0%}）。"
+            TEXT["data.tags._medical.use_medical.10"].format(p1=engine.character(tenant).name, p2=item.name, p3=success)
         )

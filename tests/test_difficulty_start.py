@@ -55,10 +55,10 @@ class DifficultyAndStartTests(unittest.TestCase):
         self.assertEqual(sum(c for _, c in engine._start_loot_schedule(-1)), 4)
         for key, expected in (("a7", -4.0), ("a-7", 4.0)):
             game = GameEngine.new_game(seed="diff-fortune-" + key.replace("-", "m"), difficulty=key, max_turns=20)
-            value = game._apply_modifiers("search", 0.0, ("开局", "时运"), {"tenant": None, "rng": None})
+            value = game._apply_modifiers("search", 0.0, ("setup", "luck"), {"tenant": None, "rng": None})
             self.assertEqual(value, expected)   # 全局 fortune_delta 与本池时运叠加
         leak = GameEngine.new_game(seed="diff-leak", difficulty="a7", max_turns=20)
-        value = leak._apply_modifiers("search", 0.0, ("搜索", "时运", "hkw"), {"tenant": None, "rng": None})
+        value = leak._apply_modifiers("search", 0.0, ("search", "luck", "hkw"), {"tenant": None, "rng": None})
         self.assertEqual(value, -1.0)           # 本池时运不漏进搜索
 
         def units(difficulty: str) -> int:

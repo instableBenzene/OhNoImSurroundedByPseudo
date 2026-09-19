@@ -135,14 +135,6 @@ def avatar_mode(*, dlc_root: str | Path | None = None,
     return mode
 
 
-def avatar_part_url(section: str, part_id: str, *, dlc_root: str | Path | None = None,
-                    rp_root: str | Path | None = None) -> str:
-    """零件的 URL（找不到返回空串，前端会回退内置图标）。"""
-    if resolve_avatar_part(section, part_id, dlc_root=dlc_root, rp_root=rp_root) is None:
-        return ""
-    return f"/api/avatar/{section}/{part_id}"
-
-
 def part_markup(path: Path, *, colors: dict | None = None) -> str:
     """读零件文件；若它用了色槽，就把 ``var(--a/b/c…)`` 换成具体颜色后返回**内联标记**。
 

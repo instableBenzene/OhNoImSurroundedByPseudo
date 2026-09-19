@@ -5,14 +5,15 @@
 
 from ..types import A, CharacterDefinition, MarkDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "rose", 13, "罗兹", "流淌着恶魔血液的魔人，为寻找友人踏入未知领域。",
-    "suspicious", "stubborn", 3, ("学生", "16-18岁", "男性", "神秘学研究者"),
-    (A("blood_drive", "驭血", "罗兹的生命值以任何方式减少时，获得 **1 层**【恶魔印记-罗兹】（**最多 6 层**，后称印记）：\n· 印记 **≤3**：消沉值变化量 **−25%**。\n· 印记 **>3**：消沉值变化量 **+10%**。\n· 印记 **≥6**：消耗所有印记与当前 **50%** 理智，获得 1 层【魔化印记-罗兹】（最多 1 层）、生命恢复至 **100**，且下回合无法行动或使用能力。"),),
-    (A("rose_recover", "风花雪月／该我上场了？", "消耗 **1 层**印记：\n· 为自身回复 **5 生命**或 **5 理智**。\n· 若拥有【魔化印记-罗兹】：额外消耗 1 层，对所有房客造成 **5 点**生命伤害，并使自身回复等额理智。", "resource", prompt="回复哪种资源？", options=(("health","生命","i-cross","回复 5 点生命"),("sanity","理智","i-emotion","回复 5 点理智")), chips=("每回合 1 次",), per_turn=True),
-     A("rose_expel", "千裁缠天／本小姐可没什么负罪感", "消耗 **4 层**印记，驱逐 1 名房客：\n· 目标为人类：罗兹流失 **25 理智**、回复 **25 生命**。\n· 目标为伪人：罗兹回复 **40 理智**。\n· 若拥有【魔化印记-罗兹】：额外消耗 1 层，为自己回复等同于被驱逐房客的生命与理智。", "other_tenant", prompt="选择要驱逐的房客")),
+    "rose", 13, TEXT["character.rose.name"], TEXT["character.rose.description"],
+    "suspicious", "stubborn", 3, (TEXT["character.rose.tag.0"], TEXT["character.rose.tag.1"], TEXT["character.rose.tag.2"], TEXT["character.rose.tag.3"]),
+    (A("blood_drive", TEXT["ability.blood_drive.name"], TEXT["ability.blood_drive.description"]),),
+    (A("rose_recover", TEXT["ability.rose_recover.name"], TEXT["ability.rose_recover.description"], "resource", prompt=TEXT["ability.rose_recover.prompt"], options=(("health",TEXT["ability.rose_recover.option.0"],"i-cross",TEXT["data.characters.rose.module.1"]),("sanity",TEXT["ability.rose_recover.option.1"],"i-emotion",TEXT["data.characters.rose.module.2"])), chips=(TEXT["ability.rose_recover.chip.0"],), per_turn=True),
+     A("rose_expel", TEXT["ability.rose_expel.name"], TEXT["ability.rose_expel.description"], "other_tenant", prompt=TEXT["ability.rose_expel.prompt"])),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -51,17 +52,17 @@ def use_rose_recover(engine: EngineProtocol, actor: object, *, option: object) -
     from weiren_game.exceptions import RuleViolation
 
     if option == "sanity":
-        engine._restore_sanity(actor, 5, "风花雪月")
+        engine._restore_sanity(actor, 5, "rose_blizzard")
     else:
-        engine._restore_health(actor, 5, "风花雪月")
+        engine._restore_health(actor, 5, "rose_blizzard")
     if engine._mark_count(actor, "magic") > 0:
         engine._consume_mark(actor, "magic", 1)
         total = 0.0
         for tenant in engine.home_tenants():
             before = tenant.health
-            engine._damage_health(tenant, 5, "罗兹魔化")
+            engine._damage_health(tenant, 5, "rose_demonize")
             total += max(0, before - tenant.health)
-        engine._restore_sanity(actor, total, "罗兹魔化")
+        engine._restore_sanity(actor, total, "rose_demonize")
 
 
 def use_rose_expel(engine: EngineProtocol, actor: object, target_id: str | None) -> None:
@@ -73,19 +74,19 @@ def use_rose_expel(engine: EngineProtocol, actor: object, target_id: str | None)
 
     target = engine._require_home_tenant(target_id)
     if target.id == actor.id:
-        raise RuleViolation("罗兹不能驱逐自己。")
+        raise RuleViolation(TEXT["data.characters.rose.use_rose_expel.1"])
     was_pseudo = target.is_pseudo
     target_health, target_sanity = target.health, target.sanity
-    engine._expel_tenant(target, "罗兹")
+    engine._expel_tenant(target, TEXT["data.characters.rose.use_rose_expel.2"])
     if was_pseudo:
-        engine._restore_sanity(actor, 40, "驱逐伪人")
+        engine._restore_sanity(actor, 40, "expel_pseudo")
     else:
-        engine._loss_sanity(actor, 25, "驱逐人类")
-        engine._restore_health(actor, 25, "驱逐人类")
+        engine._loss_sanity(actor, 25, "expel_human")
+        engine._restore_health(actor, 25, "expel_human")
     if engine._mark_count(actor, "magic") > 0:
         engine._consume_mark(actor, "magic", 1)
-        engine._restore_health(actor, max(0, target_health), "魔化吸收")
-        engine._restore_sanity(actor, max(0, target_sanity), "魔化吸收")
+        engine._restore_health(actor, max(0, target_health), "demonize_absorb")
+        engine._restore_sanity(actor, max(0, target_sanity), "demonize_absorb")
 
 
 def on_health_decrease(engine: EngineProtocol, tenant: object) -> None:
@@ -112,12 +113,12 @@ def on_mark_reached(
     if mark_id != "demon" or tenant.character_id != "rose":
         return
     engine._consume_mark(tenant, "demon", 6)
-    engine._consume_sanity(tenant, max(0.0, tenant.sanity * .50), "驭血魔化")
+    engine._consume_sanity(tenant, max(0.0, tenant.sanity * .50), "blood_drive_demonize")
     engine._gain_mark(tenant, "magic", 1)
     tenant.health = tenant.max_health
     tenant.skip_until_turn = engine.state.flow.turn + 1
     # 真警告（少用）：魔化是强力但有代价的状态，下一回合不能行动要提前让人看到。
-    engine._log("罗兹集齐6层恶魔印记：魔化、恢复全部生命，并将在下一回合无法行动。", kind="warn")
+    engine._log(TEXT["data.characters.rose.on_mark_reached.2"], kind="warn")
 
 
 ON_MARK_REACHED = on_mark_reached
@@ -146,24 +147,24 @@ VALUE_HOOKS = {
 MARKS = (
     MarkDefinition(
         id="demon",
-        label="恶魔印记-罗兹",
-        acquisition="罗兹生命值以任何方式减少时获得 1 层。",
+        label=TEXT["mark.demon.label"],
+        acquisition=TEXT["mark.demon.acquisition"],
         minimum=0,
         maximum=6,
         # 3 = 代码里的分档点（≤3 / >3 的伤害倍率）；4 = 千裁缠天；6 = 满档转化。
-        bar_tiers=((3, "临界"), (4, "可驱逐", "danger"), (6, "转化", "warn")),
+        bar_tiers=((3, TEXT["data.characters.rose.module.3"]), (4, TEXT["data.characters.rose.module.4"], "danger"), (6, TEXT["data.characters.rose.module.5"], "warn")),
         triggers=("health.changed.after",),
         hooks=(on_health_decrease,),
-     description="每一次流血都在饲育体内的东西，越痛它越清醒。"),
+     description=TEXT["mark.demon.description"]),
     MarkDefinition(
         id="magic",
-        label="魔化印记-罗兹",
-        acquisition="恶魔印记达到 6 层时，消耗全部印记与当前 50% 理智获得 1 层。",
+        label=TEXT["mark.magic.label"],
+        acquisition=TEXT["mark.magic.acquisition"],
         minimum=0,
         maximum=1,
         triggers=("mark.demon.full",),
         hooks=(on_health_decrease,),
-     description="与体内之物达成的交易，代价是清醒的一半。"),
+     description=TEXT["mark.magic.description"]),
 )
 
 
@@ -175,7 +176,7 @@ def _rose_depression_modifier(context: object):
     if not engine._passive_available(tenant, "rose.blood.emotion_value"):
         return
     mult = .75 if engine._mark_count(tenant, "demon") <= 3 else 1.10
-    yield spec("depressionChange").path("消沉").mul(mult).source("角色技能", "罗兹", "驭血")
+    yield spec("depressionChange").path("depression").mul(mult).source("ability", "rose", "blood_drive")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regr

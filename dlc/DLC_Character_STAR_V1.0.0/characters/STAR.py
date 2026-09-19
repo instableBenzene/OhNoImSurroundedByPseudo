@@ -6,6 +6,8 @@ from weiren_game.data.types import A, CharacterDefinition, MarkDefinition, T
 from weiren_game.condition import StatusDefinition, register_status_definition
 from weiren_game.modifier_rules import register_modifier_provider
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import pack_text_from_file
+TEXT = pack_text_from_file(__file__)
 
 # ---------------------------------------------------------------- 可调数值
 
@@ -63,43 +65,28 @@ FIRE_MAX_PER_GAME = 0        # >0 时限制每局开火次数（0 = 不限制）
 #   · 数值紧贴符号、不加空格：本体是「-25%」「+10%」「最多6层」
 #   · **不用 `**加粗**`**（本体几乎不用；且 `*` 在 `mdText` 里是斜体标记，混用会串味）
 NAME_CHARACTER = "STAR"
-NAME_GUN = "流星信标"
-NAME_MARK = "复合生化电池"
-NAME_PASSIVE_ENERGY = "半永久能源动力炉"
-NAME_PASSIVE_APATHY = "有机计算机稳定化方案"
-NAME_PASSIVE_COVER = "掩护射击"
-NAME_TOGGLE_COVER = "掩护射击"
-NAME_STATUS_COVER = "掩护射击"
-NAME_FIRE = "压制射击"
+NAME_GUN = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_GUN"]
+NAME_MARK = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_MARK"]
+NAME_PASSIVE_ENERGY = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_PASSIVE_ENERGY"]
+NAME_PASSIVE_APATHY = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.1"]
+NAME_PASSIVE_COVER = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_PASSIVE_COVER"]
+NAME_TOGGLE_COVER = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_TOGGLE_COVER"]
+NAME_STATUS_COVER = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_STATUS_COVER"]
+NAME_FIRE = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_FIRE"]
 NAME_FIRE_DESC = (
-    f"处理门外当前的事件：人类访客被惊退；伪人到访则清除该事件，"
-    f"并令其 {FIRE_SUPPRESS_TURNS} 回合内不再来访。"
-    f"发动时放空全部【{NAME_MARK}】电量；仅在电量充满（{ENERGY_MAX}/{ENERGY_MAX}）"
-    f"时可发动，放空后必然进入低功耗。"
-    f"*该能力有 {FIRE_COOLDOWN} 回合冷却时间。"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_FIRE_DESC"].format(p1=FIRE_SUPPRESS_TURNS, p2=NAME_MARK, p3=ENERGY_MAX, p4=ENERGY_MAX, p5=FIRE_COOLDOWN)
 )
 NAME_PASSIVE_ENERGY_DESC = (
-    f"STAR 搭载【{NAME_MARK}】，上限 {ENERGY_MAX} 点；每回合开始时充能 "
-    f"{ENERGY_PER_TURN} 点，若生命值为上限则额外充能 {ENERGY_FULL_HEALTH_BONUS} 点。"
-    f"每回合结束时扣除 {ENERGY_UPKEEP} 点供能，"
-    f"使当回合的理智消耗量与高生命值自然流失量各-{1 - UPKEEP_HEALTH_FACTOR:.0%}。"
-    f"若电量不足 {ENERGY_UPKEEP} 点则无法供能，进入低功耗："
-    f"当回合的理智消耗量与生命流失量各+{LOW_POWER_PENALTY}。"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_PASSIVE_ENERGY_DESC"].format(p1=NAME_MARK, p2=ENERGY_MAX, p3=ENERGY_PER_TURN, p4=ENERGY_FULL_HEALTH_BONUS, p5=ENERGY_UPKEEP, p6=1 - UPKEEP_HEALTH_FACTOR, p7=ENERGY_UPKEEP, p8=LOW_POWER_PENALTY)
 )
 NAME_PASSIVE_APATHY_DESC = (
-    f"STAR 受到的理智伤害-{SANITY_DAMAGE_REDUCTION:.0%}；"
-    f"消沉值变化量、理智回复量与觉醒情绪获取量均×{DEPRESSION_FACTOR:.0%}。"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.2"].format(p1=SANITY_DAMAGE_REDUCTION, p2=DEPRESSION_FACTOR)
 )
 NAME_PASSIVE_COVER_DESC = (
-    f"STAR 在屋内且持有【{NAME_GUN}】时，可开启【{NAME_TOGGLE_COVER}】为在外搜索的同伴"
-    f"提供火力掩护：同伴受到伪人主动能力影响时，有 {COVER_RESIST:.0%} 概率免疫该影响。"
-    f"未开启时不提供任何掩护。"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_PASSIVE_COVER_DESC"].format(p1=NAME_GUN, p2=NAME_TOGGLE_COVER, p3=COVER_RESIST)
 )
 NAME_TOGGLE_COVER_DESC = (
-    f"开启后：为在外搜索的同伴提供火力掩护——同伴受到伪人主动能力影响时"
-    f"有 {COVER_RESIST:.0%} 概率免疫该影响；每次实际抵御消耗 {COVER_COST} 点"
-    f"【{NAME_MARK}】（每回合至多 {COVER_COST} 点）。"
-    f"关闭后：不提供掩护，也不消耗电量。"
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.NAME_TOGGLE_COVER_DESC"].format(p1=COVER_RESIST, p2=COVER_COST, p3=NAME_MARK, p4=COVER_COST)
 )
 
 # 事件命名空间（决定论随机的流名）
@@ -111,9 +98,9 @@ CHARACTER = CharacterDefinition(
     TENANT_ID,
     9001,
     NAME_CHARACTER,
-    "特殊作战部队Freesia的指挥官直属通用型特殊支援单元，感情平淡但意外的喜欢交流。喜欢吃松饼。",
+    TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.3"],
     "steady", "keen", 3,
-    ("改造人", "18-24岁", "未知的性别",  "星星"),
+    (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.4"], TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.5"], TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.6"],  TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.7"]),
     passives=(
         A("energy_cycle", NAME_PASSIVE_ENERGY, NAME_PASSIVE_ENERGY_DESC),
         A("apathy", NAME_PASSIVE_APATHY, NAME_PASSIVE_APATHY_DESC),
@@ -122,7 +109,7 @@ CHARACTER = CharacterDefinition(
         A("toggle_cover", NAME_TOGGLE_COVER, NAME_TOGGLE_COVER_DESC),
         A(
             "fire", NAME_FIRE, NAME_FIRE_DESC, "none",
-            chips=(f"冷却 {FIRE_COOLDOWN} 回合",) if FIRE_COOLDOWN else (),
+            chips=(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.8"].format(p1=FIRE_COOLDOWN),) if FIRE_COOLDOWN else (),
         ),
     ),
     available=True,
@@ -134,15 +121,13 @@ MARKS = (
         id=ENERGY_MARK,
         label=NAME_MARK,
         acquisition=(
-            f"每回合开始时充能 {ENERGY_PER_TURN} 点；若生命值为上限则额外充能 "
-            f"{ENERGY_FULL_HEALTH_BONUS} 点，上限 {ENERGY_MAX} 点。"
-            f"每回合结束时扣除 {ENERGY_UPKEEP} 点供能，抵消当回合的部分自然消耗。"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.9"].format(p1=ENERGY_PER_TURN, p2=ENERGY_FULL_HEALTH_BONUS, p3=ENERGY_MAX, p4=ENERGY_UPKEEP)
         ),
         minimum=0,
         maximum=ENERGY_MAX,
         # 第 1 档处画一条红线：低于它即低功耗。刻度会同时出现在状态栏与详情页。
-        bar_tiers=((1, "低于此处即低功耗", "danger"),),
-        description="它知道自己还剩多少电。低于一格时，身体会替它硬撑。",
+        bar_tiers=((1, TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.10"], "danger"),),
+        description=TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.11"],
     ),
 )
 
@@ -203,12 +188,11 @@ def turn_start(engine: EngineProtocol, tenant: object) -> None:
     now = int(_energy(engine, tenant))
 
     if actual <= 0:
-        engine._log(f"{name}的{NAME_MARK}已经充能完毕（{now}/{ENERGY_MAX}）。")
+        engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.turn_start.1"].format(p1=name, p2=NAME_MARK, p3=now, p4=ENERGY_MAX))
         return
-    note = f"，动力炉状态良好 +{ENERGY_FULL_HEALTH_BONUS}" if bonus else ""
+    note = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.turn_start.2"].format(p1=ENERGY_FULL_HEALTH_BONUS) if bonus else ""
     engine._log(
-        f"{name}的{NAME_MARK}充能 {actual} 点"
-        f"（{before}/{ENERGY_MAX} → {now}/{ENERGY_MAX}{note}）。"
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.turn_start.3"].format(p1=name, p2=NAME_MARK, p3=actual, p4=before, p5=ENERGY_MAX, p6=now, p7=ENERGY_MAX, p8=note)
     )
 
 
@@ -249,21 +233,20 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
         "max": 1,
         # 刻度线兼悬停说明：只在开启时打绿点，关着就留空条。
         "tiers": (
-            (1, f"每次实际抵御消耗 {COVER_COST} 电量，抵御 {COVER_RESIST:.0%}", "ok"),
+            (1, TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.1"].format(p1=COVER_COST, p2=COVER_RESIST), "ok"),
         ) if cover_on else (),
     })
 
-    status = f"每回合 +{ENERGY_PER_TURN}"
+    status = TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.2"].format(p1=ENERGY_PER_TURN)
     if tenant.health >= tenant.max_health:
-        status += f"（动力炉状态良好 +{ENERGY_FULL_HEALTH_BONUS}）"
+        status += TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.3"].format(p1=ENERGY_FULL_HEALTH_BONUS)
     if _low_power(tenant):
-        status += f" · **低功耗**：回合末消耗 +{LOW_POWER_PENALTY}"
+        status += TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.4"].format(p1=LOW_POWER_PENALTY)
     elif _energy(engine, tenant) >= ENERGY_UPKEEP:
         status += (
-            f" · 供能中：回合末扣 {ENERGY_UPKEEP}，"
-            f"自然消耗降至 {UPKEEP_HEALTH_FACTOR:.0%}"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.5"].format(p1=ENERGY_UPKEEP, p2=UPKEEP_HEALTH_FACTOR)
         )
-    rows.append({"kind": "text", "label": "状态", "text": status})
+    rows.append({"kind": "text", "label": TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.detail_slot.6"], "text": status})
     if _has_gun(tenant):
         rows.append({"kind": "tags", "items": [NAME_GUN]})
     return rows
@@ -286,13 +269,13 @@ def _sanity_consume_modifier(context: object):
     tenant = context["tenant"]  # type: ignore[index]
     if tenant.character_id != TENANT_ID:
         return
-    source = ("角色被动", NAME_CHARACTER, NAME_PASSIVE_ENERGY)
+    source = (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._sanity_consume_modifier.1"], NAME_CHARACTER, NAME_PASSIVE_ENERGY)
     if _low_power(tenant):
-        yield spec("sanityConsume").path("回合末消耗").flat(LOW_POWER_PENALTY).source(*source)
+        yield spec("sanityConsume").path("turn_end_consume").flat(LOW_POWER_PENALTY).source(*source)
     elif _upkeep_affordable(engine, tenant):
         yield (
             spec("sanityConsume")
-            .path("回合末消耗")
+            .path("turn_end_consume")
             .percent(-(1.0 - UPKEEP_SANITY_FACTOR))
             .source(*source)
         )
@@ -309,8 +292,8 @@ def _health_loss_modifier(context: object):
     tenant = context["tenant"]  # type: ignore[index]
     if tenant.character_id != TENANT_ID:
         return
-    source = ("角色被动", NAME_CHARACTER, NAME_PASSIVE_ENERGY)
-    path = ("生命流失", "高生命值自然流失")
+    source = (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._health_loss_modifier.1"], NAME_CHARACTER, NAME_PASSIVE_ENERGY)
+    path = (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._health_loss_modifier.2"], TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._health_loss_modifier.3"])
     if _low_power(tenant):
         yield spec("healthLoss").path(*path).flat(LOW_POWER_PENALTY).source(*source)
     elif _upkeep_affordable(engine, tenant):
@@ -337,12 +320,11 @@ def end_turn_settle(engine: EngineProtocol, tenant: object) -> None:
     if _upkeep_affordable(engine, tenant):
         engine._consume_mark(tenant, ENERGY_MARK, ENERGY_UPKEEP)
         engine._log(
-            f"{name}消耗 {ENERGY_UPKEEP} 点{NAME_MARK}，"
-            f"回合末的自然消耗减轻了。"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.end_turn_settle.1"].format(p1=name, p2=ENERGY_UPKEEP, p3=NAME_MARK)
         )
         return
     engine._log(
-        f"{name}的{NAME_MARK}已经见底，{NAME_PASSIVE_ENERGY}进入低功耗状态。"
+        TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.end_turn_settle.2"].format(p1=name, p2=NAME_MARK, p3=NAME_PASSIVE_ENERGY)
     )
 
 
@@ -356,10 +338,10 @@ def _apathy_modifiers(context: object):
     tenant = context["tenant"]  # type: ignore[index]
     if tenant.character_id != TENANT_ID:
         return
-    source = ("角色被动", NAME_CHARACTER, NAME_PASSIVE_APATHY)
-    yield spec("depressionChange").path("消沉").mul(DEPRESSION_FACTOR).source(*source)
-    yield spec("sanityRestore").path("回复").mul(SANITY_RESTORE_FACTOR).source(*source)
-    yield spec("awakeningGain").path("觉醒").mul(AWAKENING_FACTOR).source(*source)
+    source = (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._apathy_modifiers.1"], NAME_CHARACTER, NAME_PASSIVE_APATHY)
+    yield spec("depressionChange").path("depression").mul(DEPRESSION_FACTOR).source(*source)
+    yield spec("sanityRestore").path("restore").mul(SANITY_RESTORE_FACTOR).source(*source)
+    yield spec("awakeningGain").path("awakening").mul(AWAKENING_FACTOR).source(*source)
 
 
 def _sanity_damage_modifier(context: object):
@@ -371,9 +353,9 @@ def _sanity_damage_modifier(context: object):
         return
     yield (
         spec("sanityDamage")
-        .path("伤害")
+        .path("damage")
         .percent(-SANITY_DAMAGE_REDUCTION)
-        .source("角色被动", NAME_CHARACTER, NAME_PASSIVE_APATHY)
+        .source("ability_passive", NAME_CHARACTER, NAME_PASSIVE_APATHY)
     )
 
 
@@ -398,12 +380,12 @@ def _cover_fire_modifier(context: object):
     )
     if owner is None:
         return
-    source = ("角色技能", NAME_CHARACTER, NAME_PASSIVE_COVER)
+    source = (TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._cover_fire_modifier.1"], NAME_CHARACTER, NAME_PASSIVE_COVER)
     # 基础档：只要枪主在屋并且拿着枪，就自带一点抵御（不花电量）。
     if COVER_BASE_RESIST > 0:
         yield (
             spec("chance").flat(COVER_BASE_RESIST).match("all")
-            .path("抵御", "伪人使用主动能力").source(*source)
+            .path("resist", "pseudo_active").source(*source)
         )
     # 掩护档：开关开着 + 有电量 → 额外补足到 COVER_RESIST。
     extra = COVER_RESIST - COVER_BASE_RESIST
@@ -418,10 +400,10 @@ def _cover_fire_modifier(context: object):
     if int(owner.turn_counters.get("star_cover_turn", -1)) != turn:
         owner.turn_counters["star_cover_turn"] = turn
         engine._consume_mark(owner, ENERGY_MARK, COVER_COST)
-        engine._log(f"{engine.character(owner).name}为外出的同伴提供掩护射击。")
+        engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._cover_fire_modifier.2"].format(p1=engine.character(owner).name))
     yield (
         spec("chance").flat(extra).match("all")
-        .path("抵御", "伪人使用主动能力").source(*source)
+        .path("resist", "pseudo_active").source(*source)
     )
 
 
@@ -449,16 +431,16 @@ def requirements_fire(
 ) -> str | None:
     """开火条件：持有佩枪 + 门外有事件 + **电量充满** + 未超每局次数。"""
     if not _has_gun(actor):
-        return f"需要{NAME_GUN}才能开火。"
+        return TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.requirements_fire.1"].format(p1=NAME_GUN)
     if not engine.state.world.events.door_events:
-        return "门外没有值得开枪的目标。"
+        return TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.requirements_fire.2"]
     energy = int(_energy(engine, actor))
     if energy < FIRE_MIN_ENERGY:
         return (
-            f"{NAME_MARK}没有充满（{energy}/{ENERGY_MAX}），无法开火。"
+            TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.requirements_fire.3"].format(p1=NAME_MARK, p2=energy, p3=ENERGY_MAX)
         )
     if FIRE_MAX_PER_GAME and _shots_fired(actor) >= FIRE_MAX_PER_GAME:
-        return f"本次对局至多开火 {FIRE_MAX_PER_GAME} 次。"
+        return TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.requirements_fire.4"].format(p1=FIRE_MAX_PER_GAME)
     return None
 
 
@@ -479,10 +461,10 @@ def _resolve_door(engine: object, actor: object, spent_note: str) -> None:
             actor, "fire", engine.state.flow.turn + FIRE_COOLDOWN
         )
     if outcome.kind != "pseudo":
-        engine._log(f"{name}朝天放了一枪，门外的人退开了。")
+        engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._resolve_door.1"].format(p1=name))
         return
     engine._suppress_pseudo(FIRE_SUPPRESS_TURNS, ("visit",))
-    engine._log(f"{name}{spent_note}，门外的东西暂时退去了。")
+    engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR._resolve_door.2"].format(p1=name, p2=spent_note))
 
 
 # ---------------------------------------------------------------- 开关技能
@@ -499,10 +481,10 @@ def use_toggle(
     name = engine.character(actor).name
     if actor.condition(ST_COVER).active:
         actor.clear_status(ST_COVER)
-        engine._log(f"{name}关闭了{NAME_TOGGLE_COVER}。")
+        engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.use_toggle.1"].format(p1=name, p2=NAME_TOGGLE_COVER))
         return
     actor.set_status(ST_COVER, intensity=1, layers=1)
-    engine._log(f"{name}开启了{NAME_TOGGLE_COVER}。")
+    engine._log(TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.use_toggle.2"].format(p1=name, p2=NAME_TOGGLE_COVER))
 
 
 def use_fire(engine: EngineProtocol, actor: object, **kwargs: object) -> None:
@@ -514,7 +496,7 @@ def use_fire(engine: EngineProtocol, actor: object, **kwargs: object) -> None:
     """
     energy = int(_energy(engine, actor))
     actor.marks.consume(ENERGY_MARK, energy)
-    _resolve_door(engine, actor, f"把 {energy} 点{NAME_MARK}一次放空")
+    _resolve_door(engine, actor, TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.use_fire.1"].format(p1=energy, p2=NAME_MARK))
 
 
 ACTIVE_DISPATCH = {
@@ -535,6 +517,6 @@ register_status_definition(
         chip_css="info",
         source_id="ability:toggle_cover@STAR",
         auto_decay=False,
-        description="STAR把枪口对着门外，不是为了打中谁；是为了让外面知道这里有枪。",
+        description=TEXT["dlc.DLC_Character_STAR_V1.0.0.characters.STAR.module.12"],
     )
 )

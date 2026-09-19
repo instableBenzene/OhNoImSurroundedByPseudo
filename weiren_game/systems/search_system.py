@@ -17,6 +17,7 @@ from weiren_game.data import (
     QUALITY_WEIGHTS,
     SEARCH_REWARD_HOOKS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -197,19 +198,10 @@ class SearchSystemMixin:
         """
         base = self._search_carry(tenant)
         value = self._apply_modifiers(
-            "search", float(base), ("搜索", "携带", tenant.character_id),
+            "search", float(base), ("search", "carry", tenant.character_id),
             {"tenant": tenant},
         )
         return max(1, int(value))
-
-    @staticmethod
-    def _item_group_count(item_ids: Sequence[str]) -> int:
-        """按每种物资的堆叠上限，计算给定物资列表占用的携带组数。"""
-        counts = Counter(item_ids)
-        return sum(
-            math.ceil(amount / max(1, ITEMS[item_id].stack_size))
-            for item_id, amount in counts.items()
-        )
 
     def start_search(
         self,
@@ -219,9 +211,9 @@ class SearchSystemMixin:
         """校验条件后发起一次搜索：确定时长、成功率与随机序列，创建任务并派出房客。"""
         self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段发起搜索。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.1"])
         if self.state.round.searched_this_turn:
-            raise RuleViolation("每回合至多指派一名房客搜索。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.2"])
         tenant = self._require_home_tenant(tenant_id, must_act=True)
         from weiren_game.data import SCENARIO_HANDLERS
 
@@ -229,17 +221,17 @@ class SearchSystemMixin:
             self.state.pseudo_state.scenario_id, {}
         ).get("blocks_search_dispatch")
         if dispatch_blocker is not None and dispatch_blocker(self, tenant):
-            raise RuleViolation("搜索被伪人机制打断；本次搜索已取消。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.3"])
         if tenant.shock or tenant.search_locked_until >= self.state.flow.turn:
-            raise RuleViolation("该房客目前无法搜索。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.4"])
         trauma_blocks = tenant.trauma.intensity == 6 and self._condition_extra_effect_active(tenant, "trauma")
         disorder_blocks = tenant.disorder.intensity == 6 and self._condition_extra_effect_active(tenant, "disorder")
         if trauma_blocks or disorder_blocks:
-            raise RuleViolation("创伤或紊乱恰为6级时，其额外效果令房客无法搜索。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.5"])
         if location_id not in LOCATIONS:
-            raise RuleViolation("未知搜索地点。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.6"])
         if location_id not in self.state.world.locations.available_locations:
-            raise RuleViolation("该地点本局未开放。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.7"])
         location = LOCATIONS[location_id]
         all_loadout = self._tenant_item_ids(tenant)
         from weiren_game.data import ITEM_HOOKS
@@ -273,11 +265,11 @@ class SearchSystemMixin:
         turn_modifier = int(
             self._apply_modifiers(
                 "search", float(search_base_turns),
-                ("搜索", "回合", tenant.character_id), context,
+                ("search", "turn", tenant.character_id), context,
             )
         ) - initial_turns
         success_rate = self._apply_modifiers(
-            "chance", success_rate, ("搜索", "成功", tenant.character_id), context
+            "chance", success_rate, ("search", TEXT["systems.search_system.start_search.11"], tenant.character_id), context
         )
         for hook in NODE_HOOKS.get("search.parameters.reset", ()):
             initial_turns, turn_modifier = hook(
@@ -286,12 +278,12 @@ class SearchSystemMixin:
 
         occupied_groups = len(all_loadout)
         if occupied_groups > carry:
-            raise RuleViolation(f"携带栏不足：容量{carry}，背包已占{occupied_groups}格。")
+            raise RuleViolation(TEXT["systems.search_system.start_search.12"].format(p1=carry, p2=occupied_groups))
 
         fortune = int(
             self._apply_modifiers(
                 "search", float(fortune),
-                ("搜索", "时运", tenant.character_id), context,
+                ("search", "luck", tenant.character_id), context,
             )
         )
 
@@ -357,12 +349,10 @@ class SearchSystemMixin:
             tool=None, loadout=list(all_loadout),
         )
         self._log(
-            f"{self.character(tenant).name}前往{location.name}，搜索"
-            f"{mission.search_turns}回合、{mission.search_behavior_count}次行为。"
+            TEXT["systems.search_system.start_search.15"].format(p1=self.character(tenant).name, p2=location.name, p3=mission.search_turns, p4=mission.search_behavior_count)
         )
         self._log(
-            f"成功率{mission.search_success_rate:.0%}，"
-            f"容量{mission.carry_capacity}（携带物占{occupied_groups}组）。"
+            TEXT["systems.search_system.start_search.16"].format(p1=mission.search_success_rate, p2=mission.carry_capacity, p3=occupied_groups)
         )
 
     def _recalculate_search(self, mission: SearchMission) -> None:
@@ -395,25 +385,6 @@ class SearchSystemMixin:
             mission.actual_search_turns = max(1, mission.search_turns - saved)
         mission.remain_search_turns = max(0, mission.actual_search_turns - mission.elapsed_search_turns)
 
-    def apply_search_modifier(self, tenant_id: int, axis: str, value: float) -> None:
-        """对已派出任务施加回合/行为/成功率/容量等单轴修正并重新计算任务。"""
-        mission = next((m for m in self.state.world.missions if m.tenant_id == tenant_id), None)
-        if not mission:
-            raise RuleViolation("该房客当前没有搜索任务。")
-        if axis == "turns":
-            mission.search_turns = max(1, mission.search_turns + int(value))
-        elif axis == "behavior":
-            mission.search_behavior_count = max(0, mission.search_behavior_count + int(value))
-        elif axis == "success_rate":
-            mission.search_success_rate = resolve(
-                mission.search_success_rate + float(value)
-            )
-        elif axis == "capacity":
-            mission.carry_capacity = max(1, mission.carry_capacity + int(value))
-        else:
-            raise RuleViolation("搜索修饰轴必须是turns、behavior、success_rate或capacity。")
-        self._recalculate_search(mission)
-
     def _advance_searches_and_returns(self) -> None:
         """推进各搜索任务一个回合，对到期的任务执行返回结算并清出列表。"""
         remaining: list[SearchMission] = []
@@ -443,13 +414,13 @@ class SearchSystemMixin:
                 # A near-death survivor loses every carried item in the bag.
                 tenant.inventory.items.clear()
                 returned = True
-                self._log(f"{self.character(tenant).name}濒死归来，丢失全部携带物资。")
+                self._log(TEXT["systems.search_system._resolve_search_return.1"].format(p1=self.character(tenant).name))
             else:
                 self._observe_visit_information(
                     "search_return", tenant_id=tenant.id,
                     location_id=mission.location_id, returned=False,
                 )
-                self._kill_tenant(tenant, "在返程途中伤重不治")
+                self._kill_tenant(tenant, TEXT["systems.search_system._resolve_search_return.2"])
                 return
         else:
             tenant.at_home = True
@@ -465,25 +436,25 @@ class SearchSystemMixin:
                 for hook in node_hooks.values():
                     return_damage, avoid = hook(self, tenant, held, return_damage)
                     avoid_statuses = avoid_statuses or bool(avoid)
-            self._damage_health(tenant, return_damage, "搜索返程")
-            self._damage_sanity(tenant, 10, "搜索返程")
+            self._damage_health(tenant, return_damage, "search_return")
+            self._damage_sanity(tenant, 10, "search_return")
             avoidable_statuses = (tenant.trauma, tenant.disorder, *(tenant.condition(key) for key in EROSION_EMOTIONS))
             if avoid_statuses and any(condition.active for condition in avoidable_statuses):
                 mission.loot_context["ghillie_avoidance"] = 1.0
             if not avoid_statuses:
                 for condition in (tenant.trauma, tenant.disorder):
                     if condition.active:
-                        self._worsen_condition(tenant, condition, 1, "搜索返程")
-                        self._extend_condition(tenant, condition, 3, "搜索返程")
+                        self._worsen_condition(tenant, condition, 1, TEXT["systems.search_system._resolve_search_return.5"])
+                        self._extend_condition(tenant, condition, 3, TEXT["systems.search_system._resolve_search_return.6"])
                 for key in EROSION_EMOTIONS:
                     condition = tenant.condition(key)
                     if condition.active:
-                        self._worsen_condition(tenant, condition, 1, "搜索返程")
-                        self._extend_condition(tenant, condition, 3, "搜索返程")
+                        self._worsen_condition(tenant, condition, 1, TEXT["systems.search_system._resolve_search_return.7"])
+                        self._extend_condition(tenant, condition, 3, TEXT["systems.search_system._resolve_search_return.8"])
             for item_id in mission.rewards:
                 self._gain_loot_item(item_id, "search.gain", tenant.id)
-            reward_text = "、".join(ITEMS[item_id].name for item_id in mission.rewards) or "没有物资"
-            self._log(f"搜索返回：{self.character(tenant).name}从{LOCATIONS[mission.location_id].name}带回{reward_text}。")
+            reward_text = "、".join(ITEMS[item_id].name for item_id in mission.rewards) or TEXT["systems.search_system._resolve_search_return.9"]
+            self._log(TEXT["systems.search_system._resolve_search_return.10"].format(p1=self.character(tenant).name, p2=LOCATIONS[mission.location_id].name, p3=reward_text))
             for report in getattr(mission, "reports", ()):
                 self._log(report)
 
@@ -527,13 +498,13 @@ def _search_status_modifier(context: object):
     engine = context["engine"]; tenant = context["tenant"]  # type: ignore[index]
     penalties = (0, .10, .15, .20, .25, .30)
     if engine._condition_extra_effect_active(tenant, "trauma"):
-        yield spec("chance").path("搜索").flat(-penalties[min(5, tenant.trauma.intensity)])
+        yield spec("chance").path("search").flat(-penalties[min(5, tenant.trauma.intensity)])
     if engine._condition_extra_effect_active(tenant, "disorder"):
-        yield spec("chance").path("搜索").flat(-penalties[min(5, tenant.disorder.intensity)])
+        yield spec("chance").path("search").flat(-penalties[min(5, tenant.disorder.intensity)])
     if tenant.depression < 0:
-        yield spec("chance").path("搜索").flat(min(.20, max(.05, -tenant.depression * .0002)))
+        yield spec("chance").path("search").flat(min(.20, max(.05, -tenant.depression * .0002)))
     elif tenant.depression > 500:
-        yield spec("chance").path("搜索").flat(-min(.20, max(.05, tenant.depression * .0002)))
+        yield spec("chance").path("search").flat(-min(.20, max(.05, tenant.depression * .0002)))
 
 
 from weiren_game.modifier_rules import register_modifier_provider
@@ -546,14 +517,14 @@ def _difficulty_search_modifier(context: object):
     engine = context["engine"]  # type: ignore[index]
     diff = DIFFICULTIES[engine.state.meta.difficulty]
     if diff.get("search_turn_delta"):
-        yield spec("search").path("回合").flat(float(diff["search_turn_delta"])).source("难度")
+        yield spec("search").path("turn").flat(float(diff["search_turn_delta"])).source("difficulty")
     if diff.get("fortune_delta"):
-        yield spec("search").path("时运").flat(float(diff["fortune_delta"])).source("难度")
+        yield spec("search").path("luck").flat(float(diff["fortune_delta"])).source("difficulty")
     if diff.get("start_fortune_delta"):
         # 只在开局补给的调用点生效（source 含「开局」），不污染搜索时运。
         yield (
-            spec("search").path("开局").flat(float(diff["start_fortune_delta"]))
-            .source("难度", "开局")
+            spec("search").path("setup").flat(float(diff["start_fortune_delta"]))
+            .source("difficulty", "setup")
         )
 
 

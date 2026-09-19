@@ -4,18 +4,19 @@ from weiren_game.probability import resolve
 
 from ..types import I
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 ITEMS = {
-    "flashlight": I("flashlight", "手电筒", "tool", 2, "搜索成功率+10%；返回后25%消耗。", ("tool", "fragile"), fragile_chance=.25),
-    "compass": I("compass", "指南针", "tool", 2, "搜索回合数-1；返回后25%消耗。", ("tool", "fragile"), fragile_chance=.25),
-    "crowbar": I("crowbar", "撬棍", "tool", 3, "蓝色及以上掉率+25%；15%损坏；可25%抵御伪人技能。", ("tool", "fragile"), fragile_chance=.15),
-    "sports_shoes": I("sports_shoes", "运动鞋-雪晨2.5", "tool", 2, "搜索回合数-1；15%损坏；可20%抵御伪人技能。", ("tool", "shoes", "fragile"), fragile_chance=.15),
-    "chain_vest": I("chain_vest", "锁链防刺服", "tool", 2, "装备后生命伤害-3，触发消耗2耐久。", ("tool", "armor", "durability_consumable"), max_durability=50, use_cost=2),
-    "motocross_helmet": I("motocross_helmet", "越野摩托头盔", "tool", 3, "装备后受到≥5伤害时伤害-5，触发消耗5耐久。", ("tool", "armor", "durability_consumable"), max_durability=25, use_cost=5),
-    "polar_jacket": I("polar_jacket", "极地冲锋衣", "tool", 4, "装备后伤害-5；25%概率避免创伤/紊乱。", ("tool", "armor", "durability_consumable"), max_durability=125, use_cost=2),
-    "ghillie_suit": I("ghillie_suit", "吉利服", "tool", 4, "搜索遭遇率-75%，返程生命消耗-5，并避免返程状态恶化。", ("tool", "armor", "durability_consumable"), max_durability=100, use_cost=10),
-    "walkman": I("walkman", "随身听", "tool", 3, "装备者回合开始回复5理智并减轻侵蚀；回合末15%损坏。", ("tool", "entertainment", "fragile"), fragile_chance=.15),
-    "gramophone": I("gramophone", "典藏留声机", "tool", 5, "在屋主物品栏时，每回合开始全员回复1理智。", ("tool", "craft")),
+    "flashlight": I("flashlight", TEXT["item.flashlight.name"], "tool", 2, TEXT["item.flashlight.description"], ("tool", "fragile"), fragile_chance=.25),
+    "compass": I("compass", TEXT["item.compass.name"], "tool", 2, TEXT["item.compass.description"], ("tool", "fragile"), fragile_chance=.25),
+    "crowbar": I("crowbar", TEXT["item.crowbar.name"], "tool", 3, TEXT["item.crowbar.description"], ("tool", "fragile"), fragile_chance=.15),
+    "sports_shoes": I("sports_shoes", TEXT["item.sports_shoes.name"], "tool", 2, TEXT["item.sports_shoes.description"], ("tool", "shoes", "fragile"), fragile_chance=.15),
+    "chain_vest": I("chain_vest", TEXT["item.chain_vest.name"], "tool", 2, TEXT["item.chain_vest.description"], ("tool", "armor", "durability_consumable"), max_durability=50, use_cost=2),
+    "motocross_helmet": I("motocross_helmet", TEXT["item.motocross_helmet.name"], "tool", 3, TEXT["item.motocross_helmet.description"], ("tool", "armor", "durability_consumable"), max_durability=25, use_cost=5),
+    "polar_jacket": I("polar_jacket", TEXT["item.polar_jacket.name"], "tool", 4, TEXT["item.polar_jacket.description"], ("tool", "armor", "durability_consumable"), max_durability=125, use_cost=2),
+    "ghillie_suit": I("ghillie_suit", TEXT["item.ghillie_suit.name"], "tool", 4, TEXT["item.ghillie_suit.description"], ("tool", "armor", "durability_consumable"), max_durability=100, use_cost=10),
+    "walkman": I("walkman", TEXT["item.walkman.name"], "tool", 3, TEXT["item.walkman.description"], ("tool", "entertainment", "fragile"), fragile_chance=.15),
+    "gramophone": I("gramophone", TEXT["item.gramophone.name"], "tool", 5, TEXT["item.gramophone.description"], ("tool", "craft")),
 }
 
 
@@ -26,7 +27,7 @@ def _walkman_start_of_turn(
 
     使用处：round_effects 回合初背包实例节点（按 ITEM_HOOKS 扫描）。
     """
-    engine._restore_sanity(tenant, 5, "随身听")
+    engine._restore_sanity(tenant, 5, "walkman")
     engine._reduce_emotion_set(tenant, "erosion", 0, 1)
 
 
@@ -42,7 +43,7 @@ def _walkman_end_of_turn(
     chance = engine._fragile_chance(.15, tenant)
     if engine._rng(EVENT_IDS["walkman.break"], tenant.id).random() < chance:
         tenant.inventory.items.remove(held)
-        engine._log(f"{engine.character(tenant).name}的随身听损坏。")
+        engine._log(TEXT["data.items.tools_armor._walkman_end_of_turn.1"].format(p1=engine.character(tenant).name))
 
 
 ITEM_HOOKS = {
@@ -108,7 +109,7 @@ def armour_allows_status(engine: EngineProtocol, tenant: object, source: str) ->
     )
     engine._consume_held_durability(tenant, first_armour, 5)
     if avoided:
-        engine._log(f"极地冲锋衣帮助{engine.character(tenant).name}避免了{source}的状态。")
+        engine._log(TEXT["data.items.tools_armor.armour_allows_status.1"].format(p1=engine.character(tenant).name, p2=source))
     return avoided
 
 
@@ -128,14 +129,14 @@ def _walmart_bag_search_return(
     from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
     from weiren_game.probability import resolve
 
-    source = ("物品", "工具", "沃尔玛购物袋", "易损", "返程", tenant.character_id)
+    source = (TEXT["data.items.tools_armor._walmart_bag_search_return.1"], TEXT["data.items.tools_armor._walmart_bag_search_return.2"], TEXT["data.items.tools_armor._walmart_bag_search_return.3"], TEXT["data.items.tools_armor._walmart_bag_search_return.4"], TEXT["data.items.tools_armor._walmart_bag_search_return.5"], tenant.character_id)
     context = {"engine": engine, "tenant": tenant, "item": held}
     base = calculate_modified_amount(
         0.25, collect_modifiers("chance", source, context)
     )
     if engine._rng(EVENT_IDS["held.search.break"], held.item_id, tenant.id).random() < engine._fragile_chance(resolve(base), tenant):
         tenant.inventory.items.remove(held)
-        engine._log(f"{engine.character(tenant).name}的沃尔玛购物袋在返程时破损。")
+        engine._log(TEXT["data.items.tools_armor._walmart_bag_search_return.6"].format(p1=engine.character(tenant).name))
 
 
 def _walmart_bag_modifier(context: object):
@@ -147,8 +148,8 @@ def _walmart_bag_modifier(context: object):
         return
     yield (
         spec("chance").flat(-0.10).match("all")
-        .path("易损", "沃尔玛购物袋")
-        .source("物品", "工具", "沃尔玛购物袋")
+        .path("fragile", "walmart_bag")
+        .source("item", "tool", "walmart_bag")
     )
 
 
@@ -166,7 +167,7 @@ def _fragile_search_return(
     chance = engine._fragile_chance(item.fragile_chance, tenant)
     if engine._rng(EVENT_IDS["tool.return"], held.item_id, tenant.id).random() < chance:
         tenant.inventory.items.remove(held)
-        engine._log(f"携带的{item.name}在搜索中损坏。")
+        engine._log(TEXT["data.items.tools_armor._fragile_search_return.1"].format(p1=item.name))
 
 
 _return_fragile_tools = ("flashlight", "compass", "crowbar", "sports_shoes")
@@ -183,8 +184,8 @@ for _tool_id in _return_fragile_tools:
 def _gramophone_turn_start(engine: EngineProtocol) -> None:
     """典藏留声机：屋主物品栏持有期间，回合初全员回复 1 理智。"""
     for tenant in engine.home_tenants():
-        engine._restore_sanity(tenant, 1, "典藏留声机")
-    engine._log("典藏留声机的沙沙声让所有房客回复1理智。")
+        engine._restore_sanity(tenant, 1, "gramophone")
+    engine._log(TEXT["data.items.tools_armor._gramophone_turn_start.2"])
 
 
 def _smartphone_turn_start(engine: EngineProtocol) -> None:
@@ -192,7 +193,7 @@ def _smartphone_turn_start(engine: EngineProtocol) -> None:
     from weiren_game.data import EVENT_IDS
 
     if engine._rng(EVENT_IDS["smartphone.info"]).random() < .10:
-        engine._create_random_information(False, "智能手机")
+        engine._create_random_information(False, TEXT["data.items.tools_armor._smartphone_turn_start.1"])
 
 
 ITEM_HOOKS.update(
@@ -237,7 +238,7 @@ def _resist_crowbar(
     from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
 
     suffix = "" if occurrence == 0 else f".{occurrence}"
-    source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+    source = (TEXT["data.items.tools_armor._resist_crowbar.1"], TEXT["data.items.tools_armor._resist_crowbar.2"], TEXT["data.items.tools_armor._resist_crowbar.3"], TEXT["data.items.tools_armor._resist_crowbar.4"])
     ctx = {"engine": engine, "tenant": tenant, "item_id": "crowbar"}
     chance = calculate_modified_amount(
         0.0, collect_modifiers("chance", source, ctx)
@@ -267,7 +268,7 @@ def _resist_sports_shoes(
     from weiren_game.modifier_rules import calculate_modified_amount, collect_modifiers
 
     suffix = "" if occurrence == 0 else f".{occurrence}"
-    source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+    source = (TEXT["data.items.tools_armor._resist_sports_shoes.1"], TEXT["data.items.tools_armor._resist_sports_shoes.2"], TEXT["data.items.tools_armor._resist_sports_shoes.3"], TEXT["data.items.tools_armor._resist_sports_shoes.4"])
     ctx = {"engine": engine, "tenant": tenant, "item_id": "sports_shoes"}
     chance = calculate_modified_amount(
         0.0, collect_modifiers("chance", source, ctx)
@@ -354,8 +355,8 @@ def _ghillie_encounter_modifier(context: object):
     if not any(v.item_id == "ghillie_suit" for v in tenant.inventory.items):
         return
     yield (
-        spec("chance").path("遭遇").percent(-0.75)
-        .source("物品", "防具", "吉利服")
+        spec("chance").path("encounter").percent(-0.75)
+        .source("item", "armor", "ghillie_suit")
     )
 
 
@@ -371,7 +372,7 @@ def _crowbar_resist_modifier(context: object):
         return
     yield (
         spec("chance").flat(0.25).match("all")
-        .path("抵御", "伪人使用主动能力").source("物品", "工具", "撬棍")
+        .path("resist", "pseudo_active").source("item", "tool", "crowbar")
     )
 
 
@@ -383,7 +384,7 @@ def _shoes_resist_modifier(context: object):
         return
     yield (
         spec("chance").flat(0.20).match("all")
-        .path("抵御", "伪人使用主动能力").source("物品", "工具", "运动鞋")
+        .path("resist", "pseudo_active").source("item", "tool", "sports_shoes")
     )
 
 
@@ -398,7 +399,7 @@ def _compass_start_modifier(context: object):
     if tenant is None:
         return
     if any(v.item_id == "compass" for v in tenant.inventory.items):
-        yield spec("search").path("回合").flat(-1).source("物品", "工具", "指南针")
+        yield spec("search").path("turn").flat(-1).source("item", "tool", "compass")
 
 
 def _shoes_start_modifier(context: object):
@@ -407,14 +408,14 @@ def _shoes_start_modifier(context: object):
     if tenant is None:
         return
     if any(v.item_id == "sports_shoes" for v in tenant.inventory.items):
-        yield spec("search").path("回合").flat(-1).source("物品", "工具", "运动鞋")
+        yield spec("search").path("turn").flat(-1).source("item", "tool", "sports_shoes")
 
 
 def _flashlight_start_modifier(context: object):
     from weiren_game.modifier_rules import spec
     tenant = context["tenant"]  # type: ignore[index]
     if any(v.item_id == "flashlight" for v in tenant.inventory.items):
-        yield spec("chance").path("搜索").flat(0.10).source("物品", "工具", "手电筒")
+        yield spec("chance").path("search").flat(0.10).source("item", "tool", "flashlight")
 
 
 def _walmart_carry_modifier(context: object):
@@ -423,7 +424,7 @@ def _walmart_carry_modifier(context: object):
     if tenant is None:
         return
     if any(v.item_id == "walmart_bag" for v in tenant.inventory.items):
-        yield spec("search").path("携带").flat(5).source("物品", "工具", "沃尔玛购物袋")
+        yield spec("search").path("carry").flat(5).source("item", "tool", "walmart_bag")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _reg3

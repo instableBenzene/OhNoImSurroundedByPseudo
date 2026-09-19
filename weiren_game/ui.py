@@ -5,6 +5,7 @@
 """
 
 from __future__ import annotations
+from weiren_game.data.lang import TEXT
 
 
 def _pairs(options):
@@ -33,10 +34,6 @@ class UserInterface:
         """是/否确认。"""
         raise NotImplementedError
 
-    def ask_int(self, prompt: str, *, minimum: int = 0, maximum: int = 999, default: int = 1) -> int:
-        """询问一个整数。"""
-        raise NotImplementedError
-
     def choose_target(self, engine, exclude=None):
         """选择一名屋内房客，返回实例 id；无目标返回 None。"""
         ids = [t.id for t in engine.home_tenants() if t.id != exclude]
@@ -45,7 +42,7 @@ class UserInterface:
         options = [
             (i, f"{i} {engine.character(engine.state.house.tenants[i]).name}") for i in ids
         ]
-        return self.choose("选择目标 > ", options)
+        return self.choose(TEXT["ui.choose_target.1"], options)
 
 
 class CliUI(UserInterface):
@@ -67,13 +64,8 @@ class CliUI(UserInterface):
                     return value
             if raw.isdigit() and 1 <= int(raw) <= len(pairs):
                 return pairs[int(raw) - 1][0]
-            print("请输入列表中的编号。")
+            print(TEXT["ui.choose.1"])
 
     def confirm(self, prompt: str) -> bool:
-        return input(prompt).strip().lower() in {"1", "y", "yes", "是", "好"}
+        return input(prompt).strip().lower() in {"1", "y", "yes", TEXT["ui.confirm.1"], TEXT["ui.confirm.2"]}
 
-    def ask_int(self, prompt: str, *, minimum: int = 0, maximum: int = 999, default: int = 1) -> int:
-        raw = input(prompt).strip()
-        if raw.isdigit():
-            return max(minimum, min(maximum, int(raw)))
-        return default

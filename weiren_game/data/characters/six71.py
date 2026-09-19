@@ -5,15 +5,16 @@
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "six71", 8, "柳七鱼", "不擅长与人相处、喜欢独处的男大学生。",
-    "suspicious", "loner", 3, ("大学生", "18-24岁", "男性"),
-    (A("suspension_bridge", "吊桥效应", "当屋内人数＞4人时，柳七鱼回合末理智消耗+30%。"),),
-    (A("cannot_stand", "不行，我要受不了了", "驱逐 1 名房客，立即获得 **10 份**随机物资，并按目标已损失生命获得时运修正：基础 **+5**，目标每损失 **10 点**生命 **−1**，最低 **−5**。\n*柳七鱼不会因自己驱逐房客受到理智惩罚。*", "other_tenant",
+    "six71", 8, TEXT["character.six71.name"], TEXT["character.six71.description"],
+    "suspicious", "loner", 3, (TEXT["character.six71.tag.0"], TEXT["character.six71.tag.1"], TEXT["character.six71.tag.2"]),
+    (A("suspension_bridge", TEXT["ability.suspension_bridge.name"], TEXT["ability.suspension_bridge.description"]),),
+    (A("cannot_stand", TEXT["ability.cannot_stand.name"], TEXT["ability.cannot_stand.description"], "other_tenant",
        # 不可撤销：选定目标后先确认一次（文案与危险色都由内容声明，前端只渲染）。
-       confirm="驱逐不可撤销：他会离屋、不再来访，其余房客理智 −5。确定吗？",
+       confirm=TEXT["ability.cannot_stand.confirm"],
        danger=True),),
 )
 
@@ -42,12 +43,12 @@ def use_cannot_stand(engine: EngineProtocol, actor: object, target_id: str | Non
 
     target = engine._require_home_tenant(target_id)
     if target.id == actor.id:
-        raise RuleViolation("柳七鱼不能驱逐自己。")
+        raise RuleViolation(TEXT["data.characters.six71.use_cannot_stand.1"])
     # 目标损失生命越多，时运越低（基础 +5，每损失 10 点 -1，最低 -5）。
     lost = max(0, int(target.max_health) - int(target.health))
     fortune = max(-5, 5 - lost // 10)
     occupants_before = len(engine.home_tenants())
-    engine._expel_tenant(target, "柳七鱼", sanity_exempt_ids={actor.id})
+    engine._expel_tenant(target, TEXT["data.characters.six71.use_cannot_stand.2"], sanity_exempt_ids={actor.id})
     rewards = 10
     gained = []
     for index in range(rewards):
@@ -57,7 +58,7 @@ def use_cannot_stand(engine: EngineProtocol, actor: object, target_id: str | Non
         gained.append(item_id)
         engine._gain_item(item_id)
     engine._log(
-        f"柳七鱼找出物资（时运{fortune:+d}）：" + "、".join(ITEMS[key].name for key in gained) + "。"
+        TEXT["data.characters.six71.use_cannot_stand.3"].format(p1=fortune) + "、".join(ITEMS[key].name for key in gained) + "。"
     )
 
 
@@ -85,7 +86,7 @@ def cannot_stand_targets(engine: EngineProtocol, actor: object) -> list:
         rows.append({
             "value": tenant.id,
             "label": engine.character(tenant).name,
-            "desc": f"驱逐他：得 10 份物资，时运 {fortune:+d}（已损失 {int(lost)} 生命）",
+            "desc": TEXT["data.characters.six71.cannot_stand_targets.1"].format(p1=fortune, p2=int(lost)),
         })
     return rows
 
@@ -114,7 +115,7 @@ def _six71_sanity_modifier(context: object):
         return
     mult = crowd_sanity_multiplier(engine, tenant)
     if mult != 1.0:
-        yield spec("sanityConsume").path("回合末消耗").mul(mult).source("角色技能", "陆柒壹", "喧嚣")
+        yield spec("sanityConsume").path("turn_end_consume").mul(mult).source("ability", "six71", "hustle")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _reg6

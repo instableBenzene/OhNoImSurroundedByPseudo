@@ -8,16 +8,17 @@ from dataclasses import dataclass
 
 from ..types import PseudoDefinition
 from weiren_game.lifecycle import AbilityLaunch
+from weiren_game.data.lang import TEXT
 
 DEFINITION = PseudoDefinition(
     "pseudo_benzene",
-    "无眠怪医-苯环",
+    TEXT["pseudo.pseudo_benzene.name"],
     "benzene",
-    "染血白大褂、面目模糊，手术刀反射冷光。",
-    "来访时两次来访间死亡数+屋内休克数＞min(5, 9−来访次数)。",
-    "连续5次诅咒结算无人休克，或连续7次结算无人死亡。",
+    TEXT["pseudo.pseudo_benzene.description"],
+    TEXT["pseudo.pseudo_benzene.breakthrough"],
+    TEXT["pseudo.pseudo_benzene.liberation"],
     mark_field="fear_marks",
-    mark_label="恐惧印记-苯环",
+    mark_label=TEXT["pseudo.pseudo_benzene.mark_label"],
 )
 
 
@@ -100,18 +101,16 @@ def visit(engine: object) -> None:
     score = interval_deaths + shocked
     pseudo.deaths_since_last_visit = 0
     engine._log(
-        f"夜间查房：两次来访间死亡{interval_deaths}，"
-        f"当前休克{shocked}，阈值{threshold:g}。"
+        TEXT["data.pseudos.pseudo_benzene.visit.1"].format(p1=interval_deaths, p2=shocked, p3=threshold)
     )
     if score > threshold:
         engine._attempt_breakthrough(
-            "苯环在两次来访之间积累了足够的死亡与休克，强行突破。"
+            TEXT["data.pseudos.pseudo_benzene.visit.2"]
         )
         return
     if not maybe_curse(engine):
         engine._log(
-            f"恐惧印记{pseudo.fear_marks}/{curse_threshold_value(engine)}，"
-            f"苯环没有发动诅咒。"
+            TEXT["data.pseudos.pseudo_benzene.visit.3"].format(p1=pseudo.fear_marks, p2=curse_threshold_value(engine))
         )
 
 
@@ -127,9 +126,9 @@ def cast_curse(engine: object) -> None:
     pseudo.fear_marks = 0
     pseudo.curse_count += 1
     engine._observe_pseudo_skill("curse")
-    engine._log(f"苯环发动「希波克拉底诅咒」，消耗{spent}层恐惧印记。")
+    engine._log(TEXT["data.pseudos.pseudo_benzene.cast_curse.1"].format(p1=spent))
     blocked = engine._skill_respond_skill(
-        "希波克拉底诅咒", "cast",
+        TEXT["data.pseudos.pseudo_benzene.cast_curse.2"], "cast",
         mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
     )
     resistant_ids: set[str] = set()
@@ -138,13 +137,13 @@ def cast_curse(engine: object) -> None:
     if not blocked:
         for tenant in list(engine.home_tenants()):
             if engine._skill_respond_skill(
-                "希波克拉底诅咒", "lock",
+                TEXT["data.pseudos.pseudo_benzene.cast_curse.3"], "lock",
                 mode=AbilityLaunch.PSEUDO_HUMAN, caster=engine.state.pseudo_state,
                 target=tenant, event="benzene.curse",
             ):
                 resistant_ids.add(tenant.id)
                 continue
-            engine._damage_health(tenant, 15, "希波克拉底诅咒")
+            engine._damage_health(tenant, 15, "hippocratic_curse")
         repeats = max(0, 10 - spent) * len(engine.home_tenants())
         for index in range(repeats):
             targets = [
@@ -171,7 +170,7 @@ def cast_curse(engine: object) -> None:
                 condition.layers = min(99, condition.layers + 1)
                 if condition.intensity == 0:
                     condition.intensity = 1
-    engine._collect_flush(title="希波克拉底诅咒")
+    engine._collect_flush(title=TEXT["data.pseudos.pseudo_benzene.cast_curse.5"])
     home = engine.home_tenants()
     if any(value.shock for value in home):
         pseudo.safe_no_shock_streak = 0
@@ -183,24 +182,23 @@ def cast_curse(engine: object) -> None:
         pseudo.safe_no_death_streak += 1
     pseudo.death_since_last_curse = False
     engine._log(
-        f"「早交班」进度：连续无休克{pseudo.safe_no_shock_streak}/5，"
-        f"连续无死亡{pseudo.safe_no_death_streak}/7。"
+        TEXT["data.pseudos.pseudo_benzene.cast_curse.6"].format(p1=pseudo.safe_no_shock_streak, p2=pseudo.safe_no_death_streak)
     )
     if pseudo.safe_no_shock_streak >= 5 or pseudo.safe_no_death_streak >= 7:
         pseudo.liberated = True
         engine._finish(
             True,
-            "连续的安全诅咒让苯环停下手术刀；早交班的钟声响起。",
+            TEXT["data.pseudos.pseudo_benzene.cast_curse.7"],
         )
 
 
 def attack_searcher(engine: object, mission: object, tenant: object) -> None:
     """搜索袭击：苯环「精湛刀艺」（创伤+2/+2 与 15 生命伤害）。"""
     engine._observe_pseudo_skill("precision")
-    engine._worsen_condition(tenant, tenant.trauma, 2, "精湛刀艺")
-    engine._extend_condition(tenant, tenant.trauma, 2, "精湛刀艺")
-    engine._damage_health(tenant, 15, "精湛刀艺")
-    engine.defer_search_report(mission, f"伪人袭击：{engine.character(tenant).name}在外遭到苯环袭击。")
+    engine._worsen_condition(tenant, tenant.trauma, 2, TEXT["data.pseudos.pseudo_benzene.attack_searcher.1"])
+    engine._extend_condition(tenant, tenant.trauma, 2, TEXT["data.pseudos.pseudo_benzene.attack_searcher.2"])
+    engine._damage_health(tenant, 15, "master_blade")
+    engine.defer_search_report(mission, TEXT["data.pseudos.pseudo_benzene.attack_searcher.4"].format(p1=engine.character(tenant).name))
 
 
 # 场景处理器注册表（供伪人协调器查表调用）。
@@ -235,15 +233,14 @@ def encounter_chance(engine: object, mission: object, tenant: object) -> float:
 
 def observed_skills(engine: object) -> tuple[str, ...]:
     """苯环场景对外可见的技能（id, 展示名），供信息文本与核验使用。"""
-    return (("curse", "希波克拉底诅咒"), ("precision", "精湛刀艺"))
+    return (("curse", TEXT["data.pseudos.pseudo_benzene.observed_skills.1"]), ("precision", TEXT["data.pseudos.pseudo_benzene.observed_skills.2"]))
 
 
 def progress_text(engine: object) -> str:
     """苯环场景的进度摘要文本。"""
     pseudo = engine.state.pseudo_state
     return (
-        f"恐惧{pseudo.fear_marks}，无休克{pseudo.safe_no_shock_streak}/5，"
-        f"无死亡{pseudo.safe_no_death_streak}/7"
+        TEXT["data.pseudos.pseudo_benzene.progress_text.1"].format(p1=pseudo.fear_marks, p2=pseudo.safe_no_shock_streak, p3=pseudo.safe_no_death_streak)
     )
 
 
@@ -257,14 +254,14 @@ def card_info(engine: object) -> dict:
     shock = sum(1 for t in engine.home_tenants() if getattr(t, "shock", 0))
     need = max(0, min(5, 9 - visits))
     return {
-        "liberation": f"早交班：连续无休克 {getattr(ps,'safe_no_shock_streak',0)}/5 · 连续无死亡 {getattr(ps,'safe_no_death_streak',0)}/7",
-        "breakthrough": f"夜间查房：死亡+休克 {getattr(ps,'deaths_since_last_visit',0)+shock}/{need}（已到访 {visits} 次）",
+        "liberation": TEXT["data.pseudos.pseudo_benzene.card_info.1"].format(p1=getattr(ps,'safe_no_shock_streak',0), p2=getattr(ps,'safe_no_death_streak',0)),
+        "breakthrough": TEXT["data.pseudos.pseudo_benzene.card_info.2"].format(p1=getattr(ps,'deaths_since_last_visit',0)+shock, p2=need, p3=visits),
         "mark_need": int(threshold),
         "skills": [
-            {"name": "希波克拉底诅咒", "text": "消耗恐惧印记：对屋内造成 15 点生命伤害，并按印记追加创伤/紊乱。",
-             "mark": {"label": "恐惧印记", "current": int(getattr(ps, "fear_marks", 0)), "need": int(threshold)}},
-            {"name": "精湛刀艺", "text": "搜索袭击：目标创伤 +2/+2，并造成 15 点生命伤害。"},
-            {"name": "死亡恐惧", "text": "初访后，生命 ≤50 的房客回合末理智消耗 +2（≤25 则 +5）。"},
+            {"name": TEXT["data.pseudos.pseudo_benzene.card_info.3"], "text": TEXT["data.pseudos.pseudo_benzene.card_info.4"],
+             "mark": {"label": TEXT["data.pseudos.pseudo_benzene.card_info.5"], "current": int(getattr(ps, "fear_marks", 0)), "need": int(threshold)}},
+            {"name": TEXT["data.pseudos.pseudo_benzene.card_info.6"], "text": TEXT["data.pseudos.pseudo_benzene.card_info.7"]},
+            {"name": TEXT["data.pseudos.pseudo_benzene.card_info.8"], "text": TEXT["data.pseudos.pseudo_benzene.card_info.9"]},
         ],
     }
 

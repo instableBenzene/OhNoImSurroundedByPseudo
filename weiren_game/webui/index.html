@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>SVC · 完蛋，我被伪人包围了！？ · 界面设计稿</title>
+<title data-t="ui.markup.1"></title>
 <style>
   :root{
     /* 默认材质（兜底）：值取自 base 资源包 data/resourcepack/theme.py；
@@ -1111,7 +1111,7 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 <body>
 
 <div class="toast-wrap" id="toastWrap"></div>
-<button id="pendingBtn" class="peek-toggle" style="display:none" onclick="togglePending()">待处理 ▸</button>
+<button id="pendingBtn" class="peek-toggle" style="display:none" onclick="togglePending()" data-t="ui.markup.2"></button>
 
 <svg class="defs" aria-hidden="true">
   <linearGradient id="prismGrad" x1="0" y1="0" x2="1" y2="1">
@@ -1123,20 +1123,20 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 
 <header class="topbar">
   <nav class="top-actions">
-    <button id="menuBtn" onclick="openPause()">菜单 ESC</button>
-    <button onclick="doSave()">保存</button>
-    <button onclick="doRewind()">回溯</button>
+    <button id="menuBtn" onclick="openPause()" data-t="ui.markup.3"></button>
+    <button onclick="doSave()" data-t="ui.markup.4"></button>
+    <button onclick="doRewind()" data-t="ui.markup.5"></button>
   </nav>
   <div class="hud-stats">
-    <div class="stat"><span class="k">回合</span><span class="v" id="hudTurn">0 / 32</span></div>
-    <div class="stat" style="cursor:help" onmouseover="showDiffTip(this)" onmouseout="hideTip()"><span class="k">难度</span><span class="v" id="hudDiff">-</span></div>
-    <div class="stat"><span class="k">种子</span><span class="v" id="hudSeed">-</span></div>
-    <div class="stat"><span class="k">屋内</span><span class="v" id="hudHome">0</span></div>
-    <div class="stat"><span class="k">门口</span><span class="v" id="hudDoor" style="color:var(--warn)">0</span></div>
+    <div class="stat"><span class="k" data-t="ui.markup.6"></span><span class="v" id="hudTurn">0 / 32</span></div>
+    <div class="stat" style="cursor:help" onmouseover="showDiffTip(this)" onmouseout="hideTip()"><span class="k" data-t="ui.markup.7"></span><span class="v" id="hudDiff">-</span></div>
+    <div class="stat"><span class="k" data-t="ui.markup.8"></span><span class="v" id="hudSeed">-</span></div>
+    <div class="stat"><span class="k" data-t="ui.markup.9"></span><span class="v" id="hudHome">0</span></div>
+    <div class="stat"><span class="k" data-t="ui.markup.10"></span><span class="v" id="hudDoor" style="color:var(--warn)">0</span></div>
   </div>
   <div class="brand-block">
     <div class="eyebrow">SHELTER STATUS</div>
-    <div class="compact-hud" id="hudLine">尚未开始</div>
+    <div class="compact-hud" id="hudLine" data-t="ui.markup.11"></div>
   </div>
 </header>
 
@@ -1144,72 +1144,72 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   <div class="dusk-bg" aria-hidden="true"></div>
   <section class="lpane on" id="lpaneMain">
     <div class="lpane-inner">
-      <p class="mc-eyebrow">Local Shelter · Night Watch</p>
+      <p class="mc-eyebrow" data-t="ui.launcher.eyebrow"></p>
       <!-- 标题块：「大标题 + 副标题」当**一整块**，高度固定（随机排版不会推动下方按钮）；
            资源包的 title 素材也是替换整块。 -->
       <div class="title-block" id="titleBlock">
-        <h1 class="mc-title" aria-label="完蛋，我被伪人包围了？！">
+        <h1 class="mc-title" data-t-aria="ui.launcher.title">
           <span class="title-cn"></span>
           <span class="title-bangs"><b class="bang-q">？</b><b class="bang-e">！</b></span>
         </h1>
         <p class="mc-sub-en" id="titleEn"></p>
       </div>
       <div class="mc-rule"></div>
-      <p class="mc-sub">黄昏将尽，夜色未深 —— 小镇的每一扇窗后，<br>都藏着一个<span class="hl">不该被看见的秘密</span>。</p>
+      <p class="mc-sub" data-t-html="ui.launcher.sub"></p>
       <div class="mc-menu">
-        <button class="mc-btn wide" onclick="lpane('saves')">开始游戏</button>
-        <button class="mc-btn wide" onclick="lpane('settings')">设置</button>
-        <button class="mc-btn wide" onclick="quitGame()">退出游戏</button>
-        <button class="mc-btn wide p" id="resumeBtn" style="display:none" onclick="resumeGame()">返回对局</button>
+        <button class="mc-btn wide" onclick="lpane('saves')" data-t="ui.launcher.start"></button>
+        <button class="mc-btn wide" onclick="lpane('settings')" data-t="ui.launcher.settings"></button>
+        <button class="mc-btn wide" onclick="quitGame()" data-t="ui.launcher.quit"></button>
+        <button class="mc-btn wide p" id="resumeBtn" style="display:none" onclick="resumeGame()" data-t="ui.launcher.resume"></button>
       </div>
-      <p class="mc-foot">本地界面 · 纯标准库 · 版本 2.1.0</p>
+      <p class="mc-foot" data-t="ui.launcher.foot"></p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneSaves">
     <div class="lpane-inner tall" style="max-width:1080px">
-      <h2 class="mc-h2">选择存档</h2>
-      <div class="mc-panel"><div class="save-list" id="saveList">加载中…</div></div>
+      <h2 class="mc-h2" data-t="ui.markup.12"></h2>
+      <div class="mc-panel"><div class="save-list" id="saveList" data-t="ui.markup.13"></div></div>
       <div class="mc-row">
-        <button class="mc-btn" onclick="openCreate()">创建新对局</button>
-        <button class="mc-btn" onclick="loadSelected()">载入所选</button>
-        <button class="mc-btn" onclick="exportSelected()">导出所选流程</button>
-        <button class="mc-btn" onclick="deleteSelected()">删除所选</button>
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn" onclick="openCreate()" data-t="ui.markup.14"></button>
+        <button class="mc-btn" onclick="loadSelected()" data-t="ui.markup.15"></button>
+        <button class="mc-btn" onclick="exportSelected()" data-t="ui.markup.16"></button>
+        <button class="mc-btn" onclick="deleteSelected()" data-t="ui.markup.17"></button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.18"></button>
       </div>
     </div>
   </section>
 
   <section class="lpane" id="lpaneSettings">
     <div class="lpane-inner">
-      <h2 class="mc-h2">设置</h2>
+      <h2 class="mc-h2" data-t="ui.markup.19"></h2>
       <div class="set-menu">
-        <button class="mc-btn wide" onclick="lpane('display')">显示设置</button>
-        <button class="mc-btn wide" onclick="lpane('difficulty')">难度</button>
-        <button class="mc-btn wide" onclick="lpane('codex')">图鉴</button>
-        <button class="mc-btn wide" onclick="lpane('dlc')">资料包</button>
-        <button class="mc-btn wide" onclick="lpane('resourcepack')">资源包</button>
+        <button class="mc-btn wide" onclick="lpane('display')" data-t="ui.markup.20"></button>
+        <button class="mc-btn wide" onclick="lpane('difficulty')" data-t="ui.markup.21"></button>
+        <button class="mc-btn wide" onclick="lpane('codex')" data-t="ui.markup.22"></button>
+        <button class="mc-btn wide" onclick="lpane('dlc')" data-t="ui.markup.23"></button>
+        <button class="mc-btn wide" onclick="lpane('resourcepack')" data-t="ui.markup.24"></button>
       </div>
       <div class="mc-row" style="margin-top:22px">
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.25"></button>
       </div>
     </div>
   </section>
 
   <section class="lpane" id="lpaneDifficulty">
     <div class="lpane-inner">
-      <h2 class="mc-h2">设置 · 难度</h2>
+      <h2 class="mc-h2" data-t="ui.markup.26"></h2>
       <div class="mc-panel"><div class="diff-list" id="diffList"></div></div>
       <div class="mc-panel" style="margin-top:10px">
         <div class="mc-row" style="margin-top:0">
-          <label class="mc-field">日出回合<input id="setTurns" type="number" min="12" value="32" style="width:96px"></label>
-          <label class="mc-field">伪人<select id="setPseudo"></select></label>
+          <label class="mc-field"><span data-t="ui.markup.99"></span><input id="setTurns" type="number" min="12" value="32" style="width:96px"></label>
+          <label class="mc-field"><span data-t="ui.markup.100"></span><select id="setPseudo"></select></label>
         </div>
       </div>
       <div class="mc-row">
-        <button class="mc-btn p" onclick="saveSettings()">保存设置</button>
-        <button class="mc-btn" onclick="lpane('settings')">返回设置</button>
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn p" onclick="saveSettings()" data-t="ui.markup.27"></button>
+        <button class="mc-btn" onclick="lpane('settings')" data-t="ui.markup.28"></button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.29"></button>
       </div>
       <p class="lc-hint" id="setHint"></p>
     </div>
@@ -1217,76 +1217,76 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 
   <section class="lpane" id="lpaneDisplay">
     <div class="lpane-inner">
-      <h2 class="mc-h2">显示设置</h2>
+      <h2 class="mc-h2" data-t="ui.markup.30"></h2>
       <div class="mc-panel">
         <div class="disp-row" onclick="toggleDisplay()">
-          <span>房客卡详情页面显示完整技能</span>
-          <span class="disp-val" id="dispFullSkills">是</span>
+          <span data-t="ui.markup.31"></span>
+          <span class="disp-val" id="dispFullSkills" data-t="ui.markup.32"></span>
         </div>
       </div>
       <div class="mc-row">
-        <button class="mc-btn" onclick="lpane('settings')">返回设置</button>
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn" onclick="lpane('settings')" data-t="ui.markup.33"></button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.34"></button>
       </div>
-      <p class="lc-hint" id="dispHint">关：技能只显示一行（名称 + 标记），悬浮 1 秒查看完整效果。</p>
+      <p class="lc-hint" id="dispHint" data-t="ui.markup.35"></p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneDlc">
     <div class="lpane-inner tall" style="max-width:1180px">
-      <h2 class="mc-h2">资料包</h2>
+      <h2 class="mc-h2" data-t="ui.markup.36"></h2>
       <div class="dlc-cols">
-        <div class="dlc-col"><h3>可用内容包</h3><div class="dlc-list" id="dlcLeft"></div></div>
+        <div class="dlc-col"><h3 data-t="ui.markup.37"></h3><div class="dlc-list" id="dlcLeft"></div></div>
         <div class="dlc-mid"><button class="mc-btn" onclick="dlcMove('right')">&#9654;</button><button class="mc-btn" onclick="dlcMove('left')">&#9664;</button></div>
         <div class="dlc-col">
-          <h3>已启用（上 = 优先级高）</h3>
+          <h3 data-t="ui.markup.38"></h3>
           <div class="dlc-list" id="dlcRight"></div>
         </div>
       </div>
       <div class="mc-row">
-        <button class="mc-btn p" onclick="applyDlc()">应用</button>
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn p" onclick="applyDlc()" data-t="ui.markup.39"></button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.40"></button>
       </div>
-      <p class="lc-hint" id="dlcHint">左→右＝启用，右→左＝卸载（**双击**任意一行即可快速切换，快捷键）；在右侧点选一行后，行尾出现 ▲▼ 调优先级：越靠上越优先，同 id 内容由高位包覆盖。把包移到 base 之上即可替换内置内容（例如替换某位房客）。</p>
+      <p class="lc-hint" id="dlcHint" data-t="ui.markup.41"></p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneResourcepack">
     <div class="lpane-inner tall" style="max-width:1180px">
-      <h2 class="mc-h2">资源包</h2>
+      <h2 class="mc-h2" data-t="ui.markup.42"></h2>
       <div class="dlc-cols">
-        <div class="dlc-col"><h3>可用资源包</h3><div class="dlc-list" id="rpLeft"></div></div>
+        <div class="dlc-col"><h3 data-t="ui.markup.43"></h3><div class="dlc-list" id="rpLeft"></div></div>
         <div class="dlc-mid"><button class="mc-btn" onclick="rpMove('right')">&#9654;</button><button class="mc-btn" onclick="rpMove('left')">&#9664;</button></div>
         <div class="dlc-col">
-          <h3>已启用（上 = 优先级高）</h3>
+          <h3 data-t="ui.markup.44"></h3>
           <div class="dlc-list" id="rpRight"></div>
         </div>
       </div>
       <div class="mc-row">
-        <button class="mc-btn p" onclick="applyResourcepacks()">应用</button>
-        <button class="mc-btn" onclick="lpane('settings')">返回设置</button>
-        <button class="mc-btn" onclick="lpane('main')">回到主页面</button>
+        <button class="mc-btn p" onclick="applyResourcepacks()" data-t="ui.markup.45"></button>
+        <button class="mc-btn" onclick="lpane('settings')" data-t="ui.markup.46"></button>
+        <button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.47"></button>
       </div>
-      <p class="lc-hint" id="rpHint">资源包只改外观（配色 / 字体 / 贴图 / 头像零件 / 物品图标 / 封面背景与大标题）；**双击**任意一行可在"可用 / 已启用"之间快速切换；点选已启用的一行后，行尾出现 ▲▼ 调位次。越靠上越优先，低者被高者覆盖。`base` 就是内置材质本身，恒在清单里、不可卸载，但**位次可调**：排在 base 下方的资源包改不动内置材质。资源包总在资料包之后套用，所以能盖过资料包自带的外观。</p>
+      <p class="lc-hint" id="rpHint" data-t="ui.markup.48"></p>
       <p class="lc-hint dim mono" id="rpPath" style="font-size:11px"></p>
     </div>
   </section>
 
   <section class="lpane" id="lpaneCreate">
     <div class="lpane-inner tall" style="max-width:780px">
-      <h2 class="mc-h2">创建新对局</h2>
+      <h2 class="mc-h2" data-t="ui.markup.49"></h2>
       <div class="mc-panel">
-        <label class="mc-field">存档名称<input id="cName" maxlength="40" placeholder="例如：第一次尝试"></label>
-        <label class="mc-field">难度<select id="cDiff"></select></label>
-        <label class="mc-field">种子（留空则随机）<input id="cSeed" maxlength="48" placeholder="可填入任意文字，用来复现同一局"></label>
+        <label class="mc-field"><span data-t="ui.markup.101"></span><input id="cName" maxlength="40" placeholder="" data-t-ph="ui.markup.65"></label>
+        <label class="mc-field"><span data-t="ui.markup.102"></span><select id="cDiff"></select></label>
+        <label class="mc-field"><span data-t="ui.markup.103"></span><input id="cSeed" maxlength="48" placeholder="" data-t-ph="ui.markup.66"></label>
         <div class="mc-row" style="margin-top:6px">
-          <label class="mc-field">日出回合<input id="cTurns" type="number" min="12" value="32" style="width:110px"></label>
-          <label class="mc-field">伪人<select id="cPseudo"></select></label>
-          <label class="mc-field">地图<select id="cMap"></select></label>
+          <label class="mc-field"><span data-t="ui.markup.99"></span><input id="cTurns" type="number" min="12" value="32" style="width:110px"></label>
+          <label class="mc-field"><span data-t="ui.markup.100"></span><select id="cPseudo"></select></label>
+          <label class="mc-field"><span data-t="ui.markup.104"></span><select id="cMap"></select></label>
         </div>
         <div class="mc-row">
-          <button class="mc-btn p" onclick="confirmCreate()">创建并开始</button>
-          <button class="mc-btn" onclick="lpane('saves')">返回存档</button>
+          <button class="mc-btn p" onclick="confirmCreate()" data-t="ui.markup.50"></button>
+          <button class="mc-btn" onclick="lpane('saves')" data-t="ui.markup.51"></button>
         </div>
         <p class="lc-hint" id="cHint"></p>
       </div>
@@ -1295,18 +1295,18 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 
   <section class="lpane" id="lpaneCodex">
     <div class="lpane-inner" style="max-width:1240px">
-      <h2 class="mc-h2">图鉴 · 内容总览</h2>
+      <h2 class="mc-h2" data-t="ui.markup.52"></h2>
       <p class="lc-hint" id="codexStats" style="margin:0 0 12px"></p>
       <div class="mc-panel" style="padding:0">
         <div class="codex-tabs" id="codexTabs">
-          <button class="mc-btn act" data-tab="characters" onclick="codexTab('characters',this)">房客</button>
-          <button class="mc-btn" data-tab="items" onclick="codexTab('items',this)">物资</button>
-          <button class="mc-btn" data-tab="locations" onclick="codexTab('locations',this)">地点</button>
-          <button class="mc-btn" data-tab="information" onclick="codexTab('information',this)">信息</button>
-          <button class="mc-btn" data-tab="pseudos" onclick="codexTab('pseudos',this)">伪人</button>
-          <button class="mc-btn" data-tab="personalities" onclick="codexTab('personalities',this)">羁绊</button>
-          <button class="mc-btn" data-tab="mechanics" onclick="codexTab('mechanics',this)">机制</button>
-          <input id="codexFilter" class="codex-search" placeholder="搜索…" oninput="codexFilter(this.value)">
+          <button class="mc-btn act" data-tab="characters" onclick="codexTab('characters',this)" data-t="ui.markup.53"></button>
+          <button class="mc-btn" data-tab="items" onclick="codexTab('items',this)" data-t="ui.markup.54"></button>
+          <button class="mc-btn" data-tab="locations" onclick="codexTab('locations',this)" data-t="ui.markup.55"></button>
+          <button class="mc-btn" data-tab="information" onclick="codexTab('information',this)" data-t="ui.markup.56"></button>
+          <button class="mc-btn" data-tab="pseudos" onclick="codexTab('pseudos',this)" data-t="ui.markup.57"></button>
+          <button class="mc-btn" data-tab="personalities" onclick="codexTab('personalities',this)" data-t="ui.markup.58"></button>
+          <button class="mc-btn" data-tab="mechanics" onclick="codexTab('mechanics',this)" data-t="ui.markup.59"></button>
+          <input id="codexFilter" class="codex-search" placeholder="" data-t-ph="ui.markup.67" oninput="codexFilter(this.value)">
         </div>
         <div class="codex-filters" id="codexFilters"></div>
         <div class="codex-split">
@@ -1314,20 +1314,20 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
           <div class="codex-detail" id="codexDetail"></div>
         </div>
       </div>
-      <div class="mc-row"><button class="mc-btn" onclick="lpane('main')">回到主页面</button></div>
+      <div class="mc-row"><button class="mc-btn" onclick="lpane('main')" data-t="ui.markup.60"></button></div>
     </div>
   </section>
 </div>
 
 <section class="bonds-strip">
-  <span class="eyebrow">SYNERGY · 羁绊</span>
+  <span class="eyebrow" data-t="ui.markup.61"></span>
   <span class="bond-chips" id="bondChips"></span>
-  <button class="btn" onclick="toggleBonds()">羁绊概况 ›</button>
+  <button class="btn" onclick="toggleBonds()" data-t="ui.markup.62"></button>
 </section>
 
 <aside class="bond-drawer" id="bondDrawer">
-  <div class="head"><span class="eyebrow">SYNERGY</span><h2 style="margin-left:6px">羁绊概况</h2>
-    <button class="btn" style="margin-left:auto" onclick="toggleBonds()">收起 ‹</button></div>
+  <div class="head"><span class="eyebrow">SYNERGY</span><h2 style="margin-left:6px" data-t="ui.markup.63"></h2>
+    <button class="btn" style="margin-left:auto" onclick="toggleBonds()" data-t="ui.markup.64"></button></div>
   <div class="body" id="bondDrawerBody"></div>
 </aside>
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleBonds()"></div>
@@ -1337,29 +1337,29 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   <!-- 避难所 -->
   <section class="board">
     <div class="board-topline">
-      <div><span class="eyebrow">SAFEHOUSE FLOOR</span><h2 id="homeName">城郊小屋</h2></div>
+      <div><span class="eyebrow">SAFEHOUSE FLOOR</span><h2 id="homeName" data-t="ui.markup.68"></h2></div>
       <div class="turn-controls">
-        <button onclick="showDoor()">处理门口</button>
-        <button id="searchBtn" onclick="showSearch()">指派搜索</button>
-        <button class="p" onclick="endTurn()">结束回合 ▸</button>
+        <button onclick="showDoor()" data-t="ui.markup.69"></button>
+        <button id="searchBtn" onclick="showSearch()" data-t="ui.markup.70"></button>
+        <button class="p" onclick="endTurn()" data-t="ui.markup.71"></button>
       </div>
     </div>
 
     <section class="door-zone" id="pseudoZone" onmouseenter="pseudoHoverStart()" onmouseleave="pseudoHoverEnd()">
       <div>
         <span class="eyebrow">THRESHOLD EVENT</span>
-        <h3>门口</h3>
-        <p class="muted" id="doorSummary">门外有 2 个事件等待处理。</p>
+        <h3 data-t="ui.markup.72"></h3>
+        <p class="muted" id="doorSummary" data-t="ui.markup.73"></p>
       </div>
       <button class="door-button" onclick="showDoor()">
         <span class="door-frame"><svg class="ic lg"><use href="#i-gate"/></svg></span>
-        <span>查看门外</span>
+        <span data-t="ui.markup.74"></span>
         <span class="door-badge" id="doorBadge">0</span>
       </button>
       <div class="pseudo-card" id="pseudoCard">
-        <span class="eyebrow">PSEUDO · 已知威胁</span>
-        <div class="mono" id="pseudoName" style="font-size:12px;color:var(--danger)">尚未确认</div>
-        <div class="vit"><span class="lab"><span id="pseudoMarkLab">印记</span><span class="mono" id="pseudoMark">-</span></span>
+        <span class="eyebrow" data-t="ui.markup.75"></span>
+        <div class="mono" id="pseudoName" style="font-size:12px;color:var(--danger)" data-t="ui.markup.76"></div>
+        <div class="vit"><span class="lab"><span id="pseudoMarkLab" data-t="ui.markup.77"></span><span class="mono" id="pseudoMark">-</span></span>
           <span class="bar" id="pbar"></span></div>
         <div class="dim mono" id="pseudoInfo" style="font-size:10px">—</div>
         <div class="panel-slot" id="pseudoSlot"></div>
@@ -1369,29 +1369,29 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
     <div class="board-split">
       <section class="roster-col">
         <div class="section-heading">
-          <div><span class="eyebrow">TENANT ROSTER</span><h3>房客席位</h3></div>
-          <span class="muted" style="font-size:11px">点选房客查看背包与状态</span>
-          <button class="btn danger" id="accuseBtn" onclick="askAccuse()" hidden>指认</button>
+          <div><span class="eyebrow">TENANT ROSTER</span><h3 data-t="ui.markup.78"></h3></div>
+          <span class="muted" style="font-size:11px" data-t="ui.markup.79"></span>
+          <button class="btn danger" id="accuseBtn" onclick="askAccuse()" hidden data-t="ui.markup.80"></button>
         </div>
         <div id="expandedWrap"></div>
         <div class="tenant-grid" id="tenantGrid"></div>
       </section>
       <section class="panel warehouse-col">
-        <div class="head"><span class="eyebrow">OWNER STORAGE</span><h2 style="margin-left:6px">屋主仓库</h2>
-          <span class="muted" style="font-size:11px">拖动可在格间自由摆放</span></div>
+        <div class="head"><span class="eyebrow">OWNER STORAGE</span><h2 style="margin-left:6px" data-t="ui.markup.81"></h2>
+          <span class="muted" style="font-size:11px" data-t="ui.markup.82"></span></div>
         <div class="body">
-          <div class="muted mono" style="font-size:10px;margin-bottom:6px">仓库 <span class="dim" id="whCount"></span></div>
+          <div class="muted mono" style="font-size:10px;margin-bottom:6px"><span data-t="ui.markup.105"></span> <span class="dim" id="whCount"></span></div>
           <div class="wh-scroll"><div class="slot-grid warehouse" id="warehouseGrid"></div></div>
         </div>
         <!-- 房客背包：与仓库同宽对齐的贴底悬浮窗（最多两排，超出内置滚动） -->
         <div class="bp-float" id="bpFloat" hidden>
           <div class="head">
             <span class="bp-head-main">
-              <span class="eyebrow">TENANT BAG</span><h3>房客背包</h3>
+              <span class="eyebrow">TENANT BAG</span><h3 data-t="ui.markup.83"></h3>
               <span class="bp-who" id="bpLabel">—</span>
               <span class="bp-cap" id="bpCapacity"></span>
             </span>
-            <button class="btn tri-btn" id="bpTri" onclick="toggleBp()" title="展开 / 收起">▾</button></div>
+            <button class="btn tri-btn" id="bpTri" onclick="toggleBp()" title="" data-t-title="ui.markup.84">▾</button></div>
           <div class="body">
             <div class="bp-scroll">
               <div class="slot-grid backpack" id="backpackGrid" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="dropOnBackpack(event)"></div>
@@ -1407,22 +1407,22 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
   <aside class="detail-panel">
     <section class="panel" style="flex:1;min-height:0">
       <div class="head"><span class="eyebrow" id="intelEyebrow">INTELLIGENCE</span>
-        <h3 class="switch-title" id="intelTitle" style="margin-left:6px" onclick="toggleIntelTab()" title="切换：现有信息 / 全局事件">现有信息<span class="sw">⇄</span></h3>
-        <button class="btn" id="intelExpiredBtn" style="margin-left:auto" onclick="toggleIntelExpired()">隐藏已失效</button>
-        <span class="count-chip" id="intelCount" title="条目数">0 条</span></div>
+        <h3 class="switch-title" id="intelTitle" style="margin-left:6px" onclick="toggleIntelTab()" title="" data-t-title="ui.markup.88"><span data-t="ui.markup.98"></span><span class="sw">⇄</span></h3>
+        <button class="btn" id="intelExpiredBtn" style="margin-left:auto" onclick="toggleIntelExpired()" data-t="ui.markup.85"></button>
+        <span class="count-chip" id="intelCount" title="" data-t-title="ui.markup.89" data-t="ui.markup.86"></span></div>
       <div class="body" id="intelList"></div>
     </section>
     <section class="mission-float collapsed" id="missionFloat">
-      <div class="head"><span class="eyebrow">FIELD TEAM</span><h3 style="margin-left:6px">外出搜索</h3>
-        <button class="btn tri-btn" id="missionTri" style="margin-left:auto" onclick="toggleMissions()" title="展开 / 收起">▴</button></div>
+      <div class="head"><span class="eyebrow">FIELD TEAM</span><h3 style="margin-left:6px" data-t="ui.markup.87"></h3>
+        <button class="btn tri-btn" id="missionTri" style="margin-left:auto" onclick="toggleMissions()" title="" data-t-title="ui.markup.90">▴</button></div>
       <div class="body" id="missionList"></div>
     </section>
   </aside>
 
   <!-- 日志 -->
   <section class="panel log-panel">
-    <div class="head"><span class="eyebrow">VISIBLE EVENT FEED</span><h2 style="margin-left:6px">可视日志</h2>
-      <button class="btn" style="margin-left:auto" onclick="clearLog()">清空显示</button></div>
+    <div class="head"><span class="eyebrow">VISIBLE EVENT FEED</span><h2 style="margin-left:6px" data-t="ui.markup.91"></h2>
+      <button class="btn" style="margin-left:auto" onclick="clearLog()" data-t="ui.markup.92"></button></div>
     <div class="body"><ol class="log-list" id="logList"></ol></div>
   </section>
 
@@ -1435,24 +1435,24 @@ body.in-launcher .bond-drawer,body.in-launcher .drawer-backdrop{display:none !im
 
 <div class="mask" id="mask">
   <div class="dialog" id="dialog">
-    <div class="dhead"><svg class="ic"><use href="#i-info"/></svg><b class="mono" id="dTitle">事件</b>
+    <div class="dhead"><svg class="ic"><use href="#i-info"/></svg><b class="mono" id="dTitle" data-t="ui.markup.93"></b>
       <span class="muted mono" style="margin-left:auto;font-size:10px" id="dSub"></span></div>
     <div class="dbody" id="dBody"></div>
-    <div class="dfoot"><button class="btn" id="dCancel" onclick="closeDialog()">取消</button>
-      <button class="btn p" onclick="confirmDialog()">确认</button></div>
+    <div class="dfoot"><button class="btn" id="dCancel" onclick="closeDialog()" data-t="ui.markup.94"></button>
+      <button class="btn p" onclick="confirmDialog()" data-t="ui.markup.95"></button></div>
   </div>
 </div>
 
 <!-- 游戏内 Esc：MC 风「桌面」。长条=退出游戏；短的两个并排（左右外缘与长条齐平）；返回游戏。 -->
 <section class="pause" id="pauseMenu">
   <div class="pause-panel">
-    <h2 class="mc-h2">游戏菜单</h2>
-    <button class="mc-btn wide" onclick="exitToMenu()">退出游戏</button>
+    <h2 class="mc-h2" data-t="ui.markup.96"></h2>
+    <button class="mc-btn wide" onclick="exitToMenu()" data-t="ui.launcher.quit"></button>
     <div class="pause-row">
-      <button class="mc-btn" onclick="pausePane('settings')">设置</button>
-      <button class="mc-btn" onclick="pausePane('codex')">图鉴</button>
+      <button class="mc-btn" onclick="pausePane('settings')" data-t="ui.common.settings"></button>
+      <button class="mc-btn" onclick="pausePane('codex')" data-t="ui.common.codex"></button>
     </div>
-    <button class="mc-btn wide p" onclick="closePause()">返回游戏</button>
+    <button class="mc-btn wide p" onclick="closePause()" data-t="ui.markup.97"></button>
   </div>
 </section>
 
@@ -1467,10 +1467,29 @@ const ITEM_INFO = {};
 const $=(id)=>document.getElementById(id);
 const ic=(id,cls="")=>`<svg class="ic ${cls}"><use href="#${id}"/></svg>`;
 const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+/* 界面文字全部来自后端 lang 表（GET /api/lang）；这里只按 key 取字，**不写字面量**。
+   LANG 缺失时回落到 key 本身（便于一眼看出漏配）。 */
+let LANG = {};
+const TXT = (key) => (Object.prototype.hasOwnProperty.call(LANG, key) ? LANG[key] : key);
+async function loadLang(){
+  try{ const r = await api("/api/lang"); LANG = (r && r.text) || {}; }
+  catch(e){ LANG = {}; }
+  TIER_NAME_KEYS.forEach((k,i)=>{ if(k) TIER_NAMES[i]=TXT(k); });
+}
+/* 静态标记：data-t=纯文本 / data-t-html=含标记 / data-t-ph=placeholder */
+  function applyStaticText(root){
+  const scope = root || document;
+  scope.querySelectorAll("[data-t]").forEach(el => { el.textContent = TXT(el.dataset.t); });
+  scope.querySelectorAll("[data-t-html]").forEach(el => { el.innerHTML = TXT(el.dataset.tHtml); });
+  scope.querySelectorAll("[data-t-ph]").forEach(el => { el.placeholder = TXT(el.dataset.tPh); });
+  scope.querySelectorAll("[data-t-aria]").forEach(el => { el.setAttribute("aria-label", TXT(el.dataset.tAria)); });
+  scope.querySelectorAll("[data-t-title]").forEach(el => { el.setAttribute("title", TXT(el.dataset.tTitle)); });
+}
 const STATUS_INFO = {};
 const STATUS_FLAVOR = {};
 const TIER_CLASS=["","t-bronze","t-silver","t-gold","t-prism"];
-const TIER_NAMES=["","铜","银","金","棱彩"];
+const TIER_NAME_KEYS=["","ui.tier.bronze","ui.tier.silver","ui.tier.gold","ui.tier.prism"];
+const TIER_NAMES=["",TXT("ui.js.1"),TXT("ui.js.2"),TXT("ui.js.3"),TXT("ui.js.4")];
 /* 激活档位取后端下发的 reached（部分羁绊非“达到即激活”，其 tier_value 恒为 0，不能用它判档）。
    位阶随档数：2 档=银/金，3 档=铜/银/金，4 档=铜/银/金/棱彩 */
 const tierFor=(b)=>{const i=b.reached||0;return i?i+(((b.tiers||[]).length<=2)?1:0):0;};
@@ -1502,11 +1521,11 @@ function startBondTierCycle(tiers){
   const icon=document.getElementById("bondTierIcon"), label=document.getElementById("bondTierPreview");
   if(!icon || !(tiers||[]).length) return;
   const classes=bondTierClasses(tiers);
-  const names=(classes.length<=2)?["银","金"]:["铜","银","金","棱彩"].slice(0,classes.length);
+  const names=(classes.length<=2)?[TXT("ui.js.2"),TXT("ui.js.3")]:[TXT("ui.js.1"),TXT("ui.js.2"),TXT("ui.js.3"),TXT("ui.js.4")].slice(0,classes.length);
   let i=0;
   const paint=()=>{
     icon.className="cd-av "+classes[i];
-    if(label) label.textContent=`档位预览：${names[i]}（${tiers[i]}）`;
+    if(label) label.textContent=`${TXT("ui.js.5")}${names[i]}${TXT("ui.js.6")}${tiers[i]}${TXT("ui.js.7")}`;
     i=(i+1)%classes.length;
   };
   paint();
@@ -1516,25 +1535,25 @@ function bondDetailHtml(){
   return sortedBonds().map(b=>{
     const tr=tierFor(b), cur=curTierIdx(b);
     const nums=b.tiers.map((x,i)=>`<b class="${(cur&&i===cur-1)?"on":""}">${x}</b>`).join("<i>/</i>");
-    const effs=b.effects.map((e,i)=>`<li class="${(cur&&i===cur-1)?"on":""}"><b>（${e[0]}）</b>${e[1]}</li>`).join("");
+    const effs=b.effects.map((e,i)=>`<li class="${(cur&&i===cur-1)?"on":""}"><b>${TXT("ui.js.6")}${e[0]}${TXT("ui.js.7")}</b>${e[1]}</li>`).join("");
     return `<div class="bond"><div class="row"><span class="${TIER_CLASS[tr]||"dim"}">${ic(b.icon)}</span>
       <span class="name ${TIER_CLASS[tr]}">${b.name}</span>
       <span class="tiernums">${nums}</span>
       <span class="badge" style="margin-left:auto">${b.lv?(TIER_NAMES[tr]+" "+b.lv):"未激活"}</span></div>
-      <div class="bond-base">羁绊效果：${b.base}</div>
+      <div class="bond-base">${TXT("ui.js.8")}${b.base}</div>
       <ul class="bond-effs">${effs}</ul>
-      <div class="bond-own">激活他的人：${b.providers.length?b.providers.join("、"):"—"}</div>
-      <div class="bond-own">本局可提供此羁绊：${(b.potential||[]).length?b.potential.join("、"):"—"}</div></div>`;
+      <div class="bond-own">${TXT("ui.js.9")}${b.providers.length?b.providers.join("、"):"—"}</div>
+      <div class="bond-own">${TXT("ui.js.10")}${(b.potential||[]).length?b.potential.join("、"):"—"}</div></div>`;
   }).join("")
-  + `<div class="tier-legend"><span><i class="tier-badge t-bronze"></i>铜</span><span><i class="tier-badge t-silver"></i>银</span><span><i class="tier-badge t-gold"></i>金</span><span><i class="tier-badge t-prism"></i>棱彩</span><span class="dim">2档=银/金 · 3档=铜/银/金 · 4档=铜/银/金/棱彩</span></div>`;
+  + `<div class="tier-legend"><span><i class="tier-badge t-bronze"></i>${TXT("ui.js.1")}</span><span><i class="tier-badge t-silver"></i>${TXT("ui.js.2")}</span><span><i class="tier-badge t-gold"></i>${TXT("ui.js.3")}</span><span><i class="tier-badge t-prism"></i>${TXT("ui.js.4")}</span><span class="dim">2${TXT("ui.js.11")}=${TXT("ui.js.2")}/${TXT("ui.js.3")} ${TXT("ui.js.12")} 3${TXT("ui.js.11")}=${TXT("ui.js.1")}/${TXT("ui.js.2")}/${TXT("ui.js.3")} ${TXT("ui.js.12")} 4${TXT("ui.js.11")}=${TXT("ui.js.1")}/${TXT("ui.js.2")}/${TXT("ui.js.3")}/${TXT("ui.js.4")}</span></div>`;
 }
 function bondTipHtml(b,tr){
   const cur=curTierIdx(b);
-  const effs=b.effects.map((e,i)=>`<span class="tip-line ${(cur&&i===cur-1)?"on":""}"><b>（${e[0]}）</b>${e[1]}</span>`).join("");
-  return `<span class="tip"><b class="${TIER_CLASS[tr]}">${b.name}</b> · ${TIER_NAMES[tr]}（${b.lv}）
-    <span class="tip-eff">羁绊效果：${b.base}</span>${effs}
-    <span class="tip-line">激活他的人：${b.providers.length?b.providers.join("、"):"—"}</span>
-    <span class="tip-line">本局可提供此羁绊：${(b.potential||[]).length?b.potential.join("、"):"—"}</span></span>`;
+  const effs=b.effects.map((e,i)=>`<span class="tip-line ${(cur&&i===cur-1)?"on":""}"><b>${TXT("ui.js.6")}${e[0]}${TXT("ui.js.7")}</b>${e[1]}</span>`).join("");
+  return `<span class="tip"><b class="${TIER_CLASS[tr]}">${b.name}</b> ${TXT("ui.js.12")} ${TIER_NAMES[tr]}${TXT("ui.js.6")}${b.lv}${TXT("ui.js.7")}
+    <span class="tip-eff">${TXT("ui.js.8")}${b.base}</span>${effs}
+    <span class="tip-line">${TXT("ui.js.9")}${b.providers.length?b.providers.join("、"):"—"}</span>
+    <span class="tip-line">${TXT("ui.js.10")}${(b.potential||[]).length?b.potential.join("、"):"—"}</span></span>`;
 }
 function renderBondStrip(){
   /* on=已激活；idle=有成员但未达首档；dead=权重归零（成员全部失效）。 */
@@ -1544,7 +1563,7 @@ function renderBondStrip(){
         const cls = tr>0 ? "on" : (b.lv>0 ? "idle" : "dead");
         const lv = b.lv>0 ? b.lv : "0";
         return `<span class="bond-chip ${cls}"><span class="${TIER_CLASS[tr]}">${ic(b.icon)}</span><span class="nm ${TIER_CLASS[tr]}">${b.name}</span><span class="lv">${lv}</span>${bondTipHtml(b,tr)}</span>`;}).join("")
-    : `<span class="bond-chip none">尚无激活羁绊</span>`;
+    : `<span class="bond-chip none">${TXT("ui.js.13")}</span>`;
 }
 function toggleBonds(){
   const drawer=$("bondDrawer"), backdrop=$("drawerBackdrop");
@@ -1639,13 +1658,13 @@ function tenantDetailHtml(id){
     const chips=(a.chips||[]).map(c=>`<span class="badge chip-note">${esc(c)}</span>`).join("");
     /* 只负责打开专属面板的技能：渲染成开 / 关，点击**不走** use_ability（引擎也不结算它）。 */
     const panelSkill = !!a.opens_panel;
-    const usable = panelSkill || (a.kind==="主动" && !a.disabled && !a.used && !(a.cooldown>0));
+    const usable = panelSkill || (a.kind===TXT("ui.js.14") && !a.disabled && !a.used && !(a.cooldown>0));
     const state = panelSkill?`<span class="badge">${PANEL_OPEN===t.id?"已打开":"打开界面"}</span>`
-      :(a.disabled?`<span class="badge seal">已封印</span>`
-      :(a.cooldown>0?`<span class="badge">冷却 ${a.cooldown}</span>`
-      :(a.used?`<span class="badge">本回合已用</span>`:"")));
+      :(a.disabled?`<span class="badge seal">${TXT("ui.js.15")}</span>`
+      :(a.cooldown>0?`<span class="badge">${TXT("ui.js.16")} ${a.cooldown}</span>`
+      :(a.used?`<span class="badge">${TXT("ui.js.17")}</span>`:"")));
     /* 技能栏本体即按钮：可用=抬起可点；本回合不可用=按下未回弹；被动=普通条目。 */
-    const cls = a.disabled ? " disabled locked" : (usable ? " usable" : (a.kind==="主动" ? " locked" : ""));
+    const cls = a.disabled ? " disabled locked" : (usable ? " usable" : (a.kind===TXT("ui.js.14") ? " locked" : ""));
     /* 整条技能栏都是按钮：可用才真正发动；不可用（冷却/已用/封印/被动）也只**吞掉点击**，
        不再冒泡到详情页的「点空白返回缩略」——否则点技能会莫名退回席位。 */
     const click = ` onclick="event.stopPropagation();${panelSkill?`togglePanel(${t.id})`:(usable?`useAbility(${t.id},'${a.id}')`:"")}"`;
@@ -1659,18 +1678,18 @@ function tenantDetailHtml(id){
       <div class="ab-text">${fmt(a.text)}</div></div>`;
   }).join("");
   return `<div class="td-inline" onclick="selectTenant(null)">
-    <div class="td-head"><button class="btn" onclick="event.stopPropagation();selectTenant(null)">‹ 返回席位</button>
+    <div class="td-head"><button class="btn" onclick="event.stopPropagation();selectTenant(null)">‹ ${TXT("ui.js.18")}</button>
       <b>${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>
       <span style="margin-left:auto;font-size:13px">${personaHtml(t)}</span></div>
     <div class="td-body">
       <div class="td-left"><div class="td-avid"><div class="av">${avatarIcon(t.character_id,t.avatar,"lg",t.art,t.avatar_parts)}</div>
           ${markLines?`<div class="panel-slot">${markLines}</div>`:""}</div>
-        <div class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
-        <div class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
+        <div class="vit"><span class="lab"><span>${TXT("ui.js.19")}</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
+        <div class="vit"><span class="lab"><span>${TXT("ui.js.20")}</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
         <div class="chips">${chips}</div></div>
       <div class="td-right">
         <div class="it-flavor" style="margin:0 0 6px">${fmt(t.pf||"")}</div>
-        <div class="muted mono" style="font-size:11.5px;margin-bottom:6px">携带物资 ${t.carry} 格 · ${t.carryNote}</div>
+        <div class="muted mono" style="font-size:11.5px;margin-bottom:6px">${TXT("ui.js.21")} ${t.carry} ${TXT("ui.js.22")} ${TXT("ui.js.12")} ${t.carryNote}</div>
         <div class="ab-list">${abil}</div></div>
     </div></div>`;
 }
@@ -1710,12 +1729,12 @@ function tenantCardHtml(t){
     <div class="t-top"><div class="av">${avatarIcon(t.character_id,t.avatar,"av",t.art,t.avatar_parts)}</div>
       <div class="t-main">
         <div class="tn"><b style="font-size:${nameFont(t.name)}">${t.name}</b><span class="tag">#${String(t.id).padStart(2,"0")}</span>${t.searching?`<span class="tag search">搜索中</span>`:""}</div>
-        <div class="t-persona"><span>${personaPart(t,ps[0])}</span><i>·</i><span>${personaPart(t,ps[1])}</span></div>
+        <div class="t-persona"><span>${personaPart(t,ps[0])}</span><i>${TXT("ui.js.12")}</i><span>${personaPart(t,ps[1])}</span></div>
         <div class="t-tags">${(t.tags||[]).slice(0,2).map(x=>`<span class="tag">${x}</span>`).join("")}</div>
       </div></div>
     <div class="t-vitals">
-      <div class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
-      <div class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
+      <div class="vit"><span class="lab"><span>${TXT("ui.js.19")}</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></div>
+      <div class="vit"><span class="lab"><span>${TXT("ui.js.20")}</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></div>
     </div>
     <div class="chips" onmouseover="statusZoneOver(event,${t.id})" onmouseout="hideTip()">${chips}</div></div>`;
 }
@@ -1725,7 +1744,7 @@ function slotInner(item){
   const dur=item[10]||0, dmax=item[11]||0;
   const pct=dmax>0?Math.max(0,Math.min(100,Math.round(dur/dmax*100))):0;
   const dcls=pct<=25?"crit":(pct<=55?"low":"");
-  const durBar=dmax>0?`<span class="dur" title="耐久 ${dur}/${dmax}"><i class="${dcls}" style="width:${pct}%"></i></span>`:"";
+  const durBar=dmax>0?`<span class="dur" title="${TXT("ui.js.23")} ${dur}/${dmax}"><i class="${dcls}" style="width:${pct}%"></i></span>`:"";
   return itemIcon(item[12],i,"q"+q)+'<span class="n">'+n+'</span>'+((stack&&c>1)?'<span class="c">×'+c+'</span>':'')+durBar;
 }
 function slotCell(item,index,kind){
@@ -1739,7 +1758,7 @@ function slotCell(item,index,kind){
 }
 function renderWarehouse(){
   const used=STATE.warehouse.filter(x=>x).length;
-  $("whCount").textContent="· "+used+" / "+STATE.warehouse.length;
+  $("whCount").textContent=TXT("ui.js.12") + " "+used+" / "+STATE.warehouse.length;
   $("warehouseGrid").innerHTML=STATE.warehouse.map((item,k)=>slotCell(item,k,"wh")).join("");
 }
 function renderBackpack(){
@@ -1754,7 +1773,7 @@ function renderBackpack(){
   BP_LOCKED=!!t.searching;
   const carry=Math.max(1,t.carry||3);
   $("bpLabel").textContent=t.name;
-    $("bpCapacity").textContent=carry+" 格"+(t.carryNote?("（"+t.carryNote+"）"):"")+(t.searching?" · 外出中，无法取出":"");
+    $("bpCapacity").textContent=carry+" " + TXT("ui.js.22")+(t.carryNote?(TXT("ui.js.6")+t.carryNote+TXT("ui.js.7")):"")+(t.searching?" " + TXT("ui.js.12") + " " + TXT("ui.js.24"):"");
   const items=t.inventory||[];
   grid.innerHTML=Array.from({length:carry},(_,k)=>slotCell(items[k],k,"bp")).join("");
 }
@@ -1778,7 +1797,7 @@ function panelSlotHtml(tid,s){
   const drag=s.onTake?` draggable="true" ondragstart="onPanelDragStart(event,${tid},${s.group},'${s.onTake}')" ondragend="onDragEnd()"`:"";
   const e=s.entry, tip=e?` onmouseenter="showItemTip(this,'${esc(e[1])}',${e[2]},${e[10]||0},${e[11]||0})" onmouseleave="hideTip()"`:"";
   return `<div class="slot${e?" q"+e[2]:""}${s.locked?" locked":""}"${drag}${drop}${tip} title="${esc(s.label||"")}">`
-    +(e?slotInner(e):'<span class="dim">空</span>')+'</div>';
+    +(e?slotInner(e):"<span class=\"dim\">" + TXT("ui.js.25") + "</span>")+'</div>';
 }
 /* 一块地一框：地格 + 信息（生长 / 湿润度 / 状态）+ 产物格，都框在里面。 */
 function panelGridHtml(tid,p){
@@ -1800,7 +1819,7 @@ function renderPanel(){
   const acts=(p.actions||[]).map(a=>`<button class="btn${a.enabled?"":" locked"}" title="${esc(a.hint||"")}"`
     +(a.enabled?` onclick="postPanelAction(${t.id},'${esc(a.id)}',{})"`:"")+`>${esc(a.label)}</button>`).join("");
   box.innerHTML=`<div class="head"><span class="eyebrow">FIELD</span><h3>${esc(p.title||"")}</h3>${acts}`
-    +`<button class="btn" onclick="closePanel()">关闭</button></div>`
+    +`<button class="btn" onclick="closePanel()">${TXT("ui.js.26")}</button></div>`
     +`<div class="body">${back}`
     +(p.prompt?`<div class="pf-prompt">${fmt(p.prompt)}</div>`:"")
     +((p.rows||[]).length?`<div class="panel-slot">${slotHtml(p.rows)}</div>`:"")
@@ -1870,7 +1889,7 @@ function dropOnPanel(ev,group,role){
   const t=panelTenant(); if(!t||!t.panel) return;
   const slot=(t.panel.slots||[]).find(s=>s.group===group&&s.role===role);
   if(!slot||!slot.onDrop) return;
-  if(!src||!src.itemId){ toast("从仓库或背包里拖一件物资过来。","err"); return; }
+  if(!src||!src.itemId){ toast(TXT("ui.js.27"),"err"); return; }
   postPanelAction(t.id,slot.onDrop,{slot:group,item_id:src.itemId,
     source:{kind:src.kind,tenant:src.tenant,slot:src.slot}});
 }
@@ -1886,9 +1905,9 @@ function renderMissions(){
   $("missionList").innerHTML=STATE.missions.map(m=>`<div class="acc">
     <div class="acc-head" onclick="toggleAcc(this)">${ic("i-search")}
       <span class="acc-title">${m.who} → ${m.place}</span>
-      <span class="badge pending">剩 ${m.eta} 回合</span><span class="chev">▾</span></div>
-    <div class="acc-body"><div class="it-desc">携带：${m.carry.length?m.carry.join("、"):"—"}</div>
-      <div class="it-desc">当前成功率 ${m.rate}　·　${m.note}</div>
+      <span class="badge pending">${TXT("ui.js.28")} ${m.eta} ${TXT("ui.js.29")}</span><span class="chev">▾</span></div>
+    <div class="acc-body"><div class="it-desc">${TXT("ui.js.30")}${m.carry.length?m.carry.join("、"):"—"}</div>
+      <div class="it-desc">${TXT("ui.js.31")} ${m.rate}${TXT("ui.js.32")}${m.note}</div>
       <div class="dim mono" style="font-size:11px">${esc(STATE.searchReturnNote||"")}</div></div></div>`).join("");
   const open=MISSIONS_MANUAL===null?(STATE.missions||[]).length>0:MISSIONS_MANUAL;
   setMissions(open);
@@ -1898,25 +1917,25 @@ function syncSearchBtn(){
   const b=$("searchBtn"); if(!b) return;
   const blocked=!!(STATE&&STATE.searchBlocked);
   b.classList.toggle("pressed",blocked);
-  b.title=blocked?"本回合已无法再指派搜索":"指派一名房客外出搜索";
+  b.title=blocked?TXT("ui.js.33"):TXT("ui.js.34");
 }
 let INTEL_HIDE_EXPIRED=false;
 let INTEL_TAB="intel";                 /* "intel"（现有信息）| "events"（全局事件） */
 function toggleIntelTab(){ INTEL_TAB=(INTEL_TAB==="intel"?"events":"intel"); renderIntel(); }
 function toggleIntelExpired(){
   INTEL_HIDE_EXPIRED=!INTEL_HIDE_EXPIRED;
-  const b=$("intelExpiredBtn"); if(b) b.textContent=INTEL_HIDE_EXPIRED?"显示已失效":"隐藏已失效";
+  const b=$("intelExpiredBtn"); if(b) b.textContent=INTEL_HIDE_EXPIRED?TXT("ui.js.35"):TXT("ui.js.36");
   renderIntel();
 }
 function renderIntel(){
   const eventsTab=(INTEL_TAB==="events");
   const eb=$("intelEyebrow"), title=$("intelTitle"), btn=$("intelExpiredBtn"), chip=$("intelCount");
   if(eb) eb.textContent=eventsTab?"GLOBAL EVENTS":"INTELLIGENCE";
-  if(title) title.innerHTML=esc(eventsTab?"全局事件":"现有信息")+'<span class="sw">⇄</span>';
+  if(title) title.innerHTML=esc(eventsTab?TXT("ui.js.37"):TXT("ui.js.38"))+'<span class="sw">⇄</span>';
   if(btn) btn.style.display=eventsTab?"none":"";
   if(eventsTab){
     const rows=STATE.events||[];
-    if(chip) chip.textContent=rows.length+" 项";
+    if(chip) chip.textContent=rows.length+" " + TXT("ui.js.39");
     $("intelList").innerHTML=rows.length?rows.map(x=>`<div class="acc">
       <div class="acc-head" onclick="toggleAcc(this)">
         <span class="cv">${ic(x.icon||"i-clock")}</span>
@@ -1924,19 +1943,19 @@ function renderIntel(){
         <span class="chip mono">${esc(x.remain||"")}</span>
         <span class="chev">▾</span></div>
       <div class="acc-body"><div class="it-desc">${x.desc?fmt(x.desc):'<span class="dim">（暂无说明）</span>'}</div></div></div>`).join("")
-      :'<div class="dim" style="padding:10px;color:var(--ink3)">（当前没有全局事件）</div>';
+      :"<div class=\"dim\" style=\"padding:10px;color:var(--ink3)\">" + TXT("ui.js.40") + "</div>";
     return;
   }
-  const label={pending:"待验证",true:"已证实",false:"已证伪",expired:"已失效"};
+  const label={pending:TXT("ui.js.41"),true:TXT("ui.js.42"),false:TXT("ui.js.43"),expired:TXT("ui.js.44")};
   const all=STATE.intel||[];
   const rows=INTEL_HIDE_EXPIRED?all.filter(x=>x.state!=="expired"):all;
-  $("intelCount").textContent=(rows.length===all.length?`${all.length}`:`${rows.length}/${all.length}`)+" 条";
+  $("intelCount").textContent=(rows.length===all.length?`${all.length}`:`${rows.length}/${all.length}`)+" " + TXT("ui.js.45");
   $("intelList").innerHTML=rows.map(x=>`<div class="acc">
     <div class="acc-head head2" onclick="toggleAcc(this)">
       <div class="acc-line"><span class="cv">${iconOrArt(x.art,"i-note")}</span><span class="acc-title">${esc(x.t)}</span><span class="chev">▾</span></div>
       <div class="acc-line">${x.expire?`<span class="chip expire mono">${esc(x.expire)}</span>`:""}
         <span class="badge ${x.state}" style="margin-left:auto">${label[x.state]}</span></div></div>
-    <div class="acc-body"><div class="it-meta mono">来源：${esc(x.source||"未知")}${x.kind_label?` · ${esc(x.kind_label)}`:""}</div>
+    <div class="acc-body"><div class="it-meta mono">${TXT("ui.js.46")}${esc(x.source||"未知")}${x.kind_label?` · ${esc(x.kind_label)}`:""}</div>
       <div class="it-desc">${x.desc}</div>
       <div class="acc-eff">${x.effect}</div></div></div>`).join("");
 }
@@ -1966,7 +1985,7 @@ function syncAccuseBtn(){
   const b=$("accuseBtn"); if(!b) return;
   const list=_accuseTargets();
   b.hidden=!list.length;
-  if(list.length) b.textContent=((list[0].expel||{}).action)||"指认";
+  if(list.length) b.textContent=((list[0].expel||{}).action)||TXT("ui.js.47");
 }
 /* 公共「确认」范式：不可撤销的动作都用它。文案由调用方给（通常来自内容层下发）。 */
 let _confirmYes=null;
@@ -1984,18 +2003,18 @@ function closeConfirm(){ _confirmYes=null; closeDialog(); }
 function confirmYes(){ const cb=_confirmYes; _confirmYes=null; closeDialog(); if(cb) cb(); }
 function askAccuse(){
   const list=_accuseTargets();
-  if(!list.length){ toast("目前没有可以指认的房客。","err"); return; }
+  if(!list.length){ toast(TXT("ui.js.48"),"err"); return; }
   const rows=list.map(t=>{
     const hint=(t.expel||{}).hint||"";
     return tenantChoiceCard(t, hint?`<span class="tag danger">${esc(hint)}</span>`:"");
   }).join("");
-  openDialog(((list[0].expel||{}).action)||"指认","ACCUSE",
+  openDialog(((list[0].expel||{}).action)||TXT("ui.js.47"),"ACCUSE",
     `<div class="choice-grid">${rows}</div>`, true, ()=>{
-      const el=pickedEl(); if(!el){ toast("请先选择房客。","err"); return; }
+      const el=pickedEl(); if(!el){ toast(TXT("ui.js.49"),"err"); return; }
       const id=Number(el.dataset.id);
       const t=list.find(x=>x.id===id)||{};
-      askConfirm({ title:((t.expel||{}).action)||"指认", question:(t.expel||{}).confirm||"",
-        danger:true, yes:"驱逐", no:"取消",
+      askConfirm({ title:((t.expel||{}).action)||TXT("ui.js.47"), question:(t.expel||{}).confirm||"",
+        danger:true, yes:TXT("ui.js.50"), no:TXT("ui.js.51"),
         onYes:()=>postAction({type:"accuse", tenant_id:id}) });
     });
 }
@@ -2051,10 +2070,10 @@ function showPseudoSkills(pd){
       +`<div class="psk-t">${mdText(sk.text)}</div></div>`;
   }).join("");
   const L=$("tipLayer");
-  L.innerHTML=`<b>${esc(pd.name||"伪人")} · 技能</b>`
-    +(card.liberation?`<span class="tip-line">解放：${esc(card.liberation)}</span>`:"")
-    +(card.breakthrough?`<span class="tip-line">突破：${esc(card.breakthrough)}</span>`:"")
-    +(rows||'<span class="tip-line">暂无技能</span>');
+  L.innerHTML=`<b>${esc(pd.name||"伪人")} ${TXT("ui.js.12")} ${TXT("ui.js.52")}</b>`
+    +(card.liberation?`<span class="tip-line">${TXT("ui.js.53")}${esc(card.liberation)}</span>`:"")
+    +(card.breakthrough?`<span class="tip-line">${TXT("ui.js.54")}${esc(card.breakthrough)}</span>`:"")
+    +(rows||"<span class=\"tip-line\">" + TXT("ui.js.55") + "</span>");
   L.style.display="block"; _tipPlace(el,L);
 }
 /* ---- 门外访客：悬浮查看具体信息 ---- */
@@ -2064,8 +2083,8 @@ function showVisitorTip(el){
     +`<div class="psk-t">${mdText(x.text)}</div></div>`).join("");
   const L=$("tipLayer");
   L.innerHTML=`<b>${esc(v.name)}</b>`
-    +`<span class="tip-line">性格：${esc(v.persona)}</span>`
-    +`<span class="tip-line">标签：${linkTags((v.tags||[]).map(t=>"【"+t+"】").join(" "))}</span>`
+    +`<span class="tip-line">${TXT("ui.js.56")}${esc(v.persona)}</span>`
+    +`<span class="tip-line">${TXT("ui.js.57")}${linkTags((v.tags||[]).map(t=>"【"+t+"】").join(" "))}</span>`
     +(v.desc?`<span class="tip-line">${mdText(v.desc)}</span>`:"")
     +(ab?`<div style="margin-top:6px">${ab}</div>`:"");
   L.style.display="block"; _tipPlace(el,L);
@@ -2080,7 +2099,7 @@ function mdText(s){
   // 行首 · 本身就是换行标记：先把「\n + ·」收成一个换行，否则会撞出**空行**
   // （内容按 §12 用 · 分行时，常顺手在它前面也写一个 \n）。
   s=s.replace(/\n(?=·)/g,"").replace(/\n/g,"<br>")
-   .replace(/<br>·/g,"\u0003").replace(/·/g,"<br>·").replace(/\u0003/g,"<br>·");
+   .replace(/<br>·/g,"\u0003").replace(/·/g,"<br>" + TXT("ui.js.12")).replace(/\u0003/g,"<br>" + TXT("ui.js.12"));
   // 引号不再自动换行：这条规则原为对话设计，但库里绝大多数引号框的是物资名/术语，
   // 一律断行会把名字劈到下一行。要断行请显式写 \n 或 ·（见 docs/STYLE.md §12）。
   return s.replace(/\u0001b/g,"<b>").replace(/\u0002/g,"</b>");
@@ -2091,8 +2110,8 @@ function linkTags(html){
   const labels=Object.keys(idx).sort((a,b)=>b.length-a.length);
   for(const lb of labels){
     if(!lb) continue;
-    const re=new RegExp("【"+lb.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"】","g");
-    html=html.replace(re,`<span class="tagref" onmouseover="showTagTip(this,'${lb}')" onmouseout="hideTip()">【${lb}】</span>`);
+    const re=new RegExp(TXT("ui.js.58")+lb.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+TXT("ui.js.59"),"g");
+    html=html.replace(re,`<span class="tagref" onmouseover="showTagTip(this,'${lb}')" onmouseout="hideTip()">${TXT("ui.js.58")}${lb}${TXT("ui.js.59")}</span>`);
   }
   return html;
 }
@@ -2131,7 +2150,7 @@ function avatarIcon(id,av,cls,art,parts){
 }
 function showTagTip(el,label){
   const list=(tagIndexMap()[label])||[], L=$("tipLayer");
-  L.innerHTML=`<b>标签：${esc(label)}</b>`+(list.length?list.map(x=>`<span class="tip-line">${esc(x.name)}</span>`).join(""):'<span class="tip-line">（暂无）</span>');
+  L.innerHTML=`<b>${TXT("ui.js.57")}${esc(label)}</b>`+(list.length?list.map(x=>`<span class="tip-line">${esc(x.name)}</span>`).join(""):"<span class=\"tip-line\">" + TXT("ui.js.60") + "</span>");
   L.style.display="block";
   const r=el.getBoundingClientRect(); L.style.left=Math.min(window.innerWidth-340,Math.max(8,r.left))+"px";
   let top=r.bottom+8; if(top+L.offsetHeight>window.innerHeight-8) top=r.top-L.offsetHeight-8; L.style.top=top+"px";
@@ -2155,13 +2174,13 @@ function allStatusHtml(id){
     ...t.emotions.map(e=>chip(e[1],e[0],e[2]||"")),
     ...(t.mark?[chip(t.mark,"i-mark","")]:[])];
   if(!all.length) return "";   // 没有任何状态时不弹提示
-  return `<b>${t.name} · 全部状态效果</b><div class="chips" style="max-height:none;margin-top:6px">${all.join("")}</div>`;
+  return `<b>${t.name} ${TXT("ui.js.12")} ${TXT("ui.js.61")}</b><div class="chips" style="max-height:none;margin-top:6px">${all.join("")}</div>`;
 }
 function showDiffTip(el){
   const diffs=STATE.difficulty_effects||[];
   const L=$("tipLayer");
-  L.innerHTML=`<b>难度 ${esc(STATE.difficulty||"-")} · ${esc(STATE.difficulty_label||"")}</b>`
-    +(diffs.length?diffs.map(x=>`<span class="tip-line">${esc(x)}</span>`).join(""):'<span class="tip-line">无附加效果</span>');
+  L.innerHTML=`<b>${TXT("ui.js.62")} ${esc(STATE.difficulty||"-")} ${TXT("ui.js.12")} ${esc(STATE.difficulty_label||"")}</b>`
+    +(diffs.length?diffs.map(x=>`<span class="tip-line">${esc(x)}</span>`).join(""):"<span class=\"tip-line\">" + TXT("ui.js.63") + "</span>");
   L.style.display="block"; const r=el.getBoundingClientRect();
   L.style.left=Math.min(window.innerWidth-340,Math.max(8,r.left))+"px";
   L.style.top=(r.bottom+8)+"px";
@@ -2194,8 +2213,8 @@ function tenantChoiceCard(t,extra){
     <span class="dc-av">${avatarIcon(t.character_id,t.avatar,"lg",t.art,t.avatar_parts)}</span>
     <span class="dc-name"><b>${esc(t.name)}</b></span>
     <span class="ch-vitals">
-      <span class="vit"><span class="lab"><span>生命</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></span>
-      <span class="vit"><span class="lab"><span>理智</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></span>
+      <span class="vit"><span class="lab"><span>${TXT("ui.js.19")}</span><span class="mono">${hp.val}</span></span><span class="bar">${hp.body}</span></span>
+      <span class="vit"><span class="lab"><span>${TXT("ui.js.20")}</span><span class="mono">${san.val}</span></span><span class="bar">${san.body}</span></span>
     </span>
     <span class="ch-persona">${personaHtml(t)}</span>
     ${t.searching?'<span class="tag search">搜索中</span>':""}${extra||""}</div>`;
@@ -2221,11 +2240,11 @@ function amountBox(spec){
   return `<div class="amount-box">
       <button class="amt-btn" type="button" id="amtMinus" onclick="amtStep(-1)">−</button>
       <input class="amt-num" id="abAmount" type="number" min="1" max="${max}" value="1" oninput="amtSync('num')">
-      <button class="amt-btn" type="button" id="amtPlus" onclick="amtStep(1)">＋</button>
+      <button class="amt-btn" type="button" id="amtPlus" onclick="amtStep(1)">${TXT("ui.js.64")}</button>
     </div>
     <input class="amt-range" id="amtRange" type="range" min="1" max="${max}" value="1" oninput="amtSync('range')">
     <div class="amt-bar" id="amtBar">${Array.from({length:max},(_,i)=>`<i data-i="${i}"></i>`).join("")}</div>
-    <div style="text-align:center;font-size:11px;color:var(--ink3);margin-top:8px">${esc(spec.amount_label||"数量")}（最多 ${max}）</div>`;
+    <div style="text-align:center;font-size:11px;color:var(--ink3);margin-top:8px">${esc(spec.amount_label||"数量")}${TXT("ui.js.65")} ${max}${TXT("ui.js.7")}</div>`;
 }
 function amtClamp(v){
   const num=$("abAmount"); const max=num?Math.max(1,Number(num.max)||1):1;
@@ -2250,24 +2269,24 @@ function renderHud(){
   const s=STATE||{}, pd=s.pseudo||{};
   /* 屋子名字来自内容层（将来是"地图"的名字）：前端不写死。 */
   const hn=$("homeName"); if(hn&&s.home&&s.home.name) hn.textContent=s.home.name;
-  const phaseName={created:"开局",action:"行动",turn_end:"结算",between_turns:"间歇",finished:"结束"}[s.phase]||s.phase||"-";
+  const phaseName={created:TXT("ui.js.66"),action:TXT("ui.js.67"),turn_end:TXT("ui.js.68"),between_turns:TXT("ui.js.69"),finished:TXT("ui.js.70")}[s.phase]||s.phase||"-";
   $("hudTurn").textContent=(s.turn||0)+" / "+(s.max_turns||32);
   $("hudDiff").textContent=s.difficulty||"-";
   $("hudSeed").textContent=s.seed||"-";
   $("hudHome").textContent=(s.tenants||[]).length;
   $("hudDoor").textContent=(s.door||[]).length;
-  $("hudLine").textContent="回合 "+(s.turn||0)+" / "+(s.max_turns||32)+" · 难度 "+(s.difficulty||"-")+" · 阶段 "+phaseName;
-  $("pseudoName").textContent=pd.known?(pd.name||"?"):"尚未确认";
+  $("hudLine").textContent=TXT("ui.js.29") + " "+(s.turn||0)+" / "+(s.max_turns||32)+" " + TXT("ui.js.12") + " " + TXT("ui.js.62") + " "+(s.difficulty||"-")+" " + TXT("ui.js.12") + " " + TXT("ui.js.71") + " "+phaseName;
+  $("pseudoName").textContent=pd.known?(pd.name||"?"):TXT("ui.js.72");
   const card=pd.card||{};
   $("pseudoInfo").innerHTML = pd.known
-    ? `到访 ${pd.visits||0} 次`
-      + (card.liberation?`<br><span class="dim">解放</span> ${esc(card.liberation)}`:"")
-      + (card.breakthrough?`<br><span class="dim">突破</span> ${esc(card.breakthrough)}`:"")
-    : "尚未确认";
-  $("pseudoMarkLab").textContent=pd.known?((pd.mark_label||"印记").split("-")[0]):"印记";
+    ? `${TXT("ui.js.73")} ${pd.visits||0} ${TXT("ui.js.74")}`
+      + (card.liberation?`<br><span class="dim">${TXT("ui.js.75")}</span> ${esc(card.liberation)}`:"")
+      + (card.breakthrough?`<br><span class="dim">${TXT("ui.js.76")}</span> ${esc(card.breakthrough)}`:"")
+    : TXT("ui.js.72");
+  $("pseudoMarkLab").textContent=pd.known?((pd.mark_label||TXT("ui.js.77")).split("-")[0]):TXT("ui.js.77");
   $("pseudoMark").textContent=pd.known?((pd.mark_value||0)+" / "+(pd.mark_max||20)):"? / ?";
   renderPbar();
-  $("doorSummary").textContent=(s.door&&s.door.length)?("门外有 "+s.door.length+" 个事件等待处理。"):"门外暂时没有动静。";
+  $("doorSummary").textContent=(s.door&&s.door.length)?(TXT("ui.js.78") + " "+s.door.length+" " + TXT("ui.js.79")):TXT("ui.js.80");
   $("doorBadge").textContent=(s.door||[]).length;
 }
 function renderPbar(){ const pd=STATE.pseudo||{};
@@ -2290,7 +2309,7 @@ function showChipTip(el){ if(_dragItem) return; const L=$("tipLayer");
 function chip(label,iconId,cls){
   const key=(label||"").split(" ")[0];
   const info=(STATE.statusInfo&&STATE.statusInfo[key])||{};
-  const tip=[info.desc, info.flavor].filter(Boolean).join("　");
+  const tip=[info.desc, info.flavor].filter(Boolean).join(TXT("ui.js.81"));
   return `<span class="chip ${cls||""}" data-name="${label}" data-tip="${tip}" onmouseover="showChipTip(this)" onmouseout="hideTip()">${ic(iconId)}${label}</span>`;
 }
 async function api(path, body){
@@ -2392,7 +2411,7 @@ function downloadUrl(url){
   document.body.appendChild(a); a.click(); a.remove();
 }
 function exportSelected(){
-  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast("请先选择一个存档。"); return; }
+  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast(TXT("ui.js.82")); return; }
   downloadUrl("/api/export?file="+encodeURIComponent(SAVES[SEL_SAVE].file));
 }
 async function refresh(){ try{ const r=await api("/api/state"); mergeState(r.state); appendLog(r.messages); }catch(e){} }
@@ -2441,9 +2460,9 @@ function syncPeek(){
   const b=$("pendingBtn"); if(!b) return;
   if(!hasPending()){ b.style.display="none"; return; }
   b.style.display="block";
-  b.textContent=$("mask").classList.contains("on")?"隐藏":"显示";
+  b.textContent=$("mask").classList.contains("on")?TXT("ui.js.83"):TXT("ui.js.84");
 }
-function maskClick(e){ if(e.target&&e.target.id==="mask" && hasPending()) toast("请先完成当前选择。"); }
+function maskClick(e){ if(e.target&&e.target.id==="mask" && hasPending()) toast(TXT("ui.js.85")); }
 function togglePending(){ if($("mask").classList.contains("on")){ closeDialog(); } else { maybePending(); } syncPeek(); }
 function hidePendingDialog(){ closeDialog(); syncPeek(); }
 function reopenPending(){ maybePending(); syncPeek(); }
@@ -2470,14 +2489,14 @@ function renderScrapTitle(){
   const inks=[tok("--title-ink-1"),tok("--title-ink-2"),tok("--title-ink-3"),tok("--title-ink-4")];
   const cn=host.querySelector(".title-cn");
   if(cn){
-    const lines=["完蛋，","我被伪人包围了"];
+    const lines=[TXT("ui.js.86"),TXT("ui.js.87")];
     cn.innerHTML=lines.map((line,li)=>{
       const chars=[...line].map((ch,ci)=>{
-        const big="完蛋".includes(ch);
+        const big=TXT("ui.js.88").includes(ch);
         const size=base*(big?rnd(1.24,1.42):rnd(0.9,1.12));
         const dx=rnd(-0.05,0.05)*base, dy=rnd(-0.08,0.08)*base, rot=rnd(-6,6);
         let ink;
-        if("包围".includes(ch)) ink=(Math.random()<0.5?tok("--title-ink-accent-1"):tok("--title-ink-accent-2"));
+        if(TXT("ui.js.89").includes(ch)) ink=(Math.random()<0.5?tok("--title-ink-accent-1"):tok("--title-ink-accent-2"));
         else ink=inks[(ci+li)%inks.length];
         const bg=paper[(ci*2+li)%paper.length];
         return '<span class="title-ch" style="font-size:'+size.toFixed(1)+'px;color:'+ink+';background:'+bg+';'
@@ -2536,48 +2555,48 @@ async function loadSaves(){
   try{ const r=await api("/api/saves"); SAVES=r.saves||[]; }catch(e){ SAVES=[]; }
   SEL_SAVE=null; renderSaves();
 }
-function fmtDate(t){ return t?String(t).replace("T"," ").slice(0,16):"—"; }
+function fmtDate(t){ return t?String(t).replace("T"," ").slice(0,16):TXT("ui.js.90"); }
 function renderSaves(){
   const box=$("saveList");
-  if(!SAVES.length){ box.innerHTML='<div class="dim" style="padding:22px;text-align:center;color:var(--ink3)">还没有存档。点击「创建新对局」开始一段新的夜晚。</div>'; return; }
+  if(!SAVES.length){ box.innerHTML="<div class=\"dim\" style=\"padding:22px;text-align:center;color:var(--ink3)\">" + TXT("ui.js.91") + "</div>"; return; }
   box.innerHTML=SAVES.map((s,i)=>`<div class="save-row${i===SEL_SAVE?" sel":""}" onclick="selectSave(${i})" ondblclick="selectSave(${i});loadSelected()">
     <div class="save-ico">SAVE</div>
     <div class="save-main"><b>${esc(s.name)}</b>
-      <div class="save-sub">难度 ${esc(s.difficulty)} · 回合 ${s.turn}/${s.max_turns}${s.game_over?" · 已是结局":""}</div>
-      <div class="save-code">创建于 ${esc(fmtDate(s.created))} · ${esc(s.file)}</div>
+      <div class="save-sub">${TXT("ui.js.62")} ${esc(s.difficulty)} ${TXT("ui.js.12")} ${TXT("ui.js.29")} ${s.turn}/${s.max_turns}${s.game_over?" · 已是结局":""}</div>
+      <div class="save-code">${TXT("ui.js.92")} ${esc(fmtDate(s.created))} ${TXT("ui.js.12")} ${esc(s.file)}</div>
     </div></div>`).join("");
 }
 function selectSave(i){ SEL_SAVE=i; renderSaves(); }
 async function loadSelected(){
-  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast("请先选择一个存档。"); return; }
+  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast(TXT("ui.js.82")); return; }
   const r=await api("/api/load_save",{file:SAVES[SEL_SAVE].file});
   if(r.error){ toast(r.error,"err"); return; }
   enterGame(); seedLog(r.state); mergeState(r.state); appendLog(r.messages);
 }
 async function deleteSelected(){
-  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast("请先选择一个存档。"); return; }
-  if(!confirm("确定删除存档「"+SAVES[SEL_SAVE].name+"」？此操作不可恢复。")) return;
+  if(SEL_SAVE==null||!SAVES[SEL_SAVE]){ toast(TXT("ui.js.82")); return; }
+  if(!confirm(TXT("ui.js.93")+SAVES[SEL_SAVE].name+TXT("ui.js.94"))) return;
   const r=await api("/api/delete_save",{file:SAVES[SEL_SAVE].file});
   if(r.error){ toast(r.error,"err"); return; }
   loadSaves();
 }
 function defaultSaveName(){ const d=new Date(),p=n=>String(n).padStart(2,"0");
-  return "伪人 "+d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+p(d.getMinutes()); }
+  return TXT("ui.js.95") + " "+d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+p(d.getMinutes()); }
 function openCreate(){ lpane("create"); }
 function renderCreate(){
   const list=(MENU&&MENU.difficulty_info)||[];
-  $("cDiff").innerHTML=list.map(d=>`<option value="${d.id}"${d.id===SETTINGS.difficulty?" selected":""}>${d.id} · ${esc(d.label)}${d.kind==="hard"?"（更难）":d.kind==="easy"?"（更易）":""}</option>`).join("");
+  $("cDiff").innerHTML=list.map(d=>`<option value="${d.id}"${d.id===SETTINGS.difficulty?" selected":""}>${d.id} ${TXT("ui.js.12")} ${esc(d.label)}${d.kind==="hard"?"（更难）":d.kind==="easy"?"（更易）":""}</option>`).join("");
   const ps=(MENU&&MENU.pseudos)||[];
-  $("cPseudo").innerHTML='<option value="">（随机）</option>'+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
+  $("cPseudo").innerHTML="<option value=\"\">" + TXT("ui.js.96") + "</option>"+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
   $("cTurns").value=SETTINGS.max_turns;
   /* 地图（区域包）：默认选内容层标记为 default 的那张（城郊小镇）。 */
   const maps=(MENU&&MENU.maps)||[];
   const cur=$("cMap").value;
-  $("cMap").innerHTML=maps.map(m=>`<option value="${esc(m.id)}"${(cur?m.id===cur:m.default)?" selected":""}>${esc(m.name)}（屋子：${esc(m.shelter)}）</option>`).join("")
-    ||'<option value="">（默认）</option>';
+  $("cMap").innerHTML=maps.map(m=>`<option value="${esc(m.id)}"${(cur?m.id===cur:m.default)?" selected":""}>${esc(m.name)}${TXT("ui.js.97")}${esc(m.shelter)}${TXT("ui.js.7")}</option>`).join("")
+    ||"<option value=\"\">" + TXT("ui.js.98") + "</option>";
   $("cSeed").value="";
   const box=$("cName"); box.value=defaultSaveName(); box.focus(); box.select();
-  $("cHint").textContent=(DLC_ENABLED.size?("内容包："+[...DLC_ENABLED].join("、")):"未启用额外内容包");
+  $("cHint").textContent=(DLC_ENABLED.size?(TXT("ui.js.99")+[...DLC_ENABLED].join(TXT("ui.js.100"))):TXT("ui.js.101"));
 }
 async function confirmCreate(){
   const name=$("cName").value.trim()||defaultSaveName();
@@ -2603,7 +2622,7 @@ function renderSettings(){
     <span class="diff-eff">${d.added&&d.added.length?esc(d.added.join("；")):"无附加效果"}</span></div>`).join("");
   $("setTurns").value=SETTINGS.max_turns;
   const ps=(MENU&&MENU.pseudos)||[];
-  $("setPseudo").innerHTML='<option value="">（随机）</option>'+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
+  $("setPseudo").innerHTML="<option value=\"\">" + TXT("ui.js.96") + "</option>"+ps.map(p=>`<option value="${p.id}"${p.id===SETTINGS.pseudo?" selected":""}>${esc(p.name)}</option>`).join("");
   $("setHint").textContent="";
 }
 function pickDiff(id){ SETTINGS.difficulty=id; renderSettings(); }
@@ -2614,12 +2633,12 @@ async function saveSettings(){
      这里不再顺带上报 enabled_dlc —— 否则 DLC_ENABLED 一旦是空/旧值，
      保存设置就会把玩家启用的资料包悄悄清空（图鉴角色随之消失）。 */
   const r=await api("/api/settings",{difficulty:SETTINGS.difficulty,max_turns:SETTINGS.max_turns,pseudo:SETTINGS.pseudo});
-  $("setHint").textContent=r.error?("保存失败："+r.error):"已保存设置。";
+  $("setHint").textContent=r.error?(TXT("ui.js.102")+r.error):TXT("ui.js.103");
 }
 
 /* ---- 显示设置 ---- */
 function renderDisplay(){
-  const v=$("dispFullSkills"); if(v) v.textContent=SETTINGS.show_full_skills?"是":"否";
+  const v=$("dispFullSkills"); if(v) v.textContent=SETTINGS.show_full_skills?TXT("ui.js.104"):TXT("ui.js.105");
 }
 async function toggleDisplay(){
   SETTINGS.show_full_skills=!SETTINGS.show_full_skills;
@@ -2635,7 +2654,7 @@ let CODEX_QS=new Set(), CODEX_TAGS=new Set(), CODEX_SORT="id";
 async function renderCodex(){
   if(!CODEX){ try{ const r=await api("/api/codex"); CODEX=(r&&r.codex)||{}; }catch(e){ CODEX={}; } }
   const s=CODEX.stats||{};
-  $("codexStats").textContent=`房客 ${s.characters||0}/${s.characters_total||0} · 物资 ${s.items||0} · 地点 ${s.locations||0} · 信息模板 ${s.information||0} · 伪人 ${s.pseudos||0}`;
+  $("codexStats").textContent=`${TXT("ui.js.106")} ${s.characters||0}/${s.characters_total||0} ${TXT("ui.js.12")} ${TXT("ui.js.107")} ${s.items||0} ${TXT("ui.js.12")} ${TXT("ui.js.108")} ${s.locations||0} ${TXT("ui.js.12")} ${TXT("ui.js.109")} ${s.information||0} ${TXT("ui.js.12")} ${TXT("ui.js.95")} ${s.pseudos||0}`;
   CODEX_SEL=0; renderCodexFilters(); renderCodexList(); renderCodexDetail();
 }
 function codexTab(t,el){
@@ -2651,13 +2670,13 @@ function renderCodexFilters(){
   if(CODEX_TAB!=="items"){ box.classList.remove("on"); box.innerHTML=""; return; }
   box.classList.add("on");
   const qn=(CODEX.qualityNames)||[];
-  let html='<span class="fl-lab">品质</span>';
-  html+='<span class="fl-chip'+(CODEX_QS.size?"":" act")+'" onclick="toggleQF(\'all\')">全部</span>';
+  let html="<span class=\"fl-lab\">" + TXT("ui.js.110") + "</span>";
+  html+='<span class="fl-chip'+(CODEX_QS.size?"":" act")+"\" onclick=\"toggleQF(\\'all\\')\">" + TXT("ui.js.111") + "</span>";
   qn.forEach((label,i)=>{ html+=`<span class="fl-chip${CODEX_QS.has(i)?" act":""}" onclick="toggleQF(${i})">${esc(label)}</span>`; });
-  html+='<span class="fl-lab">排序</span>';
-  [["id","默认"],["quality","品质"],["name","名称"]].forEach(([k,l])=>{ html+=`<span class="fl-chip${CODEX_SORT===k?" act":""}" onclick="setSort(\'${k}\')">${l}</span>`; });
+  html+="<span class=\"fl-lab\">" + TXT("ui.js.112") + "</span>";
+  [["id",TXT("ui.js.113")],["quality",TXT("ui.js.110")],["name",TXT("ui.js.114")]].forEach(([k,l])=>{ html+=`<span class="fl-chip${CODEX_SORT===k?" act":""}" onclick="setSort(\'${k}\')">${l}</span>`; });
   const tags=Object.keys(CODEX.tagIndex||{}).sort();
-  html+='<span class="fl-lab">标签</span>';
+  html+="<span class=\"fl-lab\">" + TXT("ui.js.115") + "</span>";
   html+=tags.map(t=>`<span class="fl-chip${CODEX_TAGS.has(t)?" act":""}" onclick="toggleTag(\'${esc(t)}\')">${esc(t)}</span>`).join("");
   box.innerHTML=html;
 }
@@ -2690,7 +2709,7 @@ function codexItems(){
 }
 /* 图鉴符号墙的一格：内容给"一张一个内联 svg"，没给就画一条杠（方便看出还缺哪些）。 */
 function codexSymHtml(s){
-  const art=s.svg?`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${s.svg}</svg>`:'<span class="dim">—</span>';
+  const art=s.svg?`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${s.svg}</svg>`:"<span class=\"dim\">" + TXT("ui.js.90") + "</span>";
   return `<span class="cd-sym${s.svg?"":" none"}" title="${esc(s.label)}">${art}<b>${esc(s.label)}</b></span>`;
 }
 function codexRowIcon(o){
@@ -2715,11 +2734,11 @@ function codexRowLabel(o){
 }
 function codexRowSub(o){
   if(CODEX_TAB==="characters") return o.persona;
-  if(CODEX_TAB==="items") return o.quality_label+" · "+o.category_label;
+  if(CODEX_TAB==="items") return o.quality_label+" " + TXT("ui.js.12") + " "+o.category_label;
   if(CODEX_TAB==="locations") return o.group_label;
   if(CODEX_TAB==="pseudos") return o.human||"";
   if(CODEX_TAB==="information") return o.kind_label;
-  if(CODEX_TAB==="mechanics") return (o.entries||[]).length+" 条";
+  if(CODEX_TAB==="mechanics") return (o.entries||[]).length+" " + TXT("ui.js.45");
   return (o.tiers||[]).join("/");
 }
 function renderCodexList(){
@@ -2727,7 +2746,7 @@ function renderCodexList(){
   if(CODEX_SEL>=rows.length) CODEX_SEL=0;
   $("codexList").innerHTML = rows.length
     ? rows.map((o,i)=>`<div class="codex-row${i===CODEX_SEL?" sel":""}" onclick="codexPick(${i})"><span class="cv${CODEX_TAB==="items"?" q"+o.quality:""}">${codexRowIconHtml(o)}</span><span>${esc(codexRowLabel(o))}</span><span class="dim" style="margin-left:auto;font-size:11px">${esc(codexRowSub(o))}</span></div>`).join("")
-    : '<div class="codex-empty">没有匹配项。</div>';
+    : "<div class=\"codex-empty\">" + TXT("ui.js.116") + "</div>";
 }
 function codexPick(i){ CODEX_SEL=i; renderCodexList(); renderCodexDetail(); }
 function renderCodexDetail(){
@@ -2738,7 +2757,7 @@ function renderCodexDetail(){
   if(CODEX_TAB==="characters"){
     h=`<div class="cd-dossier"><span class="cd-av">${avatarIcon(o.id,o.avatar,"lg",o.art,o.avatar_parts)}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.name)}</div>
-        <div class="cd-sub">档案编号 #${String(o.no).padStart(2,"0")} · 携带 ${o.carry} 格 · ${o.available?"可用":"原稿缺位"}</div>
+        <div class="cd-sub">${TXT("ui.js.117")} #${String(o.no).padStart(2,"0")} ${TXT("ui.js.12")} ${TXT("ui.js.118")} ${o.carry} ${TXT("ui.js.22")} ${TXT("ui.js.12")} ${o.available?"可用":"原稿缺位"}</div>
         <div class="cd-sub">${esc(o.persona)}</div>
         <div class="cd-chips">${(o.tags||[]).map(t=>`<span class="cd-chip">${esc(t)}</span>`).join("")}</div></div></div>
       <div class="cd-block">${fmt(o.desc)}</div>
@@ -2749,10 +2768,10 @@ function renderCodexDetail(){
   } else if(CODEX_TAB==="items"){
     h=`<div class="cd-dossier"><span class="cd-av q${o.quality}">${itemIcon(o.icon_svg,o.icon,"q"+o.quality)}</span>
         <div class="cd-doss-main"><div class="cd-name q${o.quality}">${esc(o.name)}</div>
-        <div class="cd-sub">${esc(o.quality_label)} · ${esc(o.category_label)} · 堆叠上限 ${o.stack}</div></div></div>
+        <div class="cd-sub">${esc(o.quality_label)} ${TXT("ui.js.12")} ${esc(o.category_label)} ${TXT("ui.js.12")} ${TXT("ui.js.119")} ${o.stack}</div></div></div>
       ${o.book?`<div class="cd-block">${fmt(o.book_main||o.full||o.desc)}</div>${o.book_gain?`<div class="cd-section cd-book"><h4>获得能力</h4><div class="cd-entry">${fmt(o.book_gain)}</div></div>`:""}`:`<div class="cd-block">${fmt(o.full||o.desc)}</div>`}
       ${o.flavor?`<div class="cd-block flavor-line">${fmt(o.flavor)}</div>`:""}
-      <div class="cd-section"><h4>标签</h4><div class="cd-chips">${(o.tags||[]).map(t=>`<span class="cd-chip cd-chip-tag" onmouseover="showTagTip(this,'${esc(t[1])}')" onmouseout="hideTip()">${esc(t[1])}</span>`).join("")||'<span class="dim">无</span>'}</div></div>
+      <div class="cd-section"><h4>${TXT("ui.js.115")}</h4><div class="cd-chips">${(o.tags||[]).map(t=>`<span class="cd-chip cd-chip-tag" onmouseover="showTagTip(this,'${esc(t[1])}')" onmouseout="hideTip()">${esc(t[1])}</span>`).join("")||'<span class="dim">无</span>'}</div></div>
       ${o.links&&(o.links.bonds.length||o.links.characters.length||o.links.pseudos.length)?`<div class="cd-section"><h4>关联</h4><div class="cd-chips">${o.links.bonds.map(b=>`<span class="cd-chip cd-link" onclick="codexOpen('personalities','${b.key}')">羁绊 · ${esc(b.label)}</span>`).join("")}${o.links.characters.map(c=>`<span class="cd-chip cd-link" onclick="codexOpen('characters','${c.id}')">房客 · ${esc(c.name)}</span>`).join("")}${o.links.pseudos.map(p=>`<span class="cd-chip cd-link" onclick="codexOpen('pseudos','${p.id}')">伪人 · ${esc(p.name)}</span>`).join("")}</div></div>`:""}`;
   } else if(CODEX_TAB==="locations"){
     h=`<div class="cd-dossier"><span class="cd-av">${iconOrArt(o.art,o.icon,"lg")}</span>
@@ -2764,7 +2783,7 @@ function renderCodexDetail(){
   } else if(CODEX_TAB==="information"){
     h=`<div class="cd-dossier"><span class="cd-av">${iconOrArt(o.art,"i-note","lg")}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.name)}</div>
-        <div class="cd-sub">${esc(o.kind_label)}${o.location?` · 地点：${esc(o.location)}`:""} · 持续 ${o.duration} 回合</div></div></div>
+        <div class="cd-sub">${esc(o.kind_label)}${o.location?` · 地点：${esc(o.location)}`:""} ${TXT("ui.js.12")} ${TXT("ui.js.120")} ${o.duration} ${TXT("ui.js.29")}</div></div></div>
       <div class="cd-block">${fmt(o.desc)}</div>
       ${(o.rewards||[]).length?`<div class="cd-section"><h4>奖励</h4><div class="cd-chips">${o.rewards.map(r=>`<span class="cd-chip cd-link" onclick="codexOpen('items','${r[0]}')">${esc(r[1])}</span>`).join("")}</div></div>`:""}
       ${(o.effect||[]).length?`<div class="cd-section"><h4>效果</h4>${o.effect.map(e=>`<div class="cd-entry">${fmt(e)}</div>`).join("")}</div>`:""}
@@ -2776,7 +2795,7 @@ function renderCodexDetail(){
   } else if(CODEX_TAB==="pseudos"){
     h=`<div class="cd-dossier"><span class="cd-av">${avatarIcon(o.id,o.avatar,"lg",o.art,o.avatar_parts)}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.name)}</div>
-        <div class="cd-sub">人类原型：${o.human_id?`<span class="cd-link" onclick="codexOpen('characters','${o.human_id}')">${esc(o.human)}</span>`:esc(o.human)} · ${o.enters_house?"会亲自到访（门口事件）":"不会亲自到访（从外部行动）"}</div>
+        <div class="cd-sub">${TXT("ui.js.121")}${o.human_id?`<span class="cd-link" onclick="codexOpen('characters','${o.human_id}')">${esc(o.human)}</span>`:esc(o.human)} ${TXT("ui.js.12")} ${o.enters_house?"会亲自到访（门口事件）":"不会亲自到访（从外部行动）"}</div>
         ${o.mark_label?`<div class="cd-sub">印记：${esc(o.mark_label)}</div>`:""}</div></div>
       <div class="cd-block">${fmt(o.desc)}</div>
       ${(o.skills||[]).length?`<div class="cd-section"><h4>技能</h4>${o.skills.map(s=>`<div class="cd-entry"><b>${esc(s[0])}</b><br>${fmt(s[1])}</div>`).join("")}</div>`:""}
@@ -2786,14 +2805,14 @@ function renderCodexDetail(){
   } else if(CODEX_TAB==="mechanics"){
     h=`<div class="cd-dossier"><span class="cd-av" style="color:${esc(o.tint||"var(--amber)")}">${ic(o.icon||"i-note","lg")}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.title)}</div>
-        <div class="cd-sub">通用机制 · 与代码一致</div></div></div>
+        <div class="cd-sub">${TXT("ui.js.122")} ${TXT("ui.js.12")} ${TXT("ui.js.123")}</div></div></div>
       <div class="cd-section">${(o.entries||[]).map(e=>`<div class="cd-entry"><b>${esc(e[0])}</b><br>${fmt(e[1])}</div>`).join("")}</div>`;
   } else {
     const tiers=(o.tiers||[]);
     const tierLines=(o.tier_text||[]).map((t,i)=>`<div class="cd-tier"><span class="tn">${tiers[i]!==undefined?tiers[i]:"·"}</span><span>${fmt(t)}</span></div>`).join("");
     h=`<div class="cd-dossier"><span class="cd-av" id="bondTierIcon">${iconOrArt(o.art,o.icon||"i-mark","lg")}</span>
         <div class="cd-doss-main"><div class="cd-name">${esc(o.label)}</div>
-        <div class="cd-sub">档位阈值：${tiers.length?tiers.join(" / "):"特殊（见激活条件）"}</div>
+        <div class="cd-sub">${TXT("ui.js.124")}${tiers.length?tiers.join(" / "):"特殊（见激活条件）"}</div>
         ${tiers.length?`<div class="cd-sub" id="bondTierPreview"></div>`:""}</div></div>
       <div class="cd-block">${fmt(o.desc)}</div>
       ${o.base?`<div class="cd-section"><h4>基础效果</h4><div class="cd-entry">${fmt(o.base)}</div></div>`:""}
@@ -2823,31 +2842,31 @@ function renderDlc(){
     /* 快捷开关：双击任意一行 = 左→右启用 / 右→左卸载。 */
     const move=sel&&side==="right"
       ? `<span class="dlc-move" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">`
-        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('up')" title="上移（提高优先级）">&#9650;</button>`
-        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('down')" title="下移（降低优先级）">&#9660;</button></span>`
+        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('up')" title="${TXT("ui.js.125")}">&#9650;</button>`
+        +`<button class="mc-btn dlc-arrow" onclick="dlcMove('down')" title="${TXT("ui.js.126")}">&#9660;</button></span>`
       : "";
     return `<div class="dlc-item${sel?" on":""}" onclick="selDlc('${name}','${side}')" ondblclick="dlcToggle('${name}','${side}')">`
       +`<span class="dlc-name">${esc(name)}${extra||""}</span>${move}</div>`;
   };
-  $("dlcLeft").innerHTML=left.length?left.map(d=>row(d.name,"left")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（无）</div>';
-  $("dlcRight").innerHTML=PACK_ORDER.map(n=>row(n,"right",n==="base"?'<span class="dim dlc-base-tag">基底</span>':"")).join("");
+  $("dlcLeft").innerHTML=left.length?left.map(d=>row(d.name,"left")).join(""):"<div class=\"dim\" style=\"padding:10px;color:var(--ink3)\">" + TXT("ui.js.127") + "</div>";
+  $("dlcRight").innerHTML=PACK_ORDER.map(n=>row(n,"right",n==="base"?"<span class=\"dim dlc-base-tag\">" + TXT("ui.js.128") + "</span>":"")).join("");
 }
 function selDlc(name,side){ SEL_DLC={name:name,side:side}; renderDlc(); }
 /* 双击 = 快捷启用/卸载（设计快捷键）；base 不可卸载，位次仍可调。 */
 function dlcToggle(name,side){
   if(side==="left"){ PACK_ORDER.unshift(name); SEL_DLC=null; renderDlc(); return; }
-  if(name==="base"){ toast("base 基底不可卸载。"); return; }
+  if(name==="base"){ toast("base " + TXT("ui.js.129")); return; }
   PACK_ORDER=PACK_ORDER.filter(n=>n!==name); SEL_DLC=null; renderDlc();
 }
 function dlcMove(dir){
-  if(!SEL_DLC){ toast("请先选择一个内容包。"); return; }
+  if(!SEL_DLC){ toast(TXT("ui.js.130")); return; }
   /* 移入的包默认**放在最上面**（= 优先级最高），要降序再用 ▼ 调。 */
   if(dir==="right"&&SEL_DLC.side==="left"){ PACK_ORDER.unshift(SEL_DLC.name); SEL_DLC=null; renderDlc(); return; }
   if(dir==="left"&&SEL_DLC.side==="right"){
-    if(SEL_DLC.name==="base"){ toast("base 基底不可卸载。"); return; }
+    if(SEL_DLC.name==="base"){ toast("base " + TXT("ui.js.129")); return; }
     PACK_ORDER=PACK_ORDER.filter(n=>n!==SEL_DLC.name); SEL_DLC=null; renderDlc(); return;
   }
-  if(SEL_DLC.side!=="right") { toast("请先在右侧选择要调整的内容包。"); return; }
+  if(SEL_DLC.side!=="right") { toast(TXT("ui.js.131")); return; }
   const i=PACK_ORDER.indexOf(SEL_DLC.name);
   const j=dir==="up"?i-1:(dir==="down"?i+1:-1);
   if(i<0||j<0||j>=PACK_ORDER.length){ return; }
@@ -2856,7 +2875,7 @@ function dlcMove(dir){
 }
 async function applyDlc(){
   const r=await api("/api/dlc",{pack_order:PACK_ORDER});
-  if(r.error){ $("dlcHint").textContent="应用失败："+r.error; return; }
+  if(r.error){ $("dlcHint").textContent=TXT("ui.js.132")+r.error; return; }
   MENU=r.menu||MENU;
   /* 内容变了：图鉴缓存必须作废，否则新装的资料包角色/物品不会出现
      （这正是"有时查得到、有时查不到"的原因）。 */
@@ -2864,7 +2883,7 @@ async function applyDlc(){
   PACK_ORDER=(((MENU||{}).settings||{}).pack_order||["base"]).slice();
   syncPackState(); renderDlc();
   await applyResourcePack();          // 资料包可能自带外观，重新套用一次
-  $("dlcHint").textContent="已应用：内容包即时生效，无需重启界面。";
+  $("dlcHint").textContent=TXT("ui.js.133");
 }
 
 /* ---- 资源包（只改外观：配色/字体/贴图/头像零件/封面与标题）；位次高者覆盖低者 ----
@@ -2885,7 +2904,7 @@ function syncRpState(){
   RP_INITED=true;
 }
 function rpLabel(name){
-  if(name===RP_BASE) return "base（内置材质）";
+  if(name===RP_BASE) return "base" + TXT("ui.js.134");
   const row=((MENU&&MENU.resourcepacks)||[]).find(x=>x.name===name);
   return row&&row.label?row.label:name;
 }
@@ -2896,44 +2915,44 @@ function renderResourcepack(){
   const missing=(MENU&&MENU.resourcepacks===undefined);
   const hint=$("rpHint");
   if(hint && missing){
-    hint.textContent="未取到资源包列表：本地界面进程可能是旧版，重启一次界面即可（停止游戏UI 后再启动）。";
+    hint.textContent=TXT("ui.js.135") + "UI " + TXT("ui.js.136");
   }
   const pathLine=$("rpPath");
   if(pathLine){
     const root=(MENU&&MENU.resourcepack_root)||"";
     pathLine.textContent = missing
       ? ""
-      : `资源包目录：${root}（放 <名字>/ 进去即会出现在"可用资源包"）`;
+      : `${TXT("ui.js.137")}${root}${TXT("ui.js.138")} <${TXT("ui.js.139")}>/ ${TXT("ui.js.140")}"${TXT("ui.js.141")}"${TXT("ui.js.7")}`;
   }
   const left=all.filter(x=>!RP_ORDER.includes(x.name));
   const row=(name,side)=>{
     const sel=RP_SEL&&RP_SEL.name===name&&RP_SEL.side===side;
     const move=sel&&side==="right"
       ? `<span class="dlc-move" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">`
-        +`<button class="mc-btn dlc-arrow" onclick="rpMove('up')" title="上移（提高优先级）">&#9650;</button>`
-        +`<button class="mc-btn dlc-arrow" onclick="rpMove('down')" title="下移（降低优先级）">&#9660;</button></span>`
+        +`<button class="mc-btn dlc-arrow" onclick="rpMove('up')" title="${TXT("ui.js.125")}">&#9650;</button>`
+        +`<button class="mc-btn dlc-arrow" onclick="rpMove('down')" title="${TXT("ui.js.126")}">&#9660;</button></span>`
       : "";
     return `<div class="dlc-item${sel?" on":""}" onclick="selRp('${name}','${side}')" ondblclick="rpToggle('${name}','${side}')">`
       +`<span class="dlc-name">${esc(rpLabel(name))}${name===RP_BASE?'<span class="dim dlc-base-tag">基底</span>':""}</span>${move}</div>`;
   };
-  $("rpLeft").innerHTML=left.length?left.map(x=>row(x.name,"left")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（无）</div>';
-  $("rpRight").innerHTML=RP_ORDER.length?RP_ORDER.map(n=>row(n,"right")).join(""):'<div class="dim" style="padding:10px;color:var(--ink3)">（未启用）</div>';
+  $("rpLeft").innerHTML=left.length?left.map(x=>row(x.name,"left")).join(""):"<div class=\"dim\" style=\"padding:10px;color:var(--ink3)\">" + TXT("ui.js.127") + "</div>";
+  $("rpRight").innerHTML=RP_ORDER.length?RP_ORDER.map(n=>row(n,"right")).join(""):"<div class=\"dim\" style=\"padding:10px;color:var(--ink3)\">" + TXT("ui.js.142") + "</div>";
 }
 function selRp(name,side){ RP_SEL={name:name,side:side}; renderResourcepack(); }
 /* 双击 = 快捷启用/卸载；`base` 不可卸载（它是内置材质本身）。 */
 function rpToggle(name,side){
   if(side==="left"){ RP_ORDER.unshift(name); RP_SEL=null; renderResourcepack(); return; }
-  if(name===RP_BASE){ toast("base 基底不可卸载（它是内置材质本身）。"); return; }
+  if(name===RP_BASE){ toast("base " + TXT("ui.js.143")); return; }
   RP_ORDER=RP_ORDER.filter(n=>n!==name); RP_SEL=null; renderResourcepack();
 }
 function rpMove(dir){
-  if(!RP_SEL){ toast("请先选择一个资源包。"); return; }
+  if(!RP_SEL){ toast(TXT("ui.js.144")); return; }
   if(dir==="right"&&RP_SEL.side==="left"){ RP_ORDER.unshift(RP_SEL.name); RP_SEL=null; renderResourcepack(); return; }
   if(dir==="left"&&RP_SEL.side==="right"){
-    if(RP_SEL.name===RP_BASE){ toast("base 基底不可卸载（它是内置材质本身）。"); return; }
+    if(RP_SEL.name===RP_BASE){ toast("base " + TXT("ui.js.143")); return; }
     RP_ORDER=RP_ORDER.filter(n=>n!==RP_SEL.name); RP_SEL=null; renderResourcepack(); return;
   }
-  if(RP_SEL.side!=="right"){ toast("请先在右侧选择要调整的资源包。"); return; }
+  if(RP_SEL.side!=="right"){ toast(TXT("ui.js.145")); return; }
   const i=RP_ORDER.indexOf(RP_SEL.name);
   const j=dir==="up"?i-1:(dir==="down"?i+1:-1);
   if(i<0||j<0||j>=RP_ORDER.length){ return; }
@@ -2942,40 +2961,40 @@ function rpMove(dir){
 }
 async function applyResourcepacks(){
   const r=await api("/api/dlc",{pack_order:PACK_ORDER, resourcepack_order:RP_ORDER});
-  if(r.error){ $("rpHint").textContent="应用失败："+r.error; return; }
+  if(r.error){ $("rpHint").textContent=TXT("ui.js.132")+r.error; return; }
   MENU=r.menu||MENU;
   /* 图鉴里的图标由**后端按当前资源包**解析下发（内联/URL 都在里面），换包后必须重取。 */
   CODEX=null;
   RP_ORDER=(((MENU||{}).settings||{}).resourcepack_order||[RP_BASE]).slice();
   syncRpState(); renderResourcepack();
   await applyResourcePack();          // 立刻把新外观应用到界面（无需刷新）
-  $("rpHint").textContent="已应用：外观即时生效。";
+  $("rpHint").textContent=TXT("ui.js.146");
 }
 
 /* ---- 退出游戏：等价于「停止游戏UI.bat」（关停本地服务） ---- */
 async function quitGame(){
   try{ await api("/api/quit",{}); }catch(e){}
-  document.body.innerHTML='<div class="quit-screen"><b>已退出游戏</b>'
-    +'<span>本地服务已关闭，可以直接关闭本页。</span></div>';
+  document.body.innerHTML="<div class=\"quit-screen\"><b>" + TXT("ui.js.147") + "</b>"
+    +"<span>" + TXT("ui.js.148") + "</span></div>";
 }
 
-async function doSave(){ const r=await api("/api/action",{type:"save"}); appendLog(r.messages); if(r.error) toast(r.error,"err"); else toast("已保存到 saves/savegame.json"); }
+async function doSave(){ const r=await api("/api/action",{type:"save"}); appendLog(r.messages); if(r.error) toast(r.error,"err"); else toast(TXT("ui.js.149") + " saves/savegame.json"); }
 async function doLoad(){ const r=await api("/api/action",{type:"load"}); if(r.error){ toast(r.error,"err"); return; } seedLog(r.state); mergeState(r.state); appendLog(r.messages); }
 async function doRewind(){ const r=await api("/api/action",{type:"rewind"}); mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err"); }
 async function doorDecision(kind){ closeDialog();
-  const decision = kind==="接纳"?"accept":(kind==="拒绝"?"reject":"inspect");
+  const decision = kind===TXT("ui.js.150")?"accept":(kind===TXT("ui.js.151")?"reject":"inspect");
   const r=await api("/api/action", {type:"door", decision}); mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err");
 }
 function showDoor(){
   const d=(STATE.door||[])[0];
-  if(!d){ toast("门外没有事件。"); return; }
+  if(!d){ toast(TXT("ui.js.152")); return; }
   const v=d.visitor;
   const vline = v ? `<div class="visitor" onmouseover="showVisitorTip(this)" onmousemove="showVisitorTip(this)" onmouseout="hideTip()">`
     + `<span class="mono">${esc(v.name)}</span> <span class="dim">${esc(v.persona)}</span></div>` : "";
   const actions = d.kind==="human"
-    ? `<div class="pick-row" style="margin-top:10px"><button class="btn p" onclick="doorDecision('接纳')">接纳</button><button class="btn" onclick="doorDecision('拒绝')">拒绝</button></div>`
-    : `<div class="pick-row" style="margin-top:10px"><button class="btn p" onclick="doorDecision('处理')">处理</button></div>`;
-  openDialog("门口事件","THRESHOLD", `<p><strong>${esc(d.title)}</strong></p>${vline}<p>${mdText(d.description)}</p>${actions}`);
+    ? `<div class="pick-row" style="margin-top:10px"><button class="btn p" onclick="doorDecision('${TXT("ui.js.150")}')">${TXT("ui.js.150")}</button><button class="btn" onclick="doorDecision('${TXT("ui.js.151")}')">${TXT("ui.js.151")}</button></div>`
+    : `<div class="pick-row" style="margin-top:10px"><button class="btn p" onclick="doorDecision('${TXT("ui.js.153")}')">${TXT("ui.js.153")}</button></div>`;
+  openDialog(TXT("ui.js.154"),"THRESHOLD", `<p><strong>${esc(d.title)}</strong></p>${vline}<p>${mdText(d.description)}</p>${actions}`);
 }
 
 function optDbl(index){ tglSelect(index); confirmDialog(); }
@@ -3002,9 +3021,9 @@ function pagedOptions(key,htmls){
   /* 多于一页才出现箭头；到达端点时置灰而不是隐藏（行宽不跳）。 */
   const offL=PAGER.page<=0, offR=PAGER.page>=pages-1;
   return `<div class="disc-opts">`
-    +`<button class="pg-arrow l${offL?" off":""}"${offL?" disabled":""} onclick="pagerGo(-1,${pages})" aria-label="上一页"></button>`
+    +`<button class="pg-arrow l${offL?" off":""}"${offL?" disabled":""} onclick="pagerGo(-1,${pages})" aria-label="${TXT("ui.js.155")}"></button>`
     +row
-    +`<button class="pg-arrow r${offR?" off":""}"${offR?" disabled":""} onclick="pagerGo(1,${pages})" aria-label="下一页"></button>`
+    +`<button class="pg-arrow r${offR?" off":""}"${offR?" disabled":""} onclick="pagerGo(1,${pages})" aria-label="${TXT("ui.js.156")}"></button>`
     +`</div>`;
 }
 function pagerGo(delta,pages){ PAGER.page=Math.max(0,Math.min(pages-1,PAGER.page+delta)); maybePending(); }
@@ -3016,7 +3035,7 @@ function discoverCardHtml(index,v){
   let inner="";
   if(v.kind==="personality"){
     inner=`<div class="dc-persona">${ic(v.icon||"i-b-dynamic","lg")}<b>${esc(v.name)}</b>`
-      +`<span class="dc-weight dim">当前激活加权总和：${v.weight!=null?v.weight:0}</span></div>`;
+      +`<span class="dc-weight dim">${TXT("ui.js.157")}${v.weight!=null?v.weight:0}</span></div>`;
   } else if(v.kind==="character"){
     inner=`<span class="cn">${String(index+1).padStart(2,"0")}</span>`
       +`<span class="dc-av">${avatarIcon(v.id,v.avatar,"lg",v.art,v.avatar_parts)}</span>`
@@ -3038,9 +3057,9 @@ function discoverHoverStart(ev,index){
   _discTimer=setTimeout(()=>{
     const L=$("tipLayer"); if(!L) return;
     const rows=[];
-    if(v.persona) rows.push(`<span class="tip-line">性格：${esc(v.persona)}</span>`);
+    if(v.persona) rows.push(`<span class="tip-line">${TXT("ui.js.56")}${esc(v.persona)}</span>`);
     if((v.tags||[]).length) rows.push(`<span class="tip-line">${v.tags.map(esc).join(" · ")}</span>`);
-    if(v.quality_label) rows.push(`<span class="tip-line">品质：${esc(v.quality_label)}</span>`);
+    if(v.quality_label) rows.push(`<span class="tip-line">${TXT("ui.js.158")}${esc(v.quality_label)}</span>`);
     if(v.desc) rows.push(`<span class="tip-eff">${fmt(v.desc)}</span>`);
     L.innerHTML=`<b>${esc(v.name)}</b>${rows.join("")}`;
     L.style.display="block"; _tipPlace(el,L);
@@ -3053,20 +3072,20 @@ function maybePending(){
   const pi=STATE.pending&&STATE.pending.interaction;
   if(pi&&pi.options&&pi.options.length){
     if(pi.submit){ fateFlow(pi); return; }
-    openDialog(pi.prompt||"选择","CHOICE",
+    openDialog(pi.prompt||TXT("ui.js.159"),"CHOICE",
       `<div class="disc-desc">${mdText(pi.prompt||"")}</div>`
       +pagedOptions("pi:"+(pi.prompt||""), pi.options.map((o,i)=>optHtml(i,o,"pick-card"))),
-      false, ()=>{ const i=selectedIndex(); if(i==null){ toast("请选择。"); return; } resolveView(i); });
+      false, ()=>{ const i=selectedIndex(); if(i==null){ toast(TXT("ui.js.160")); return; } resolveView(i); });
     return;
   }
   const pc=STATE.pending&&STATE.pending.choice;
   if(!pc||!pc.options||!pc.options.length){ syncPeek(); return; }
   DISCOVER_VIEWS=pc.options;
-  openDialog("发现","DISCOVER",
+  openDialog(TXT("ui.js.161"),"DISCOVER",
     `<div class="disc-desc">${mdText(pc.prompt||"")}</div>`
     +pagedOptions("pc:"+(pc.kind||""), pc.options.map((o,i)=>discoverCardHtml(i,o))),
     false, async ()=>{
-      const i=selectedIndex(); if(i==null){ toast("请先选择一项。"); return; }
+      const i=selectedIndex(); if(i==null){ toast(TXT("ui.js.162")); return; }
       const r=await api("/api/action",{type:(pc.kind==="start_choice"?"start_choice":"discover"), index:i});
       mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err");
     }, false, /* bare = 不要背景板 */ true);
@@ -3096,8 +3115,8 @@ function fateHoverStart(ev,index){
   _fateTimer=setTimeout(()=>{
     const L=$("tipLayer"); if(!L) return;
     L.innerHTML=`<b>${esc(o.display||o.name||"")}</b>`
-      +`<span class="tip-line"><b>${esc(pi.upright_label||"")}：</b>${fmt(o.upright||"")}</span>`
-      +`<span class="tip-line"><b>${esc(pi.reversed_label||"")}：</b>${fmt(o.reversed||"")}</span>`;
+      +`<span class="tip-line"><b>${esc(pi.upright_label||"")}${TXT("ui.js.163")}</b>${fmt(o.upright||"")}</span>`
+      +`<span class="tip-line"><b>${esc(pi.reversed_label||"")}${TXT("ui.js.163")}</b>${fmt(o.reversed||"")}</span>`;
     L.style.display="block"; _tipPlace(el,L);
   },250);
 }
@@ -3111,7 +3130,7 @@ function fateFlow(pi){
     openDialog(pi.title||"","FATE",
       `<div class="disc-desc">${mdText(pi.prompt||"")}</div>`
       +pagedOptions("fate1", opts.map((o,i)=>fateCardHtml(i,o))),
-      false, ()=>{ const i=selectedIndex(); if(i==null){ toast("请选择一张。"); return; } FATE.index=i; fateAfterPick(); },
+      false, ()=>{ const i=selectedIndex(); if(i==null){ toast(TXT("ui.js.164")); return; } FATE.index=i; fateAfterPick(); },
       false, true);
     return;
   }
@@ -3138,7 +3157,7 @@ function fateFlow(pi){
       `<div class="disc-desc">${esc(spec.prompt||"")}</div>`
       +pagedOptions("fate-orient", cards),
       false, ()=>{
-        const i=selectedIndex(); if(i==null){ toast("请选择一项。"); return; }
+        const i=selectedIndex(); if(i==null){ toast(TXT("ui.js.165")); return; }
         FATE.orientation=choices[i][0]; FATE.stage=fateNextStage(); maybePending();
       }, false, true);
     return;
@@ -3149,10 +3168,10 @@ function fateFlow(pi){
       const t=(STATE.tenants||[]).find(x=>x.id===c.value);
       return t?tenantChoiceCard(t,""):"";
     }).join("");
-    if(!cards){ toast("屋里没有可以指定的房客。"); return; }
+    if(!cards){ toast(TXT("ui.js.166")); return; }
     openDialog(pi.target.prompt||pi.title||"","FATE",
       `<div class="choice-grid">${cards}</div>`, true, ()=>{
-        const el=pickedEl(); if(!el){ toast("请选择房客。"); return; }
+        const el=pickedEl(); if(!el){ toast(TXT("ui.js.167")); return; }
         FATE.targetId=Number(el.dataset.id); FATE.stage=5; maybePending();
       }, false, true);
     return;
@@ -3191,7 +3210,7 @@ function fateProceed(){
 async function fateSettle(){
 /* 需要选人的牌没选人就结算的话，后端只回一句报错；这里先挡住，
    提示文案取内容层下发的 target.prompt，前端不另造措辞。 */
-if(fateNeedsTarget()&&!FATE.targetId){ toast(((FATE.pi||{}).target||{}).prompt||"请先选择一名房客","err"); return; }
+if(fateNeedsTarget()&&!FATE.targetId){ toast(((FATE.pi||{}).target||{}).prompt||TXT("ui.js.168"),"err"); return; }
 const value={index:FATE.index};
   if(FATE.orientation) value.orientation=FATE.orientation;
   if(FATE.itemId) value.item_id=FATE.itemId;
@@ -3213,15 +3232,15 @@ function openSubmitDialog(pi){
   const cards=pi.options.map((o,i)=>`<div class="pick-card" data-index="${i}" onclick="pickUnit(this)"><b>${esc(o)}</b></div>`).join("");
   const orientChoices=(pi.orientation&&pi.orientation.choices)||spec.choices||[];
   const choices=orientChoices.map(c=>`<button class="btn sub-orient-btn" data-val="${esc(c[0])}" onclick="pickSubOrient(this)">${esc(c[1])}</button>`).join("");
-  openDialog(pi.prompt||"选择","CHOICE",
+  openDialog(pi.prompt||TXT("ui.js.159"),"CHOICE",
     `<div class="submit-wrap">
-       <div class="eyebrow">选择要结算的目标</div>
+       <div class="eyebrow">${TXT("ui.js.169")}</div>
        <div class="pick-row">${cards}</div>
        ${spec.title?`<div class="eyebrow" style="margin-top:12px">${esc(spec.title)}</div>`:""}
        ${submitSlotHtml("拖拽或点击下方物资放入此槽")}
        ${choices?`<div class="submit-orient">${choices}</div>`:""}
        <div class="submit-note">${esc(pi.submit.label||"")}</div>
-       <div class="eyebrow" style="margin-top:10px">仓库与房客背包</div>
+       <div class="eyebrow" style="margin-top:10px">${TXT("ui.js.170")}</div>
        <div class="submit-pool" id="subPool">${submitPoolHtml()}</div>
        ${pi.cancel?`<div class="note"><button class="btn" onclick="resolveView(null)">${esc(pi.cancel)}</button></div>`:""}
      </div>`,
@@ -3230,9 +3249,9 @@ function openSubmitDialog(pi){
 }
 function submitPoolHtml(){
   SUBMIT_POOL=[];
-  (STATE.warehouse||[]).forEach(e=>{ if(e) SUBMIT_POOL.push({e:e,src:"仓库"}); });
+  (STATE.warehouse||[]).forEach(e=>{ if(e) SUBMIT_POOL.push({e:e,src:TXT("ui.js.171")}); });
   (STATE.tenants||[]).forEach(t=>(t.inventory||[]).forEach(e=>{ if(e) SUBMIT_POOL.push({e:e,src:t.name}); }));
-  if(!SUBMIT_POOL.length) return '<span class="dim">没有可用物资。</span>';
+  if(!SUBMIT_POOL.length) return "<span class=\"dim\">" + TXT("ui.js.172") + "</span>";
   return SUBMIT_POOL.map(r=>{
     const icon=r.e[0],name=r.e[1],q=r.e[2],count=r.e[3],stack=r.e[4],itemId=r.e[5];
     const ok=q>=(SUBMIT?SUBMIT.min:0);
@@ -3242,7 +3261,7 @@ function submitPoolHtml(){
   }).join("");
 }
 function onSubDragOut(ev){ if(!SUBMIT||!SUBMIT.itemId||!ev.dataTransfer) return; ev.dataTransfer.setData("text/plain",SUBMIT.itemId); ev.dataTransfer.effectAllowed="move"; }
-let submitSlotHint="拖拽或点击下方物资放入此槽；把槽内物资拖走可取回";
+let submitSlotHint=TXT("ui.js.173");
 function submitSlotHtml(hint){
   if(hint) submitSlotHint=hint;
   return `<div class="submit-slot" id="subSlot" ondragover="onSubOver(event)" ondragleave="onDragLeave(event)" ondrop="onSubDrop(event)" onclick="clearSubSlot()" ondragstart="onSubDragOut(event)" ondragend="onSubDragEnd()">
@@ -3258,14 +3277,14 @@ function onSubDrop(ev){ ev.preventDefault(); ev.currentTarget.classList.remove("
   const id=ev.dataTransfer.getData("text/plain"); if(id) pickSubItemById(id); }
 function pickSubItemById(itemId){
   const row=SUBMIT_POOL.find(r=>r.e[5]===itemId); if(!row) return;
-  const q=row.e[2]; if(q<(SUBMIT.min||0)){ toast("该物资品质不足。","err"); return; }
+  const q=row.e[2]; if(q<(SUBMIT.min||0)){ toast(TXT("ui.js.174"),"err"); return; }
   if(SUBMIT.itemId===itemId){ clearSubSlot(); return; }
   SUBMIT.itemId=itemId; SUBMIT.name=row.e[1]; SUBMIT.quality=q;
   const slot=$("subSlot"), box=$("subSlotBox"), hint=$("subSlotHint");
   if(slot) slot.classList.add("filled");
   if(slot) slot.setAttribute("draggable","true");
   if(box) box.innerHTML=itemIcon(row.e[12],row.e[0]);
-  if(hint) hint.textContent=row.e[1]+"（"+qName(q)+"）";
+  if(hint) hint.textContent=row.e[1]+TXT("ui.js.6")+qName(q)+TXT("ui.js.7");
   refreshSubPool();
 }
 function clearSubSlot(){ if(!SUBMIT||!SUBMIT.itemId) return; SUBMIT.itemId=null; SUBMIT.name=null;
@@ -3278,10 +3297,10 @@ function pickSubOrient(el){ document.querySelectorAll(".sub-orient-btn").forEach
   el.classList.add("act"); SUBMIT.orientation=el.dataset.val; }
 async function submitResolve(){
   const el=pickedEl();
-  if(!el){ toast("请先选择目标。","err"); return; }
+  if(!el){ toast(TXT("ui.js.175"),"err"); return; }
   const index=Number(el.dataset.index);
   const needsOrient=(SUBMIT.requiredIndices||[]).indexOf(index)>=0;
-  if((SUBMIT.itemId||needsOrient) && !SUBMIT.orientation){ toast(SUBMIT.orientPrompt||"请选择。","err"); return; }
+  if((SUBMIT.itemId||needsOrient) && !SUBMIT.orientation){ toast(SUBMIT.orientPrompt||TXT("ui.js.160"),"err"); return; }
   const value={index:index};
   if(SUBMIT.orientation) value.orientation=SUBMIT.orientation;
   if(SUBMIT.itemId) value.item_id=SUBMIT.itemId;
@@ -3300,7 +3319,7 @@ function showItemTip(el,name,q,dur,dmax){
     <span class="it-desc">${desc||"—"}</span>
     ${flavor?`<em class="it-flavor">${flavor}</em>`:""}
     ${(dmax||0)>0?`<span class="it-dur">耐久 ${dur||0}/${dmax}</span>`:""}
-    <span class="it-act">单击使用/装备 · 拖拽给房客或背包</span>`;
+    <span class="it-act">${TXT("ui.js.176")}/${TXT("ui.js.177")} ${TXT("ui.js.12")} ${TXT("ui.js.178")}</span>`;
   L.style.display="block";
   const r=el.getBoundingClientRect(), w=320, pad=8;
   L.style.left=Math.min(window.innerWidth-w-pad, Math.max(pad, r.left+r.width/2-w/2))+"px";
@@ -3314,16 +3333,16 @@ function showItemUse(itemId,kind,index){
   const equip=!!e[9], name=e[1]||itemId, desc=e[7]||"", flavor=e[8]||"";
   const fromBp=(kind==="bp"), srcTenant=fromBp?curBpTenantId():null;
   const rows=(STATE.tenants||[]).filter(t=>!t.searching).map(t=>tenantChoiceCard(t,' data-kind="tenant"')).join("");
-  const backCard=(fromBp&&equip)?`<div class="pick-card" data-kind="warehouse" onclick="pickUnit(this)">${ic("i-bag")}<b>放回屋主仓库</b></div>`:"";
-  openDialog((equip?"装备":"使用")+" · "+name,"SUPPLY",
+  const backCard=(fromBp&&equip)?`<div class="pick-card" data-kind="warehouse" onclick="pickUnit(this)">${ic("i-bag")}<b>${TXT("ui.js.179")}</b></div>`:"";
+  openDialog((equip?TXT("ui.js.177"):TXT("ui.js.180"))+" " + TXT("ui.js.12") + " "+name,"SUPPLY",
     `<div class="it-desc">${desc}</div>${flavor?`<div class="it-flavor">${flavor}</div>`:""}
-     <div class="eyebrow" style="margin-top:10px">选择目标房客</div>
+     <div class="eyebrow" style="margin-top:10px">${TXT("ui.js.181")}</div>
      <div class="choice-grid" style="margin-top:6px">${rows}${backCard}</div>`, false, ()=>{
-      const el=pickedEl(); if(!el){ toast("请先选择房客。"); return; }
+      const el=pickedEl(); if(!el){ toast(TXT("ui.js.49")); return; }
       if(el.dataset.kind==="warehouse"){ postAction({type:"unequip",tenant_id:srcTenant,item_id:itemId,slot:index}); return; }
       const tid=Number(el.dataset.id);
-      if(fromBp && tid!==srcTenant){ postAction({type:"transfer_item",from_tenant:srcTenant,to_tenant:tid,item_id:itemId,slot:index},"已转移物资。"); return; }
-      if(fromBp && equip){ toast("该物资已在该房客背包中。"); return; }
+      if(fromBp && tid!==srcTenant){ postAction({type:"transfer_item",from_tenant:srcTenant,to_tenant:tid,item_id:itemId,slot:index},TXT("ui.js.182")); return; }
+      if(fromBp && equip){ toast(TXT("ui.js.183")); return; }
       /* 带上来源槽位：同名物品可能有多件（耐久/堆叠不同），必须精确定位到玩家点的那一件。 */
       const body = equip ? {type:"equip",tenant_id:tid,item_id:itemId,source_tenant:fromBp?srcTenant:null,slot:index}
                          : {type:"use_item",item_id:itemId,tenant_id:tid,source_tenant:fromBp?srcTenant:null,slot:index};
@@ -3331,24 +3350,24 @@ function showItemUse(itemId,kind,index){
     });
 }
 function showSearch(){
-  if(STATE&&STATE.searchBlocked){ toast("本回合已经指派过搜索了。"); return; }
+  if(STATE&&STATE.searchBlocked){ toast(TXT("ui.js.184")); return; }
   const cards=tenantPickRow();
-  if(!cards){ toast("屋里没有可以指派的房客。"); return; }
-  openDialog("指派搜索 · 选择房客","SEARCH",
+  if(!cards){ toast(TXT("ui.js.185")); return; }
+  openDialog(TXT("ui.js.186") + " " + TXT("ui.js.12") + " " + TXT("ui.js.187"),"SEARCH",
     `<div class="choice-grid">${cards}</div>`, true, ()=>{
-      const el=pickedEl(); if(!el){ toast("请选择房客。"); return; }
+      const el=pickedEl(); if(!el){ toast(TXT("ui.js.167")); return; }
       chooseLocation(Number(el.dataset.id));
     });
 }
 let LOC_SEL=null;
 function chooseLocation(tenantId){
   const locs=STATE.locations||[];
-  if(!locs.length){ toast("附近没有可搜索的地点。"); return; }
+  if(!locs.length){ toast(TXT("ui.js.188")); return; }
   LOC_SEL=locs[0].id;
-  openDialog("指派搜索 · 选择地点","SEARCH",
+  openDialog(TXT("ui.js.186") + " " + TXT("ui.js.12") + " " + TXT("ui.js.189"),"SEARCH",
     `<div class="search-layout"><div class="loc-list" id="locList"></div><div class="loc-detail" id="locDetail"></div></div>`,
     true, async ()=>{
-      if(!LOC_SEL){ toast("请选择地点。"); return; }
+      if(!LOC_SEL){ toast(TXT("ui.js.190")); return; }
       const r=await api("/api/action",{type:"start_search",tenant_id:tenantId,location_id:LOC_SEL});
       mergeState(r.state); appendLog(r.messages); if(r.error) toast(r.error,"err");
     });
@@ -3360,7 +3379,7 @@ function chooseLocation(tenantId){
    它已经通过图标特征色表达了。 */
 function locChips(l){
   return [l.group_label?`<span class="chip">${esc(l.group_label)}</span>`:"",
-          l.fixed?`<span class="chip warn">固定</span>`:""].filter(Boolean).join("");
+          l.fixed?`<span class="chip warn">${TXT("ui.js.191")}</span>`:""].filter(Boolean).join("");
 }
 function renderLocList(){
   const el=$("locList"); if(!el) return;
@@ -3410,10 +3429,10 @@ function abCond(abilityId,actorId,targetId,option){ closeDialog(); sendAbility(a
 function afterTarget(abilityId,actorId,targetId){
   const spec=specOf(actorId,abilityId), opts=spec.options||[];
   if(!opts.length){ sendAbility(abilityId,actorId,targetId); return; }
-  openDialog("使用能力 · "+(spec.name||abilityId), spec.prompt||"选择要发动的效果",
+  openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+(spec.name||abilityId), spec.prompt||TXT("ui.js.193"),
     `<div class="choice-grid">${opts.map(o=>optChoiceCard(o[0],o[1],o[2],o[3])).join("")}</div>`,
     false, ()=>{
-      const el=pickedEl(); if(!el){ toast("请选择一项。","err"); return; }
+      const el=pickedEl(); if(!el){ toast(TXT("ui.js.165"),"err"); return; }
       const val=el.dataset.val;
       if(spec.nested_option && val===spec.nested_option){ pickCopiedAbility(abilityId,actorId,targetId,val); return; }
       sendAbility(abilityId,actorId,targetId,val);
@@ -3421,12 +3440,12 @@ function afterTarget(abilityId,actorId,targetId){
 }
 function pickCopiedAbility(abilityId,actorId,targetId,option){
   const t=(STATE.tenants||[]).find(x=>x.id===targetId);
-  const actives=((t&&t.abilities)||[]).filter(a=>a.kind==="主动");
-  if(!actives.length){ toast("目标没有可模仿的主动能力。","err"); return; }
-  openDialog("使用能力 · 模仿","选择要模仿的主动能力",
+  const actives=((t&&t.abilities)||[]).filter(a=>a.kind===TXT("ui.js.14"));
+  if(!actives.length){ toast(TXT("ui.js.194"),"err"); return; }
+  openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " " + TXT("ui.js.195"),TXT("ui.js.196"),
     `<div class="choice-grid">${actives.map(a=>barChoiceCard(a.id,"i-gear",a.name,a.text||"")).join("")}</div>`,
     true, ()=>{
-      const el=pickedEl(); if(!el){ toast("请选择一项。","err"); return; }
+      const el=pickedEl(); if(!el){ toast(TXT("ui.js.165"),"err"); return; }
       sendAbility(abilityId,actorId,targetId,option,undefined,el.dataset.val);
     });
 }
@@ -3437,23 +3456,23 @@ function useAbility(actorId,abilityId){
   if(target==="none"||target==="fate"){ sendAbility(abilityId,actorId,null); return; }
   if(target==="information"){
     const opts=spec.candidates||[];
-    if(!opts.length){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择",
+    if(!opts.length){ toast(TXT("ui.js.197"),"err"); return; }
+    openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+name, prompt||TXT("ui.js.159"),
       `<div class="choice-grid">${opts.map(o=>optChoiceCard(o.value,o.label,o.icon||"i-note",o.desc)).join("")}</div>`,
-      false, ()=>{ const el=pickedEl(); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
+      false, ()=>{ const el=pickedEl(); if(!el){ toast(TXT("ui.js.198"),"err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
     return;
   }
   if(target==="resource"){
     const opts=spec.options||[];
-    if(!opts.length){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择",
+    if(!opts.length){ toast(TXT("ui.js.197"),"err"); return; }
+    openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+name, prompt||TXT("ui.js.159"),
       `<div class="choice-grid">${opts.map(o=>optChoiceCard(o[0],o[1],o[2],o[3])).join("")}</div>`,
-      false, ()=>{ const el=pickedEl(); if(!el){ toast("请先选择。","err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
+      false, ()=>{ const el=pickedEl(); if(!el){ toast(TXT("ui.js.198"),"err"); return; } sendAbility(abilityId,actorId,null,el.dataset.val); });
     return;
   }
   if(target==="amount"){
     const extra=(spec.options||[])[0];
-    openDialog("使用能力 · "+name, prompt||"",
+    openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+name, prompt||"",
       amountBox(spec)
       +(extra?`<label class="mc-field" style="flex-direction:row;align-items:center;gap:8px;margin-top:14px">${esc(extra[1])}<input id="abExtra" type="checkbox"></label>`:""),
       false, ()=>{ const on=extra&&$("abExtra")&&$("abExtra").checked;
@@ -3464,15 +3483,15 @@ function useAbility(actorId,abilityId){
   }
   if(target==="tenant"||target==="other_tenant"){
     const rows=abTargetRows(spec, target==="other_tenant"?actorId:null);
-    if(!rows){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择目标房客", `<div class="choice-grid">${rows}</div>`, false,
+    if(!rows){ toast(TXT("ui.js.197"),"err"); return; }
+    openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+name, prompt||TXT("ui.js.181"), `<div class="choice-grid">${rows}</div>`, false,
       ()=>{
-        const el=pickedEl(); if(!el){ toast("请先选择目标房客。","err"); return; }
+        const el=pickedEl(); if(!el){ toast(TXT("ui.js.199"),"err"); return; }
         const tid=Number(el.dataset.id);
         /* 不可撤销的动作：内容声明了 `confirm` 就先确认一次（文案与危险色都由内容定）。 */
         if(spec.confirm){
           askConfirm({ title:name, question:spec.confirm, danger:!!spec.danger,
-            yes:"确定", no:"取消", onYes:()=>afterTarget(abilityId,actorId,tid) });
+            yes:TXT("ui.js.200"), no:TXT("ui.js.51"), onYes:()=>afterTarget(abilityId,actorId,tid) });
           return;
         }
         afterTarget(abilityId,actorId,tid);
@@ -3487,8 +3506,8 @@ function useAbility(actorId,abilityId){
       return `<div class="card" style="min-width:0"><span class="dc-av">${ic(t.avatar||"i-person","lg")}</span>
         <span class="dc-name"><b>${esc(t.name)}</b></span><div class="chips" style="justify-content:center">${chips}</div></div>`;
     }).join("");
-    if(!rows){ toast("没有可选目标。","err"); return; }
-    openDialog("使用能力 · "+name, prompt||"选择要移除的状态", `<div class="choice-grid">${rows}</div>`, true);
+    if(!rows){ toast(TXT("ui.js.197"),"err"); return; }
+    openDialog(TXT("ui.js.192") + " " + TXT("ui.js.12") + " "+name, prompt||TXT("ui.js.201"), `<div class="choice-grid">${rows}</div>`, true);
     return;
   }
   sendAbility(abilityId,actorId,null);
@@ -3501,7 +3520,7 @@ function dropOnTenant(ev,id){
     const from=curBpTenantId();
     if(from!=null && from!==id){
       /* 从某房客背包拖到另一房客 → 转移物资 */
-      postAction({type:"transfer_item",from_tenant:from,to_tenant:id,item_id:itemId,slot:src.slot},"已转移物资。");
+      postAction({type:"transfer_item",from_tenant:from,to_tenant:id,item_id:itemId,slot:src.slot},TXT("ui.js.182"));
     } else if(isEquipId(itemId)){
       postAction({type:"equip",tenant_id:id,item_id:itemId,source_tenant:from,slot:src.slot});
     } else {
@@ -3579,7 +3598,7 @@ document.addEventListener("click",function(e){
   const act=t.closest("button,.btn,.slot,[data-act]");
   if(!act) return;
   e.preventDefault(); e.stopPropagation();
-  toast("请先完成当前选择。");
+  toast(TXT("ui.js.85"));
 },true);
 /* ================= 资源包：材质（CSS 变量/字体）与贴图零件 =================
    前端 CSS 里已带**默认材质**（`:root` 兜底块，值与 base 资源包一致），
@@ -3593,8 +3612,8 @@ async function applyResourcePack(){
   if(!tokens || !Object.keys(tokens).length){
     /* 资源包缺失 = 十有八九界面进程还没重启（该接口是后加的）。
        界面继续用内置默认材质；这里提示一声，免得靠"发现布局不对"才知道。 */
-    console.warn("资源包接口不可用：沿用内置默认材质。", r);
-    toast("资源包接口不可用：已用默认材质显示（界面进程若是旧版，重启一次即可）。");
+    console.warn(TXT("ui.js.202"), r);
+    toast(TXT("ui.js.203"));
     return;
   }
   const root=document.documentElement;
@@ -3646,8 +3665,10 @@ async function applyResourceAssets(assets){
   }
 }
 (async function boot(){
+  await loadLang();
   await applyResourcePack();
   STATE=emptyState();
+  applyStaticText();
   renderScrapTitle();
   renderAll();
   openLauncher();

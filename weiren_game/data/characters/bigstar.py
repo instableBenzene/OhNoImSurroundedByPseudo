@@ -4,17 +4,15 @@
 
 from ..types import A, CharacterDefinition, MarkDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "bigstar", 2, "比格小星", "看起来呆呆的社牛学生，最喜欢吃松饼。",
-    "cheerful", "gentle", 3, ("大学生", "留学生", "日语掌握者", "18-24岁", "未知的性别", "星星"),
-    (A("hell_gift", "地狱的赠礼",
-       "比格小星未被禁用时，房客外出搜索可能获得「可爱的玩偶」。\n"
-       "「可爱的玩偶」（紫色）【工具】【工艺品】【消耗品】\n"
-       "· 仅可用于比格小星，使用后回复 **25 理智**。\n"
-       "*一个「快乐恶魂」玩偶，比格小星总喜欢带着她，为她拍不同的照片。*"),
-     A("everyone_star", "大家的星星", "· 比格小星回复理智时，**超过 100 的部分**转化为等量【星之印记-比格小星】。\n· 回合开始时，消耗**至多 10 个**印记，为当前理智最低的 **1 名**房客回复等量 **×0.5** 的理智。")),
+    "bigstar", 2, TEXT["character.bigstar.name"], TEXT["character.bigstar.description"],
+    "cheerful", "gentle", 3, (TEXT["character.bigstar.tag.0"], TEXT["character.bigstar.tag.1"], TEXT["character.bigstar.tag.2"], TEXT["character.bigstar.tag.3"], TEXT["character.bigstar.tag.4"], TEXT["character.bigstar.tag.5"]),
+    (A("hell_gift", TEXT["ability.hell_gift.name"],
+       TEXT["ability.hell_gift.description"]),
+     A("everyone_star", TEXT["ability.everyone_star.name"], TEXT["ability.everyone_star.description"])),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -39,25 +37,21 @@ def use_star_doll(engine: EngineProtocol, tenant: object, item: object) -> None:
     from weiren_game.exceptions import RuleViolation
 
     if tenant.character_id != "bigstar":
-        raise RuleViolation("可爱的玩偶只能由比格小星使用。")
+        raise RuleViolation(TEXT["data.characters.bigstar.use_star_doll.1"])
     engine._restore_sanity(tenant, 25, item.name)
 
 
-def collect_star_overflow(engine: EngineProtocol, tenant: object, overflow: float) -> bool:
-    """大家的星星：理智回复溢出时累计为星之印记。
+def collect_star_overflow(engine: EngineProtocol, *, tenant: object, overflow: float) -> None:
+    """大家的星星：理智回复溢出时按 **100%** 累计为星之印记。
 
-    与伪人薯条的「暴露值」同属「理智溢出转化」体系：小星按 100% 转为星之印记，
-    薯条的替身按 50% 转为暴露印记（对外称暴露值）。
-
-    使用处：value_system._restore_sanity 的溢出结算段。
+    使用处：`value_system._restore_sanity` 发出的 `sanity.restored` 节点
+    （核心只发事件；"怎么用溢出"是各自的事——伪人薯条的替身按 50% 累计，另见其模块）。
     """
-    if (
-        tenant.character_id == "bigstar" and overflow
-        and engine._passive_available(tenant, "bigstar.star_overflow")
-    ):
-        engine._gain_mark(tenant, "star", overflow)
-        return True
-    return False
+    if overflow <= 0 or tenant.character_id != "bigstar":
+        return
+    if not engine._passive_available(tenant, "bigstar.star_overflow"):
+        return
+    engine._gain_mark(tenant, "star", overflow)
 
 
 def everyone_star(engine: EngineProtocol, tenant: object) -> None:
@@ -72,7 +66,7 @@ def everyone_star(engine: EngineProtocol, tenant: object) -> None:
         amount = min(10.0, engine._mark_count(tenant, "star"))
         target = min(engine.home_tenants(), key=lambda value: (value.sanity, value.id))
         engine._consume_mark(tenant, "star", amount)
-        engine._restore_sanity(target, amount * .5, "大家的星星")
+        engine._restore_sanity(target, amount * .5, "everyone_star")
 
 def turn_start(engine, tenant):
     """回合初实例钩子：委托给「大家的星星」。"""
@@ -81,7 +75,7 @@ def turn_start(engine, tenant):
 TURN_START = turn_start
 
 
-VALUE_HOOKS = {"restore_overflow": collect_star_overflow}
+NODE_HOOKS = {"sanity.restored": collect_star_overflow}
 
 
 # ---------------------------------------------------------------- runtime
@@ -90,15 +84,15 @@ VALUE_HOOKS = {"restore_overflow": collect_star_overflow}
 MARKS = (
     MarkDefinition(
         id="star",
-        label="星之印记-比格小星",
-        acquisition="比格小星回复理智超过 100 的部分，转为等量星之印记。",
+        label=TEXT["mark.star.label"],
+        acquisition=TEXT["mark.star.acquisition"],
         minimum=0,
         maximum=None,
         # 无上限：以「每回合最多消耗 10 枚」当满槽参照，攒够就换高位配色。
-        bar_tiers=((10, "满档", "warn"),),
+        bar_tiers=((10, TEXT["data.characters.bigstar.module.1"], "warn"),),
         triggers=("sanity.restore.overflow",),
         hooks=(collect_star_overflow,),
-     description="从溢出的理智里析出的微光，一颗一颗攒着。"),
+     description=TEXT["mark.star.description"]),
 )
 
 

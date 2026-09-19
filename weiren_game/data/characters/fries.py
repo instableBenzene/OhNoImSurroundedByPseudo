@@ -6,11 +6,12 @@
 from ..types import A, CharacterDefinition, T
 from weiren_game.types import EngineProtocol
 from weiren_game.condition import StatusDefinition, register_status_definition
+from weiren_game.data.lang import TEXT
 
 PERSONA_LABELS = {
-    "lucky": "幸运", "unlucky": "不幸", "focused": "专注", "distracted": "分心",
-    "vitality": "活力", "fatigued": "疲惫", "alert": "警觉", "dull": "迟钝",
-    "inspired": "灵感", "confused": "混乱",
+    "lucky": TEXT["data.characters.fries.PERSONA_LABELS.lucky"], "unlucky": TEXT["data.characters.fries.PERSONA_LABELS.unlucky"], "focused": TEXT["data.characters.fries.PERSONA_LABELS.focused"], "distracted": TEXT["data.characters.fries.PERSONA_LABELS.distracted"],
+    "vitality": TEXT["data.characters.fries.PERSONA_LABELS.vitality"], "fatigued": TEXT["data.characters.fries.PERSONA_LABELS.fatigued"], "alert": TEXT["data.characters.fries.PERSONA_LABELS.alert"], "dull": TEXT["data.characters.fries.PERSONA_LABELS.dull"],
+    "inspired": TEXT["data.characters.fries.PERSONA_LABELS.inspired"], "confused": TEXT["data.characters.fries.PERSONA_LABELS.confused"],
 }
 PERSONA_OPPOSITES = {
     "lucky": "unlucky", "unlucky": "lucky",
@@ -20,21 +21,21 @@ PERSONA_OPPOSITES = {
     "inspired": "confused", "confused": "inspired",
 }
 PERSONA_FLAVOR = {
-    "lucky": "今天似乎格外顺利，连巧合都站在自己这边。",
-    "unlucky": "做什么都差一口气，坏事像是约好了找上门。",
-    "focused": "心无旁骛，把注意力拧成一根绳。",
-    "distracted": "注意力总被别处牵走，手边的事频频出错。",
-    "vitality": "精神头很足，身体像是比平时更经得起折腾。",
-    "fatigued": "倦意压着眼皮，每一步都比平时更沉。",
-    "alert": "神经紧绷，一点风吹草动都逃不过耳朵。",
-    "dull": "感官像蒙了层布，危险的信号总慢半拍。",
-    "inspired": "灵感忽然通了，脑子转得飞快。",
-    "confused": "思路打结，连自己刚想做什么都记不清。",
+    "lucky": TEXT["data.characters.fries.PERSONA_FLAVOR.lucky"],
+    "unlucky": TEXT["data.characters.fries.PERSONA_FLAVOR.unlucky"],
+    "focused": TEXT["data.characters.fries.PERSONA_FLAVOR.focused"],
+    "distracted": TEXT["data.characters.fries.PERSONA_FLAVOR.distracted"],
+    "vitality": TEXT["data.characters.fries.PERSONA_FLAVOR.vitality"],
+    "fatigued": TEXT["data.characters.fries.PERSONA_FLAVOR.fatigued"],
+    "alert": TEXT["data.characters.fries.PERSONA_FLAVOR.alert"],
+    "dull": TEXT["data.characters.fries.PERSONA_FLAVOR.dull"],
+    "inspired": TEXT["data.characters.fries.PERSONA_FLAVOR.inspired"],
+    "confused": TEXT["data.characters.fries.PERSONA_FLAVOR.confused"],
 }
 PERSONAS = tuple(PERSONA_LABELS)
 for _persona in PERSONAS:
     register_status_definition(StatusDefinition(
-        f"persona_{_persona}", f"人设-{_persona}", "other",
+        f"persona_{_persona}", TEXT["data.characters.fries.module.1"].format(p1=_persona), "other",
         shown=frozenset(), source_id="character:fries",
         permanent=True,
         # 人设不进状态栏：它在详情页头像右侧的小面板里连同风味一起展示。
@@ -52,7 +53,7 @@ def detail_slot(engine: EngineProtocol, tenant: object) -> list[dict]:
     for key in engine._personas_of(tenant):
         rows.append({
             "kind": "text",
-            "label": "人设",
+            "label": TEXT["data.characters.fries.detail_slot.1"],
             "text": f"{PERSONA_LABELS.get(key, key)}——{PERSONA_FLAVOR.get(key, '')}",
         })
     return rows
@@ -62,11 +63,11 @@ DETAIL_SLOT = detail_slot
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "fries", 10, "薯条", "一位随波逐流的旅人，总是看上去充满活力。",
-    "stubborn", "cheerful", 4, ("无业游民", "16-18岁", "男性"),
-    (A("odd_belongings", "莫名带点东西", "入住时带来一把「燧发枪」和两枚「弹药-燧发枪」。\n「燧发枪」（金色）【工具】【易损品】\n· 搜索中受到伪人主动能力影响时，有 **25%** 可能免疫；消耗一个【弹药-燧发枪】可把概率提升为 **100%**。\n· 触发后有 **25%** 可能被消耗；若消耗了弹药则改为 **5%**。\n「弹药-燧发枪」（紫色）【工具】【消耗品】【可堆叠】\n· 可被燧发枪消耗。\n*一个较为古典的燧发枪；不到必要关头，薯条不会浪费他的子弹。薯条制作的子弹尽管逊色于机器制造的，威力仍不容小觑。*"),
-     A("odd_luck", "莫名的幸运B", "薯条搜索时遭遇伪人概率-6%；有40%可能额外获得1件随机物资；有15%可能获得一个【人设-薯条】。")),
-    (A("deep_thought", "深度思考", "获得一个【人设-薯条】：\n· **最多同时持有 2 个**；获得第 **3 个**时随机移除其中 1 个（优先移除互斥的）。\n*各人设的机制与描述见下方「人设」一栏。*", chips=("每次对局 1 次",)),),
+    "fries", 10, TEXT["character.fries.name"], TEXT["character.fries.description"],
+    "stubborn", "cheerful", 4, (TEXT["character.fries.tag.0"], TEXT["character.fries.tag.1"], TEXT["character.fries.tag.2"]),
+    (A("odd_belongings", TEXT["ability.odd_belongings.name"], TEXT["ability.odd_belongings.description"]),
+     A("odd_luck", TEXT["ability.odd_luck.name"], TEXT["ability.odd_luck.description"])),
+    (A("deep_thought", TEXT["ability.deep_thought.name"], TEXT["ability.deep_thought.description"], chips=(TEXT["ability.deep_thought.chip.0"],)),),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -131,8 +132,8 @@ def grant_persona(engine: EngineProtocol, tenant: object) -> str:
         removed = rng.choice(current)
         current.remove(removed)
     engine._set_personas(tenant, current)
-    suffix = f"；随机移除{PERSONA_LABELS[removed]}" if removed else ""
-    engine._log(f"薯条获得人设：{PERSONA_LABELS[candidate]}{suffix}。")
+    suffix = TEXT["data.characters.fries.grant_persona.1"].format(p1=PERSONA_LABELS[removed]) if removed else ""
+    engine._log(TEXT["data.characters.fries.grant_persona.2"].format(p1=PERSONA_LABELS[candidate], p2=suffix))
     return candidate
 
 
@@ -162,7 +163,7 @@ def on_arrival(engine: EngineProtocol, tenant: object) -> None:
         return
     engine._gain_item("flintlock")
     engine._gain_item("flintlock_ammo", 2)
-    engine._log("薯条带来了燧发枪和两枚弹药。")
+    engine._log(TEXT["data.characters.fries.on_arrival.1"])
 
 
 def search_reward(engine: EngineProtocol, tenant: object, guaranteed: list[str]) -> None:
@@ -239,8 +240,8 @@ def _fries_fragile_modifier(context: object):
     delta = item_fragility(engine, tenant)
     if delta:
         yield (
-            spec("chance").path("易损").flat(float(delta))
-            .source("角色技能", "薯条", "人设")
+            spec("chance").path("fragile").flat(float(delta))
+            .source("ability", "fries", "persona")
         )
 
 
@@ -257,7 +258,7 @@ def _fries_fortune_modifier(context: object):
         return
     value = search_fortune(engine, tenant)
     if value:
-        yield spec("search").path("时运").flat(value).source("角色技能", "薯条", "人设")
+        yield spec("search").path("luck").flat(value).source("ability", "fries", "persona")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regf
@@ -272,9 +273,9 @@ def _fries_loss_modifier(context: object):
     if tenant.character_id != "fries" or engine.state.flow.phase != "turn_end":
         return
     if engine._has_persona(tenant, "vitality"):
-        yield spec("healthLoss").path("生命流失").mul(0.5).source("角色技能", "薯条", "人设")
+        yield spec("healthLoss").path("health_loss").mul(0.5).source("ability", "fries", "persona")
     if engine._has_persona(tenant, "fatigued"):
-        yield spec("healthLoss").path("生命流失").mul(2.0).source("角色技能", "薯条", "人设")
+        yield spec("healthLoss").path("health_loss").mul(2.0).source("ability", "fries", "persona")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regfl
@@ -287,9 +288,9 @@ def _fries_end_sanity_modifier(context: object):
     if tenant.character_id != "fries":
         return
     if engine._has_persona(tenant, "focused"):
-        yield spec("sanityConsume").path("回合末消耗").mul(0.5).source("角色技能", "薯条", "人设")
+        yield spec("sanityConsume").path("turn_end_consume").mul(0.5).source("ability", "fries", "persona")
     if engine._has_persona(tenant, "distracted"):
-        yield spec("sanityConsume").path("回合末消耗").mul(2.0).source("角色技能", "薯条", "人设")
+        yield spec("sanityConsume").path("turn_end_consume").mul(2.0).source("ability", "fries", "persona")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regfe
@@ -306,16 +307,16 @@ AVATAR = "i-av10"
 
 
 PERSONA_TEXT = {
-    "lucky": "搜索时获得时运 +1（与不幸互斥）。",
-    "unlucky": "搜索时获得时运 -1（与幸运互斥）。",
-    "focused": "回合末理智消耗 -50%（与分心互斥）。",
-    "distracted": "回合末理智消耗 +100%（与专注互斥）。",
-    "vitality": "回合末生命流失 -50%（与疲惫互斥）。",
-    "fatigued": "回合末生命流失 +100%（与活力互斥）。",
-    "alert": "搜索时遭遇伪人技能概率 -10%（与迟钝互斥）。",
-    "dull": "搜索时遭遇伪人技能概率 +10%（与警觉互斥）。",
-    "inspired": "易损品消耗概率 -20%（与混乱互斥）。",
-    "confused": "易损品消耗概率 +20%（与灵感互斥）。",
+    "lucky": TEXT["data.characters.fries.PERSONA_TEXT.lucky"],
+    "unlucky": TEXT["data.characters.fries.PERSONA_TEXT.unlucky"],
+    "focused": TEXT["data.characters.fries.PERSONA_TEXT.focused"],
+    "distracted": TEXT["data.characters.fries.PERSONA_TEXT.distracted"],
+    "vitality": TEXT["data.characters.fries.PERSONA_TEXT.vitality"],
+    "fatigued": TEXT["data.characters.fries.PERSONA_TEXT.fatigued"],
+    "alert": TEXT["data.characters.fries.PERSONA_TEXT.alert"],
+    "dull": TEXT["data.characters.fries.PERSONA_TEXT.dull"],
+    "inspired": TEXT["data.characters.fries.PERSONA_TEXT.inspired"],
+    "confused": TEXT["data.characters.fries.PERSONA_TEXT.confused"],
 }
 
 
@@ -329,4 +330,4 @@ def CODEX_EXTRA() -> list:
         flo = flavor.get(key, "") if isinstance(flavor, dict) else ""
         text = mech + ("　" + flo if flo else "")
         entries.append((labels.get(key, key), text or "—"))
-    return [{"title": "人设（persona）", "entries": entries}]
+    return [{"title": TEXT["data.characters.fries.CODEX_EXTRA.1"], "entries": entries}]

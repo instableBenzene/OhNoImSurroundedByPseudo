@@ -19,13 +19,18 @@ description: Use when adding a pseudo/伪人 (impostor scenario) to OhNoImSurrou
 
 ```python
 from weiren_game.data.types import PseudoDefinition
+from weiren_game.data.lang import TEXT        # DLC 里用 pack_text_from_file(__file__)
 
 DEFINITION = PseudoDefinition(
-    "pseudo_my", "我的伪人", "my_human",       # id / 名称 / **人类原型角色 id（必须已存在）**
-    "一句话设定。", "突破条件文案。", "解放条件文案。",
-    mark_field="my_marks", mark_label="印记-我的伪人",
+    "pseudo_my", TEXT["pseudo.pseudo_my.name"], "my_human",   # id / 名称 / **人类原型角色 id（必须已存在）**
+    TEXT["pseudo.pseudo_my.description"], TEXT["pseudo.pseudo_my.breakthrough"],
+    TEXT["pseudo.pseudo_my.liberation"],
+    mark_field="my_marks", mark_label=TEXT["pseudo.pseudo_my.mark_label"],
 )
 ```
+
+文案写进 lang 表：`pseudo.<id>.name|description|breakthrough|liberation|mark_label`
+（加一条就能用，没有注册动作；数据键不进 lang）。
 
 `PseudoDefinition` 字段以 `weiren_game/types.py` 为准（还有 `enters_house`、
 `mark_externally_locked`）。人类原型会被**自动排除出访客池**，也不能列入禁用角色（DLC 同样生效）。
@@ -48,8 +53,10 @@ rg "SCENARIO_HANDLERS.get" weiren_game        # 找到每个名字的调用点�
 
 ## 3. 文案与图鉴
 
-- 图鉴「伪人」页技能：在模块里声明 `CODEX_SKILLS = ((名称, 文案), ...)`（优先于内置静态表）。
-- 突破 / 解放文案来自 `DEFINITION`；进度文案来自 `progress_text`；卡片信息来自 `card_info`。
+- 图鉴「伪人」页技能：在模块里声明 `CODEX_SKILLS = ((名称, 文案), ...)`（优先于内置静态表）；
+  名称与文案都从 `TEXT["pseudo.<id>.skill.N.name|text"]` 取。
+- 突破 / 解放文案来自 `DEFINITION`（lang 键见上）；进度文案来自 `progress_text`；卡片信息来自 `card_info`
+  —— 它们返回的字符串同样从 lang 取。
 - 若有"默认伪人"语义，声明 `DEFAULT_PSEUDO = True`。
 
 ## 4. 字段速查（定义 / 状态 / 印记）

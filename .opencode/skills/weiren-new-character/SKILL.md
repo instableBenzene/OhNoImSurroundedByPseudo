@@ -18,14 +18,20 @@ python tools/new_character.py <ascii_id> <中文名> [--carry N] [--primary KEY]
 # 例：python tools/new_character.py sunset 斜阳 --carry 4 --primary suspicious --secondary loner
 ```
 - 自动分配**唯一 `source_id`** 与 `AVATAR`；写入 `weiren_game/data/characters/<id>.py`。
+- **同时把文本写进 `weiren_game/data/lang.py`**：`character.<id>.name|description|tag.N`、
+  `ability.<id>_skill.name|description`、`data.characters.<id>.use_skill.1`。
+  生成的模块里已经是 `TEXT["…"]`，你只需去 lang 表把 TODO 文案填掉。
 - **无需登记**：`data/_discovery.py` 会自动发现该文件。
 - 性格键以 `PERSONALITY_LABELS` / `PERSONALITIES` 为准（**勿在文档里另存一份**，避免漂移）。
 
 ## 2. 填写内容
-- `CharacterDefinition(tenant_id, source_id, name, description, primary, secondary, carry, tags, ...)`：补人设、标签。
-- 技能用 `A(id, name, desc, target=..., prompt=..., options=..., amount_label=..., amount_mark=..., chips=..., nested_option=..., branches=...)`：
+- **文案一律先写进 lang 表，再在定义里按 key 取**（`TEXT["character.<id>.name"]` 等）：
+  键名用既有 id 拼，加文本**只是加一条**、没有注册动作；漏 key 会当场 `KeyError`。
+  约定与数据键禁区见 `.opencode/skills/weiren-dev/SKILL.md` §2.1。
+- `CharacterDefinition(tenant_id, source_id, TEXT[...], TEXT[...], primary, secondary, carry, (TEXT[...],), ...)`：补人设、标签。
+- 技能用 `A(id, TEXT[...], TEXT[...], target=..., prompt=..., options=..., amount_label=..., amount_mark=..., chips=..., nested_option=..., branches=...)`：
   - `target` 取值以 `AbilityDefinition.target`（`weiren_game/types.py`）为准，前端/CLI 据此弹选择。
-  - 限定条件写进 `chips`（如 `("冷却 3 回合", "每回合 1 次")`），**不要**在描述里重复。
+  - 限定条件写进 `chips`（如 `(TEXT["ability.<id>.chip.0"], …)`），**不要**在描述里重复。
   - 每个主动技能都要在 `ACTIVE_DISPATCH` 里有处理函数，签名用 `def handler(engine, actor, **kwargs)`。
 - 需要玩家**选目标**时，内容自描述候选：`TARGET_OPTIONS = {ability_id: lambda engine, actor: [{"value","label","desc"}...]}`。
 - 图鉴补充（可选）：`CODEX_EXTRA()`；头像：`AVATAR = "i-avN"`。
@@ -62,6 +68,9 @@ python tools/audit_separation.py
    （或包内 `avatars/characters/`）——立绘已进内容层，不再往 `assets/art/` 放
 10. 约束：`available=True` 会进入访客池、**改变按种子的随机序列**；是否触碰平衡
 
+> 以上每一项文字（名称/描述/chip/提示语/选项名）都会落进 `weiren_game/data/lang.py`；
+> **给需求时只要把文字写清楚**，落表与取用由实现方按 §2 的键名约定完成。
+
 ## 5. 字段速查（写技能/被动最常用的三套）
 
 ### 5.1 生命周期：什么时候生效
@@ -82,18 +91,19 @@ python tools/audit_separation.py
 
 ### 5.2 `path` / `source`：对谁生效、由谁触发
 
-- 词表与规则：`docs/ARCH.md` §4 令牌词表（功能词 / 对象 / 出身词 / 物品 tag）。
-- `path` = 这个修饰器**响应哪个功能**（`搜索` / `伤害` / `回合末理智`…）；
-  `source` = **调用点由什么构成**（`("羁绊","孤僻")`、`("角色","澪叁贰玖","直觉")`）；
+- 词表与规则：`docs/ARCH.md` §4 令牌词表（功能词 / 对象 / 出身词 / 物品 tag）。**令牌一律英文**。
+- `path` = 这个修饰器**响应哪个功能**（`search` / `damage` / `turn_end_consume`…）；
+  `source` = **调用点由什么构成**（`("bond","loner")`、`("ability","zero329","sharp_instinct")`）；
   两者命中取**交**。派生项靠 `source` 区分，**不新增通道**。
 - 写法：`spec("<通道>").path(...).source(...)`。
+- 令牌**不是文案**：要显示就走 `lang.source_label(令牌)`，别把令牌插进句子。
 
 ### 5.3 通道 / 概率 / 闸门：三选一，别用错
 
 | 想干的事 | 用哪个 | 入口 |
 | --- | --- | --- |
 | 数值加减 / 乘算 / 取上下限 | **通道 + 修饰器** | `engine._apply_modifiers("<通道>", base, source, context)`；`spec(...).flat/.percent/.mul/.final/.max/.min` |
-| 掷随机 | **概率收敛** | `engine._apply_chance(base, source, context)`，或内容自带 `engine._rng(EVENT_IDS["..."], salt)`；非必定收敛 5%~95%，**必定**用 0/1（`spec("chance").certain(1.0)`） |
+| 掷随机 | **概率收敛** | `calculate_modified_amount(base, collect_modifiers("chance", source, ctx))` → 自调（惩罚/保底）→ `resolve(...)`；或内容自带 `engine._rng(EVENT_IDS["..."], salt)`。非必定收敛 5%~95%，**必定**用 0/1（`spec("chance").certain(1.0)`） |
 | "能不能 / 是否免疫 / 目标是否合法" | **闸门（纯查询）** | `engine._eval_gate("<闸门类型>", source, context)`；贡献项 `gate(...).path(...).source(...).any()/.veto()`；**不掷骰、不写状态** |
 
 - 闸门是纯查询，掷骰与消耗只发生在**结算点**；闸门目录见 `docs/ARCH.md` §5。
@@ -104,8 +114,8 @@ python tools/audit_separation.py
 
 | 需求清单里的项 | 落在哪里 |
 | --- | --- |
-| 名称 + 描述 + 限定 chip | `A("call_friends", "呼朋引伴", "…", chips=("入住 3 回合后解锁", "冷却 4 回合"))`——**chip 只写一遍**，描述里不重复 |
-| "在屋存活 3 回合才可用" | `requirements_call_friends(engine, actor, *, bypass)` → 不满足**返回给玩家看的文案**（`bypass` 让内部调用跳过） |
+| 名称 + 描述 + 限定 chip | 先落 lang（`ability.call_friends.name|description|chip.0|chip.1`），再用 `A("call_friends", TEXT["ability.call_friends.name"], TEXT["ability.call_friends.description"], chips=(TEXT["ability.call_friends.chip.0"], TEXT["ability.call_friends.chip.1"]))`——**chip 只写一遍**，描述里不重复 |
+| "在屋存活 3 回合才可用" | `requirements_call_friends(engine, actor, *, bypass)` → 不满足**返回给玩家看的文案**（`TEXT["ability.call_friends.requirement.0"]`；`bypass` 让内部调用跳过） |
 | "消耗 25 理智" | `costs_call_friends(engine, actor, *, option)` → `[T("sanity", 25)]`，交给公共消耗流程；**不要在效果里手扣理智** |
 | "立即 +2 名访客" | `use_call_friends`：`engine._queue_human_visitor("…", force_supply=True)` ×2 |
 | "冷却 4 回合" | `engine._set_ability_cooldown(actor, ability_id, engine.state.flow.turn + 4)` |
@@ -115,7 +125,9 @@ python tools/audit_separation.py
 ```python
 # 骨架（照抄结构，换内容）
 def requirements_my_active(engine, actor, *, bypass):
-    return None if bypass or actor.home_turns >= 3 else "需在屋内存活 3 回合后使用。"
+    if bypass or actor.home_turns >= 3:
+        return None
+    return TEXT["ability.my_active.requirement.0"]        # 文案在 lang 表
 
 
 def costs_my_active(engine, actor, *, option):
@@ -123,7 +135,7 @@ def costs_my_active(engine, actor, *, option):
 
 
 def use_my_active(engine, actor, ability_id, *, bypass=False):
-    engine._queue_human_visitor("…", force_supply=True)
+    engine._queue_human_visitor("supply_run", force_supply=True)
     engine._set_ability_cooldown(actor, ability_id, engine.state.flow.turn + 4)
 
 
@@ -135,7 +147,8 @@ ACTIVE_DISPATCH = {
 
 - 需要玩家选目标：`target` 取值见 `AbilityDefinition.target`（`types.py`）；候选用
   `TARGET_OPTIONS = {ability_id: fn(engine, actor) -> [{"value","label","desc"}]}` **由内容自描述**。
-- 文案里的角色名/机制名都是内容，写在本文件即可；**数值与判定不要写进系统层**。
+- 文案里的角色名/机制名都是内容：**写进 lang 表**（`lang.py` 或 DLC 的 `dlc/<包>/lang.py`），
+  本文件只留 key；**数值与判定不要写进系统层**。
 
 ## 7. 完成标准
 

@@ -2,16 +2,17 @@
 
 from ..types import I
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 ITEMS = {
-    "bls_book": I("bls_book", "《基础生命支持》", "information", 3, "持有5回合习得BLS：医疗物资成功率+10%。", ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
-    "plants_book": I("plants_book", "《野外常见可食用植被图鉴》", "information", 3, "持有5回合习得植被辨识：搜索必得食物。", ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
-    "disaster_book": I("disaster_book", "《自然灾害避险手册》", "information", 3, "持有5回合习得防备：搜索遭遇率-10%。", ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
-    "nebula_legend": I("nebula_legend", "《星云传说》", "information", 5, "回合末理智消耗-10并减轻侵蚀；持有7回合习得古老传说。", ("information_carrier", "book")),
-    "newspaper": I("newspaper", "《乡野日报》", "information", 2, "获得时兑换1条待验证物资或来访信息。", ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
-    "medical_newspaper": I("medical_newspaper", "《炎黄医学报》", "information", 3, "获得时兑换1条待验证物资信息及1条已证实物资信息。", ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
-    "video_tape": I("video_tape", "监控录影带", "information", 4, "获得时兑换3条已证实信息。", ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
-    "smartphone": I("smartphone", "智能手机", "information", 5, "获得时取得10条待验证信息；使用回复15理智并减轻消沉，50%损坏。", ("information_carrier", "consultation_carrier", "entertainment", "fragile"), fragile_chance=.50, on_use="smartphone"),
+    "bls_book": I("bls_book", TEXT["item.bls_book.name"], "information", 3, TEXT["item.bls_book.description"], ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
+    "plants_book": I("plants_book", TEXT["item.plants_book.name"], "information", 3, TEXT["item.plants_book.description"], ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
+    "disaster_book": I("disaster_book", TEXT["item.disaster_book.name"], "information", 3, TEXT["item.disaster_book.description"], ("information_carrier", "book", "durability_consumable"), max_durability=25, use_cost=1),
+    "nebula_legend": I("nebula_legend", TEXT["item.nebula_legend.name"], "information", 5, TEXT["item.nebula_legend.description"], ("information_carrier", "book")),
+    "newspaper": I("newspaper", TEXT["item.newspaper.name"], "information", 2, TEXT["item.newspaper.description"], ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
+    "medical_newspaper": I("medical_newspaper", TEXT["item.medical_newspaper.name"], "information", 3, TEXT["item.medical_newspaper.description"], ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
+    "video_tape": I("video_tape", TEXT["item.video_tape.name"], "information", 4, TEXT["item.video_tape.description"], ("information_carrier", "consultation_carrier", "consumable"), consumable=True),
+    "smartphone": I("smartphone", TEXT["item.smartphone.name"], "information", 5, TEXT["item.smartphone.description"], ("information_carrier", "consultation_carrier", "entertainment", "fragile"), fragile_chance=.50, on_use="smartphone"),
 }
 
 
@@ -35,7 +36,7 @@ def ancient_legend_start_of_turn(engine: EngineProtocol, tenant: object) -> None
         tenant.has_ability("ancient_legend")
         and engine._passive_available(tenant, "book.ancient_legend")
     ):
-        engine._adjust_emotion_set(tenant, "awakening", 2, 2, "古老的崭新的传说")
+        engine._adjust_emotion_set(tenant, "awakening", 2, 2, TEXT["data.items.information_carriers.ancient_legend_start_of_turn.1"])
 
 
 def ancient_legend_blocks_erosion(engine: EngineProtocol, tenant: object) -> bool:
@@ -72,7 +73,7 @@ def _book_held_end_of_turn(
     if held.held_turns >= threshold and not tenant.has_ability(learned):
         engine._grant_learned_passive(tenant, learned)
         engine._log(
-            f"{engine.character(tenant).name}研读{ITEMS[item_id].name}，习得被动能力。"
+            TEXT["data.items.information_carriers._book_held_end_of_turn.1"].format(p1=engine.character(tenant).name, p2=ITEMS[item_id].name)
         )
 
 
@@ -116,8 +117,8 @@ def _legend_erosion_block_gate(context: object) -> object:
     if key not in EROSION_EMOTIONS or not ancient_legend_blocks_erosion(engine, tenant):
         return
     yield (
-        gate("emotion.apply.block").path("施加", key).match("all")
-        .source("物品", "古老传说", "侵蚀免疫").any()
+        gate("emotion.apply.block").path("apply", key).match("all")
+        .source("item", "ancient_legend", "erosion_immune").any()
     )
 
 
@@ -157,8 +158,8 @@ def _bls_medical_modifier(context: object):
         yield (
             spec("chance")
             .flat(0.10)
-            .path("手术包", "药箱")
-            .source("物品", "书", "基础生命支持", "角色技能", "被动", "BLS")
+            .path("surgery_kit", "medicine_kit")
+            .source("item", "book", "basic_life_support", "ability", "passive", "BLS")
         )
 
 
@@ -170,8 +171,8 @@ def _prepared_encounter_modifier(context: object):
     engine = context["engine"]; tenant = context["tenant"]  # type: ignore[index]
     if tenant.has_ability("prepared") and engine._passive_available(tenant, "book.prepared"):
         yield (
-            spec("chance").path("遭遇").flat(-0.10)
-            .source("物品", "书", "自然灾害避险", "角色技能", "被动", "防备")
+            spec("chance").path("encounter").flat(-0.10)
+            .source("item", "book", "disaster_evasion", "ability", "passive", "guard")
         )
 
 
@@ -185,13 +186,13 @@ def _book_sanity_modifier(context: object):
     tenant = context["tenant"]  # type: ignore[index]
     held = {value.item_id for value in tenant.inventory.items}
     if "bls_book" in held:
-        yield spec("sanityConsume").path("回合末消耗").flat(2).source("物品", "信息载体", "书", "基础生命支持")
+        yield spec("sanityConsume").path("turn_end_consume").flat(2).source("item", "information_carrier", "book", "basic_life_support")
     if "disaster_book" in held:
-        yield spec("sanityConsume").path("回合末消耗").flat(2).source("物品", "信息载体", "书", "自然灾害避险")
+        yield spec("sanityConsume").path("turn_end_consume").flat(2).source("item", "information_carrier", "book", "disaster_evasion")
     if "plants_book" in held:
-        yield spec("sanityConsume").path("回合末消耗").flat(1).source("物品", "信息载体", "书", "植物图鉴")
+        yield spec("sanityConsume").path("turn_end_consume").flat(1).source("item", "information_carrier", "book", "plant_codex")
     if "nebula_legend" in held:
-        yield spec("sanityConsume").path("回合末消耗").final().flat(-10).source("物品", "信息载体", "书", "星云传说")
+        yield spec("sanityConsume").path("turn_end_consume").final().flat(-10).source("item", "information_carrier", "book", "nebula_legend")
 
 
 register_modifier_provider("sanityConsume", _book_sanity_modifier)

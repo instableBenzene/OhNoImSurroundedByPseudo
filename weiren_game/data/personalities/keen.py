@@ -52,8 +52,8 @@ def _keen_fragile_modifier(context: object):
     delta = fragile_delta(engine, tenant)
     if delta:
         yield (
-            spec("chance").path("易损").flat(-float(delta))
-            .source("性格", "敏锐")
+            spec("chance").path("fragile").flat(-float(delta))
+            .source("personality", "keen")
         )
 
 

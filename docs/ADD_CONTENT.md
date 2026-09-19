@@ -26,7 +26,7 @@
 | 类型 | 位置 / 文件 | 声明方式 | 自动发现 | 备注 |
 | --- | --- | --- | --- | --- |
 | **房客（人类角色）** | `data/characters/<id>.py` | 暴露 `CHARACTER`（`CharacterDefinition`） | ✅ | 一个文件一名角色；`source_id` 唯一；建议声明 `AVATAR` |
-| **角色行为** | 同上 | `ACTIVE_DISPATCH`、`INTERACTIONS`、`PENDING_VIEW`、`TARGET_OPTIONS`、`CODEX_EXTRA/SECTION/SUMMARY`、`SEARCH_REWARD`、`TURN_START`、`VALUE_HOOKS`、`NODE_HOOKS`、`HOOKS`、`MARKS`、`HEALTH_CHANGED`、`ON_ABILITY_USED/FAILED`、`ON_MARK_GAINED/CONSUMED/REACHED`、`TENANT_DEATH`、`INFORMATION_CREATED`、`CAN_LOCK_PERSONALITY`、`PROTECTED_STARTER`、`DEFAULT_PSEUDO` | ✅（随角色模块） | 角色专属的状态/事件/搜索修正/能力全写在自己文件里 |
+| **角色行为** | 同上 | `ACTIVE_DISPATCH`、`INTERACTIONS`、`PENDING_VIEW`、`TARGET_OPTIONS`、`CODEX_EXTRA/SECTION/SUMMARY`、`SEARCH_REWARD`、`TURN_START`、`VALUE_HOOKS`、`NODE_HOOKS`、`HOOKS`、`MARKS`、`HEALTH_CHANGED`、`ON_ABILITY_USED/FAILED`、`ON_MARK_GAINED/CONSUMED/REACHED`、`TENANT_DEATH`、`INFORMATION_CREATED`、`PROTECTED_STARTER`、`DEFAULT_PSEUDO` | ✅（随角色模块） | 角色专属的状态/事件/搜索修正/能力全写在自己文件里 |
 | **性格（羁绊）** | `data/personalities/<key>.py`；DLC `personalities/<key>.py` | `TIERS`（或 `TIER_AT`/`ACTIVE_TIERS`/`ROUND_UP`）、`HOOKS`、`BOND_*`、modifier providers；可选 `LABEL`（中文名） | ✅ | 文件名即性格键；DLC 的中文名由 `LABEL` 登记（缺省回退为键名） |
 | **物品** | `data/items/<file>.py` | `CATEGORY` + `ITEMS`（`I(...)`）；可选 `ITEM_HOOKS`、`ITEM_EFFECTS` | ✅（按 `CATEGORY_ORDER`） | 风味见 `items/flavor.py`；图鉴全文见 `items/codex_text.py` |
 | **物资标签** | `data/tags/<tag>.json`（条目）或 `data/tags/<tag>.py`（行为）；DLC 同名两路 | JSON 为 `item_id`/物品名列表；`.py` 暴露 `after_*` 等 → `TAG_BEHAVIORS` | ✅（与内置同名 tag 合并/覆盖） | 中文名/图标经 `data/labels.py` 的登记函数（或 `register(ctx)` 调用） |
@@ -51,6 +51,7 @@
 ### 快速上手
 
 - 加房客：`python tools/new_character.py <id> <名>` → 填内容 → `validate_content` → 单测。
+  （脚手架**同时**把名字/描述等文本写进 `data/lang.py`，你只要去 lang 表填 TODO 文案。）
 - 打包 DLC：复制 `dlc/_template/` → 按上表填各目录 → 界面"应用"热装卸。
 - 换美术（**按 id 命名放文件即可，不用清单**）：地点/信息/伪人图标放 `data/icon/<section>/<id>.<ext>`；
   某角色的**整张头像**放 `data/avatars/characters/<角色id>.svg`；物品图标放 `data/item/item/<id>.svg`；
@@ -75,6 +76,28 @@
 > 各内容类型还有自己的一组字段：见对应 skill（`weiren-new-character` / `weiren-new-item` /
 > `weiren-new-pseudo` / `weiren-new-information` / `weiren-new-dlc`）。
 
+### 文本（lang）：加一条就能用，没有注册动作
+
+- **表在哪**：base = `weiren_game/data/lang.py::TEXT`；每个 DLC = `dlc/<包>/lang.py`
+  （模块顶部 `TEXT = pack_text_from_file(__file__)`）。
+- **键名用既有 id 拼**：`character.<id>.name|description|tag.N`、`ability.<id>.name|description`、
+  `item.<id>.name|description|flavor`、`pseudo.<id>.*`、`info.<id>.*`、`mark.<id>.*`；
+  系统层与前端的键按位置生成（`<模块>.<函数>.<n>`、`ui.js.<n>`、`ui.markup.<n>`）。
+- **怎么用**：定义里写 `TEXT["item.my_item.name"]`；带占位符的模板写 `{名字}`、调用点 `.format(...)`；
+  前端 chrome 用 `TXT("ui.x")` 或槽位 `data-t="ui.x"`。
+  ```python
+  # lang.py
+  "item.my_item.name": "我的物品",
+  "item.my_item.description": "使用后回复 {amount} 点生命。",
+  # 使用点
+  I("my_item", TEXT["item.my_item.name"], "consumable", 2,
+    TEXT["item.my_item.description"], ("consumable",), on_use="my_item")
+  ```
+- **打错 key**：Python 侧当场 `KeyError`；前端原样显示 key（肉眼可见）。核对/盘点用
+  `python tools/dump_text.py --out <目录>`。
+- **不进 lang 的**：`path` / `source` / tag / 性别 / 年龄 / 兴趣——它们参与规则命中，**禁止翻译**。
+- 详细约定（含 DLC）见 `.opencode/skills/weiren-dev/SKILL.md` §2.1 与 `weiren-new-dlc`。
+
 ### 已知限制（诚实说明）
 
 - **全局事件** 不是"放文件即生效"，需要在模块里调用注册函数（角色模块导入时执行，或用 DLC 的 `register(ctx)`）。
@@ -95,13 +118,16 @@
 """房客档案：<姓名>（<编号>号，<机制一句话>）。"""
 from ..types import A, B, CharacterDefinition, MarkDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT          # 文本都住 lang 表
 
 CHARACTER = CharacterDefinition(
-    "my_id", 25, "姓名", "一句话人设。",
+    "my_id", 25, TEXT["character.my_id.name"], TEXT["character.my_id.description"],
     "primary_key", "secondary_key", 3,
-    ("标签1", "标签2"),
-    actives=(A("active_id", "主动名", "描述。"),),          # 需要目标时给 target="tenant"/"information"/...
-    passives=(A("passive_id", "被动名", "描述。"),),
+    (TEXT["character.my_id.tag.0"], TEXT["character.my_id.tag.1"]),
+    actives=(A("active_id", TEXT["ability.active_id.name"],
+               TEXT["ability.active_id.description"]),),   # 需要目标时给 target="tenant"/...
+    passives=(A("passive_id", TEXT["ability.passive_id.name"],
+                TEXT["ability.passive_id.description"]),),
     available=True,
 )
 
@@ -127,7 +153,7 @@ AVATAR = "i-av5"
 `INTERACTIONS`、`PENDING_VIEW`、`TARGET_OPTIONS`、`CODEX_EXTRA`、`CODEX_SECTION`、`CODEX_SUMMARY`、
 `SEARCH_REWARD`、`TURN_START`、`VALUE_HOOKS`、`NODE_HOOKS`、`HOOKS`、`MARKS`、
 `HEALTH_CHANGED`、`ON_ABILITY_USED`、`ON_ABILITY_FAILED`、`ON_MARK_GAINED/CONSUMED/REACHED`、
-`TENANT_DEATH`、`INFORMATION_CREATED`、`CAN_LOCK_PERSONALITY`。
+`TENANT_DEATH`、`INFORMATION_CREATED`。
 
 ### 3. 能力声明式字段
 `A(id, name, desc, target="none", branches=..., prompt="", options=((值,显示名),...), amount_label="", amount_mark="", chips=("冷却 3 回合",), nested_option="")`。
@@ -151,6 +177,7 @@ AVATAR = "i-av5"
 ```
 dlc/<dlc_name>/
   dlc.json                # {"name": "...", "version": "1.0.0", "min_game_version": "2.1.0"}
+  lang.py                 # **本包全部文案**：TEXT = {"item.my_item.name": "我的物品", ...}
   __init__.py             # 可选：def register(ctx): ...（ctx 即 ContentManager）
   characters/<id>.py      # 每个文件暴露 CHARACTER（或 CHARACTERS）
   personalities/<key>.py  # 每文件一类性格（TIERS/TIER_AT/HOOKS/BOND_* + 可选 LABEL）

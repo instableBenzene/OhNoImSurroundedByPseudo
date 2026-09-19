@@ -5,34 +5,28 @@
 
 from ..types import A, B, CharacterDefinition, CostEffectLink, MarkDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "zero329", 11, "澪叁贰玖", "对都市传说感兴趣、对异常有天然直觉的高中生。",
-    "suspicious", "keen", 3, ("高中生", "18岁", "男性", "异常直觉"),
+    "zero329", 11, TEXT["character.zero329.name"], TEXT["character.zero329.description"],
+    "suspicious", "keen", 3, (TEXT["character.zero329.tag.0"], TEXT["character.zero329.tag.1"], TEXT["character.zero329.tag.2"], TEXT["character.zero329.tag.3"]),
     # 正文排版样板（规则见 docs/STYLE.md §12）：· 分行、数值加粗、限制交给 chips。
-    (A("sharp_instinct", "敏锐直觉",
-       "澪叁贰玖在屋内时会积累【警觉印记-澪叁贰玖】（以下简称印记），**最多持有 3 个**："
-       "· 在屋内时，有 **15%** 概率识破可被接纳的伪人，并获得 1 个印记。"
-       "· 在屋内遭遇过一次伪人来访后，**此后每回合获得 1 个印记**。"
-       "\n持有印记时："
-       "· 回合末理智消耗 **+50%**；免疫来自侵蚀情绪集的状态效果。"
-       "· 回合开始时，有 **25%** 概率获得一条待验证信息；屋内有伪人时提升为 **65%**。"
-       "\n*仅限物资信息、伪人来访、伪人技能触发提示、指认房间内的伪人信息*"),),
+    (A("sharp_instinct", TEXT["ability.sharp_instinct.name"],
+       TEXT["ability.sharp_instinct.description"]),),
     # 冷却只写在 chips 里（原来正文还重复了一句"*该能力有3回合冷却时间。*"）——见 STYLE §12 规则 3。
-    (A("information_collect", "情报收集",
-       "消耗 **1 层印记**，识破一条物资信息。"
-       "· 本回合指派澪叁贰玖搜索：搜索回合数 **−1**、可携带物资数 **+1**。",
-       "information", chips=("冷却 3 回合",)),
+    (A("information_collect", TEXT["ability.information_collect.name"],
+       TEXT["ability.information_collect.description"],
+       "information", chips=(TEXT["ability.information_collect.chip.0"],)),
      A(
          "intent_awareness",
-         "意图觉察／决策",
-         "消耗**任意层**印记，获得**等量**的待验证信息；可选择额外消耗 **30 理智**，识破这些信息。\n*仅限物资信息、伪人来访、伪人技能触发提示。*",
+         TEXT["ability.intent_awareness.name"],
+         TEXT["ability.intent_awareness.description"],
          "amount",
-         prompt="选择要消耗的警觉印记层数",
-         amount_label="消耗警觉印记层数",
+         prompt=TEXT["ability.intent_awareness.prompt"],
+         amount_label=TEXT["ability.intent_awareness.amount_label"],
          amount_mark="alert",
-         options=(("discern","额外消耗30理智立即识破","i-search","把这次拿到的信息直接变成已证实"),),
+         options=(("discern",TEXT["ability.intent_awareness.option.0"],"i-search",TEXT["data.characters.zero329.module.1"]),),
          branches=(
              B(
                  max_on_force=True,
@@ -83,8 +77,8 @@ def _erosion_block_gate(context: object) -> object:
     if key not in EROSION_EMOTIONS or not blocks_erosion(engine, tenant, key):
         return
     yield (
-        gate("emotion.apply.block").path("施加", key).match("all")
-        .source("角色", "澪叁贰玖", "敏锐直觉").any()
+        gate("emotion.apply.block").path("apply", key).match("all")
+        .source("character", "zero329", "sharp_instinct").any()
     )
 
 
@@ -122,7 +116,7 @@ def use_information_collect(
         and value.kind in {"material_reward", "location_modifier"}
     ]
     if not infos:
-        raise RuleViolation("没有待识破的物资信息。")
+        raise RuleViolation(TEXT["data.characters.zero329.use_information_collect.1"])
     chosen = next((value for value in infos if value.info_instance_id == option), infos[0])
     engine._verify_information_object(chosen)
     actor.set_status(
@@ -160,16 +154,16 @@ def use_intent_awareness(
     else:
         spend = min(int(amount or 1), int(engine._mark_count(actor, "alert")))
     if spend <= 0:
-        raise RuleViolation("没有可消耗的警觉印记。")
+        raise RuleViolation(TEXT["data.characters.zero329.use_intent_awareness.1"])
     created = [
-        engine._create_random_information(False, "意图觉察", {"visit", "pseudo_skill"})
+        engine._create_random_information(False, TEXT["data.characters.zero329.use_intent_awareness.2"], {"visit", "pseudo_skill"})
         for _ in range(spend)
     ]
     discern = forced or option == "discern"
     costs = [T("mark", spend, key="alert")]
     if discern and not forced:
         if actor.sanity < 30:
-            raise RuleViolation("额外识破需要30理智。")
+            raise RuleViolation(TEXT["data.characters.zero329.use_intent_awareness.3"])
         costs.append(T("sanity", 30))
     if not forced:
         engine._pay_ability_costs(actor, costs)
@@ -192,7 +186,7 @@ def start_of_turn(engine: EngineProtocol, tenant: object) -> None:
         engine._skill_outcome(tenant, "zero329.sharp_instinct.info", success)
         if success:
             engine._create_random_information(
-                False, "澪叁贰玖的敏锐直觉",
+                False, TEXT["data.characters.zero329.start_of_turn.1"],
                 {"material_reward", "visit", "pseudo_skill", "pseudo_inhome"},
             )
     if (
@@ -287,15 +281,15 @@ VALUE_HOOKS = {"end_sanity_cost": end_of_turn_sanity_cost}
 MARKS = (
     MarkDefinition(
         id="alert",
-        label="警觉印记-澪叁贰玖",
-        acquisition="15% 识破可接纳伪人；遭遇伪人来访后每回合获得 1 层。",
+        label=TEXT["mark.alert.label"],
+        acquisition=TEXT["mark.alert.acquisition"],
         minimum=0,
         maximum=3,
         # 1 = 够付一次能力代价；3 = 满档。
-        bar_tiers=((1, "可发动", "danger"), (3, "满", "warn")),
+        bar_tiers=((1, TEXT["data.characters.zero329.module.2"], "danger"), (3, TEXT["data.characters.zero329.module.3"], "warn")),
         triggers=("pseudo.visit", "turn_start.instances"),
         hooks=(on_pseudo_visit,),
-     description="对「伪人」的警觉层层叠加，眼睛越来越毒。"),
+     description=TEXT["mark.alert.description"]),
 )
 
 
@@ -320,8 +314,8 @@ def _gathering_search_modifier(context: object):
         return
     gathering = tenant.condition("information_gathering_zero329")
     if gathering.active:
-        yield spec("search").path("回合").flat(-1).source("角色技能", "澪叁贰玖", "信息收集")
-        yield spec("search").path("携带").flat(1).source("角色技能", "澪叁贰玖", "信息收集")
+        yield spec("search").path("turn").flat(-1).source("ability", "zero329", "information_collect")
+        yield spec("search").path("carry").flat(1).source("ability", "zero329", "information_collect")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regz
@@ -335,7 +329,7 @@ def _zero329_sanity_modifier(context: object):
         return
     mult = sanity_cost_multiplier(engine, tenant)
     if mult != 1.0:
-        yield spec("sanityConsume").path("回合末消耗").mul(mult).source("角色技能", "澪叁贰玖", "警觉")
+        yield spec("sanityConsume").path("turn_end_consume").mul(mult).source("ability", "zero329", "alert")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regz

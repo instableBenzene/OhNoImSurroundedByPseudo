@@ -5,13 +5,14 @@
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "looting", 14, "罗丁", "去过许多地方的旅行者，乐意分享背包中的必需品。",
-    "cheerful", "steady", 5, ("旅行家", "18-24岁", "男性"),
-    (A("sharing", "分享的乐趣", "罗丁在入住时，获得1份随机【食物】与1份矿泉水。"),
-     A("travel_experience", "旅游的经验", "罗丁搜索时，遭遇伪人概率-10%；搜索返回时额外获得1份矿泉水与1份随机【食物】。")),
+    "looting", 14, TEXT["character.looting.name"], TEXT["character.looting.description"],
+    "cheerful", "steady", 5, (TEXT["character.looting.tag.0"], TEXT["character.looting.tag.1"], TEXT["character.looting.tag.2"]),
+    (A("sharing", TEXT["ability.sharing.name"], TEXT["ability.sharing.description"]),
+     A("travel_experience", TEXT["ability.travel_experience.name"], TEXT["ability.travel_experience.description"])),
 )
 
 # ---------------------------------------------------------------- function
@@ -29,7 +30,7 @@ def on_arrival(engine: EngineProtocol, tenant: object) -> None:
     food = engine._random_item(required_tags=("food",), event_id="looting.arrival")
     engine._gain_item(food)
     engine._gain_item("water")
-    engine._log(f"罗丁分享了{ITEMS[food].name}和矿泉水。")
+    engine._log(TEXT["data.characters.looting.on_arrival.1"].format(p1=ITEMS[food].name))
 
 
 def encounter_penalty(engine: EngineProtocol, tenant: object) -> float:

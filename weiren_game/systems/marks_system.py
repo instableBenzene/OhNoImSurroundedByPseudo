@@ -56,17 +56,6 @@ class MarksSystemMixin:
             self._dispatch_mark_node("consumed", tenant, mark_id, consumed)
         return consumed
 
-    def _set_mark_external(self, tenant: object, mark_id: str, target: float) -> bool:
-        """外界把印记直接改写为 target；受印记“不可被外界修改”声明保护。"""
-        if getattr(self._mark_definition(tenant, mark_id), "externally_locked", False):
-            return False
-        current = tenant.marks.count(mark_id)
-        if target > current:
-            self._gain_mark(tenant, mark_id, target - current, external=True)
-        elif target < current:
-            self._consume_mark(tenant, mark_id, current - target, external=True)
-        return True
-
     def _dispatch_mark_node(
         self, kind: str, tenant: object, mark_id: str, amount: float
     ) -> None:
@@ -136,14 +125,6 @@ class MarksSystemMixin:
             base, collect_modifiers(effect_type, source, merged)
         )
 
-    def _apply_chance(
-        self, base: float, source: object = (), context: object = None
-    ) -> float:
-        """概率通道入口：编译后收敛到 5%~95%（必定 0/100 除外）。"""
-        from weiren_game.probability import resolve
-
-        return resolve(self._apply_modifiers("chance", base, source, context))
-
     def _eval_gate(
         self,
         gate_type: str,
@@ -161,20 +142,6 @@ class MarksSystemMixin:
         if isinstance(context, dict):
             merged.update(context)
         return evaluate_gate(base, collect_gates(gate_type, source, merged))
-
-    def _run_global_event_node(self, node: str) -> None:
-        """扫描生效的全局事件，执行其在该节点声明的 hook。"""
-        from weiren_game.global_event import GLOBAL_EVENT_DEFINITIONS
-
-        for event_id, instance in list(self.state.world.global_events.events.items()):
-            if not instance.active:
-                continue
-            definition = GLOBAL_EVENT_DEFINITIONS.get(event_id)
-            if definition is None or node not in definition.nodes:
-                continue
-            hook = definition.hook
-            if hook is not None:
-                hook(self, event_id, instance)
 
     # ------------------------------------------------------ pseudo caps
     # 说明：描述层说的“压制/受到抑制”，在代码层并无独立概念，而是

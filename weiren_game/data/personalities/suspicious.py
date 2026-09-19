@@ -1,6 +1,7 @@
 """性格·多疑：性格/羁绊效果全部集中在本文件。"""
 
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 
 def start_of_turn_bond(engine: EngineProtocol, bonds: dict[str, int]) -> None:
@@ -10,14 +11,14 @@ def start_of_turn_bond(engine: EngineProtocol, bonds: dict[str, int]) -> None:
         t for t in engine.home_tenants() if engine._is_personality(t, "suspicious")
     ]
     if suspicious == 2:
-        engine._create_random_information(False, "多疑羁绊")
+        engine._create_random_information(False, TEXT["data.personalities.suspicious.start_of_turn_bond.1"])
     elif suspicious == 4:
-        engine._create_random_information(True, "多疑羁绊")
-        engine._create_random_information(False, "多疑羁绊")
+        engine._create_random_information(True, TEXT["data.personalities.suspicious.start_of_turn_bond.2"])
+        engine._create_random_information(False, TEXT["data.personalities.suspicious.start_of_turn_bond.3"])
     elif suspicious >= 8:
-        engine._create_random_information(True, "多疑羁绊")
-        engine._create_random_information(True, "多疑羁绊")
-        engine._create_random_information(False, "多疑羁绊")
+        engine._create_random_information(True, TEXT["data.personalities.suspicious.start_of_turn_bond.4"])
+        engine._create_random_information(True, TEXT["data.personalities.suspicious.start_of_turn_bond.5"])
+        engine._create_random_information(False, TEXT["data.personalities.suspicious.start_of_turn_bond.6"])
     if suspicious >= 2 and suspicious < 4 and engine.state.flow.turn % 2 == 0:
         for tenant in suspicious_tenants:
             engine._discern_one_information(tenant, false_only=suspicious >= 4)
@@ -26,7 +27,7 @@ def start_of_turn_bond(engine: EngineProtocol, bonds: dict[str, int]) -> None:
             engine._discern_one_information(tenant, false_only=True)
     if suspicious >= 8:
         for _tenant in suspicious_tenants:
-            engine._create_random_information(False, "多疑房客的额外观察")
+            engine._create_random_information(False, TEXT["data.personalities.suspicious.start_of_turn_bond.7"])
 
 
 def health_protection(
@@ -63,7 +64,7 @@ def item_use_wasted(
     if engine._rng(EVENT_IDS["item.suspicious"], tenant.id).random() >= .10:
         return False
     engine._spend_item_use(item_id, item, tenant, inventory=inventory, spot=spot)
-    engine._log(f"{engine.character(tenant).name}疑心太重，物资被浪费。")
+    engine._log(TEXT["data.personalities.suspicious.item_use_wasted.1"].format(p1=engine.character(tenant).name))
     return True
 
 
@@ -81,9 +82,9 @@ def on_initial(engine: EngineProtocol) -> None:
     """多疑羁绊的初始信息发放（常驻效果的启动部分）。"""
     tier = engine._bond_tier("suspicious")
     for _ in range(2 if tier >= 8 else 1 if tier >= 4 else 0):
-        engine._create_random_information(True, "多疑羁绊")
+        engine._create_random_information(True, TEXT["data.personalities.suspicious.on_initial.1"])
     if tier >= 2:
-        engine._create_random_information(False, "多疑羁绊")
+        engine._create_random_information(False, TEXT["data.personalities.suspicious.on_initial.2"])
 
 
 ON_INITIAL = on_initial
@@ -97,7 +98,7 @@ def _suspicious_depression_modifier(context: object):
     engine = context["engine"]; tenant = context["tenant"]  # type: ignore[index]
     change = context.get("change")
     if change and change > 0 and engine._is_personality(tenant, "suspicious"):
-        yield spec("depressionChange").path("消沉").mul(1.05).source("性格", "多疑")
+        yield spec("depressionChange").path("depression").mul(1.05).source("personality", "suspicious")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regsu

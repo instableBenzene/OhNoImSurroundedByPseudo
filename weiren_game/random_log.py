@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 from typing import Callable
+from weiren_game.data.lang import TEXT
 
 
 class LoggedRandom(random.Random):
@@ -27,7 +28,7 @@ class LoggedRandom(random.Random):
     def _note(self, kind: str, value: object) -> None:
         self._sequence += 1
         self._logger(
-            f"[随机] {self._label} #{self._sequence} {kind}={value}"
+            TEXT["random_log._note.1"].format(p1=self._label, p2=self._sequence, p3=kind, p4=value)
         )
 
     def random(self) -> float:
@@ -61,8 +62,7 @@ class _LoggedFloat(float):
 
     def _judge(self, symbol: str, other: object, result: bool) -> bool:
         self._logger(
-            f"[判定] {self._roll_label} 骰点={self._roll_value} "
-            f"{symbol} {other:g} → {'生效' if result else '不生效'}"
+            TEXT["random_log._judge.1"].format(p1=self._roll_label, p2=self._roll_value, p3=symbol, p4=other, p5='生效' if result else '不生效')
         )
         return result
 

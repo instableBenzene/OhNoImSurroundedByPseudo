@@ -12,6 +12,7 @@ from weiren_game.data import (
     TAG_BEHAVIORS,
     ItemDefinition,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -59,7 +60,7 @@ class ItemSystemMixin:
                 self.state.house.inventory.add(instance)
         names = "、".join(ITEMS[value.item_id].name for value in overflow if value.item_id in ITEMS)
         self._log(
-            f"{self.character(tenant).name}的携带栏缩小，多出的物资已放回屋主仓库：{names}。"
+            TEXT["systems.item_system._spill_tenant_overflow.1"].format(p1=self.character(tenant).name, p2=names)
         )
 
     def move_item(
@@ -78,43 +79,30 @@ class ItemSystemMixin:
             tenant = self._require_home_tenant(tenant_id)
             inventory = tenant.inventory
             if not (0 <= int(to_slot) < self.tenant_carry_capacity(tenant)):
-                raise RuleViolation("目标格超出该房客的携带栏范围。")
+                raise RuleViolation(TEXT["systems.item_system.move_item.1"])
         else:
-            raise RuleViolation("未知的物资容器。")
+            raise RuleViolation(TEXT["systems.item_system.move_item.2"])
         instance = inventory.at_plot(int(from_slot))
         if instance is None:
-            raise RuleViolation("该格没有物资。")
+            raise RuleViolation(TEXT["systems.item_system.move_item.3"])
         inventory.move_to(instance, int(to_slot))
         self._record_action(
             "move_item", container=container, tenant=tenant_id,
             item=instance.item_id, slot=int(to_slot),
         )
 
-    def _item_tag_use(self, item: ItemDefinition):
-        """按物品 tag 找到行为模块的 use 方法（先命中先执行）。"""
-        for tag in item.tags:
-            module = TAG_BEHAVIORS.get(tag)
-            use = getattr(module, "use", None) if module is not None else None
-            if use is not None:
-                return use
-        return None
+    def _item_tag_fn(self, item: ItemDefinition, name: str):
+        """按物品 tag 顺序找行为模块里的某个钩子（先命中先执行，找不到返回 None）。
 
-    def _item_tag_after_food(self, item: ItemDefinition):
-        """按物品 tag 找到“食用食物后”扳机（after_food，先命中先执行）。"""
+        钩子名由**消费方**决定：`use`（使用该物资）、`after_food`（食用后）等；
+        行为体一律就近住在 `data/tags/<tag>.py`，核心不认识具体是哪种物资。
+        """
         for tag in item.tags:
             module = TAG_BEHAVIORS.get(tag)
-            fn = getattr(module, "after_food", None) if module is not None else None
+            fn = getattr(module, name, None) if module is not None else None
             if fn is not None:
                 return fn
         return None
-
-    def _take_tenant_item(self, tenant: Tenant, item_id: str):
-        """从房客背包取走槽位最靠前的指定物品实例，未持有返回 None。"""
-        return tenant.inventory.remove_first(item_id)
-
-    def _house_count(self, item_id: str) -> int:
-        """返回屋主仓库中该物品的累计数量。"""
-        return self.state.house.inventory.count(item_id)
 
     def _add_house_item(self, item_id: str, durability: int = 0, count: int = 1):
         """在屋主仓库中创建一个新物品实例并返回它。"""
@@ -207,7 +195,7 @@ class ItemSystemMixin:
         """把一件物资从一名房客的背包移到另一名房客的背包（可指定目标格）。"""
         self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段转移物资。")
+            raise RuleViolation(TEXT["systems.item_system.transfer_item.1"])
         source = self._require_home_tenant(from_id)
         target = self._require_home_tenant(to_id)
         if source.id == target.id:
@@ -215,9 +203,9 @@ class ItemSystemMixin:
         if target_slot is not None and not (
             0 <= int(target_slot) < self.tenant_carry_capacity(target)
         ):
-            raise RuleViolation("目标格超出目标房客的携带栏范围。")
+            raise RuleViolation(TEXT["systems.item_system.transfer_item.2"])
         if len(target.inventory.items) >= self.tenant_carry_capacity(target):
-            raise RuleViolation("目标房客的携带栏已满。")
+            raise RuleViolation(TEXT["systems.item_system.transfer_item.3"])
         instance = (
             source.inventory.at_plot(int(slot)) if slot is not None
             else source.inventory.remove_first(item_id)
@@ -225,14 +213,13 @@ class ItemSystemMixin:
         if instance is not None and instance.item_id != item_id:
             instance = None
         if instance is None:
-            raise RuleViolation("源房客背包里没有这件物资。")
+            raise RuleViolation(TEXT["systems.item_system.transfer_item.4"])
         if slot is not None:
             source.inventory.remove(instance.item_instance_id)
         target.inventory.add(instance, plot=target_slot)
         self._spill_tenant_overflow(source)
         self._record_action("transfer", tenant=target.id, source=source.id, item=item_id)
-        self._log(f"物资转移：{self.character(source).name} → {self.character(target).name}"
-                  f"（{ITEMS[item_id].name}）。")
+        self._log(TEXT["systems.item_system.transfer_item.5"].format(p1=self.character(source).name, p2=self.character(target).name, p3=ITEMS[item_id].name))
 
     def migrate_carriers(self) -> None:
         """"获得即兑换"的信息载体（keep=False）不该留存：读档时统一兑换为信息。"""
@@ -259,29 +246,13 @@ class ItemSystemMixin:
             instance = next((v for v in source if v.item_id == item_id), None)
         if instance is None:
             name = ITEMS[item_id].name if item_id in ITEMS else item_id
-            raise RuleViolation(f"物品数量不足：{name}")
+            raise RuleViolation(TEXT["systems.item_system._take_item.1"].format(p1=name))
         durability = instance.durability
         if instance.count > 1:
             instance.count -= 1
         else:
             source.remove(instance.item_instance_id)
         return durability
-
-    def _decrement_inventory(self, item_id: str, amount: int = 1) -> None:
-        """按数量从仓库移除物品实例，数量不足时报错。"""
-        consumed = self.state.house.inventory.consume(item_id, amount)
-        if consumed < amount:
-            raise RuleViolation(f"物品数量不足：{ITEMS[item_id].name}")
-        for _ in range(consumed):
-            self._emit_node("item.consumed", item_id=item_id)
-
-    def _return_item(self, item_id: str, durability: int = 0) -> None:
-        """把一件物品连同耐久放回屋主仓库（新实例）。"""
-        if item_id not in ITEMS:
-            return
-        item = ITEMS[item_id]
-        value = max(1, int(durability)) if item.durable else 0
-        self._add_house_item(item_id, value)
 
     def _durability_multiplier(self) -> float:
         """返回全局耐久消耗倍率（下限为 0）。"""
@@ -291,7 +262,7 @@ class ItemSystemMixin:
         """计算物品易损概率，叠加羁绊与性格修饰后限制在 5% 至 100%。"""
         if base <= 0:
             return 0.0
-        source = ("易损",) + ((tenant.character_id,) if tenant else ())
+        source = (TEXT["systems.item_system._fragile_chance.1"],) + ((tenant.character_id,) if tenant else ())
         value = self._apply_modifiers("chance", base, source, {"tenant": tenant})
         value *= max(0.0, self._global_event_value("item.fragile.multiplier", 1.0))
         from weiren_game.probability import resolve
@@ -320,7 +291,7 @@ class ItemSystemMixin:
         instance.durability -= cost
         if instance.durability <= 0:
             source.remove(instance.item_instance_id)
-            self._log(f"{ITEMS[item_id].name}耗尽耐久并损坏。")
+            self._log(TEXT["systems.item_system._consume_durability.1"].format(p1=ITEMS[item_id].name))
             self._emit_node("item.broken", item_id=item_id)
             return True
         return False
@@ -337,9 +308,9 @@ class ItemSystemMixin:
         """行动阶段把一件物资装入指定屋内房客的背包（可指定来源与目标格）。"""
         self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段装备物品。")
+            raise RuleViolation(TEXT["systems.item_system.equip_item.1"])
         if item_id not in ITEMS:
-            raise RuleViolation("未知的物资。")
+            raise RuleViolation(TEXT["systems.item_system.equip_item.2"])
         tenant = self._require_home_tenant(tenant_id)
         source = self._require_home_tenant(source_tenant) if source_tenant else None
         inventory = source.inventory if source is not None else self.state.house.inventory
@@ -347,7 +318,7 @@ class ItemSystemMixin:
         if target_slot is not None and not (
             0 <= int(target_slot) < self.tenant_carry_capacity(tenant)
         ):
-            raise RuleViolation("目标格超出该房客的携带栏范围。")
+            raise RuleViolation(TEXT["systems.item_system.equip_item.3"])
         same_owner = source is not None and source.id == tenant.id
         if same_owner:
             instance = (
@@ -355,29 +326,29 @@ class ItemSystemMixin:
                 else inventory.remove_first(item_id)
             )
             if instance is None or instance.item_id != item_id:
-                raise RuleViolation("该房客没有携带这件物资。")
+                raise RuleViolation(TEXT["systems.item_system.equip_item.4"])
             if target_slot is not None:
                 inventory.move_to(instance, int(target_slot))
             self._record_action("equip", tenant=tenant.id, item=item_id)
-            self._log(f"{self.character(tenant).name}整理了{item.name}的携带位置。", shown=False)
+            self._log(TEXT["systems.item_system.equip_item.5"].format(p1=self.character(tenant).name, p2=item.name), shown=False)
             return
         if slot is not None:
             instance = inventory.at_plot(int(slot))
             if instance is None or instance.item_id != item_id:
-                raise RuleViolation("该格没有这件物资。")
+                raise RuleViolation(TEXT["systems.item_system.equip_item.6"])
             inventory.remove(instance.item_instance_id)
         else:
             instance = inventory.remove_first(item_id)
             if instance is None:
-                raise RuleViolation("物品栏中没有这件物品。")
+                raise RuleViolation(TEXT["systems.item_system.equip_item.7"])
         if len(tenant.inventory.items) >= self.tenant_carry_capacity(tenant):
             inventory.add(instance, plot=slot if slot is not None else None)
-            raise RuleViolation("该房客的携带栏已满。")
+            raise RuleViolation(TEXT["systems.item_system.equip_item.8"])
         tenant.inventory.add(instance, plot=target_slot)
         if source is not None:
             self._spill_tenant_overflow(source)
         self._record_action("equip", tenant=tenant.id, item=item_id)
-        self._log(f"{self.character(tenant).name}装备了{item.name}。", shown=False)
+        self._log(TEXT["systems.item_system.equip_item.9"].format(p1=self.character(tenant).name, p2=item.name), shown=False)
 
     def unequip_item(
         self,
@@ -397,13 +368,13 @@ class ItemSystemMixin:
         else:
             held = tenant.inventory.remove_first(item_id)
         if not held:
-            raise RuleViolation("该房客没有携带这件物品。")
+            raise RuleViolation(TEXT["systems.item_system.unequip_item.1"])
         if slot is not None:
             tenant.inventory.remove(held.item_instance_id)
         self.state.house.inventory.add(held, plot=target_slot)
         self._spill_tenant_overflow(tenant)
         self._record_action("unequip", tenant=tenant.id, item=item_id)
-        self._log(f"{self.character(tenant).name}卸下了{ITEMS[item_id].name}。", shown=False)
+        self._log(TEXT["systems.item_system.unequip_item.2"].format(p1=self.character(tenant).name, p2=ITEMS[item_id].name), shown=False)
 
     def use_item(
         self,
@@ -417,19 +388,19 @@ class ItemSystemMixin:
         """行动阶段使用物资：校验限制后分派至医疗、镇痛或普通消耗流程。"""
         self._require_no_pending_choice()
         if self.state.flow.phase != "action":
-            raise RuleViolation("只能在玩家行动阶段使用物资。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.1"])
         if item_id not in ITEMS:
-            raise RuleViolation("未知的物资。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.2"])
         source = self._require_home_tenant(source_tenant) if source_tenant else None
         inventory = source.inventory if source is not None else self.state.house.inventory
         if inventory.count(item_id) <= 0:
-            raise RuleViolation("没有这件物资。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.3"])
         item = ITEMS[item_id]
         spot = None
         if slot is not None:
             spot = inventory.at_plot(int(slot))
             if spot is None or spot.item_id != item_id:
-                raise RuleViolation("该格没有这件物资。")
+                raise RuleViolation(TEXT["systems.item_system.use_item.4"])
         from weiren_game.data.items import (
             item_is_carried_only,
             item_is_house_object,
@@ -437,11 +408,11 @@ class ItemSystemMixin:
         )
 
         if item_requires_equip(item_id):
-            raise RuleViolation("该物品需先装备给房客。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.5"])
         if item_is_house_object(item_id):
-            raise RuleViolation("该物资放在屋主物品栏中即可持续生效，无需使用。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.6"])
         if item_is_carried_only(item_id):
-            raise RuleViolation("该工具无法直接使用，只能装入背包携带。")
+            raise RuleViolation(TEXT["systems.item_system.use_item.7"])
         from weiren_game.data.items import item_gain_info_spec
 
         if item_gain_info_spec(item_id) is not None and not item_gain_info_spec(
@@ -454,7 +425,7 @@ class ItemSystemMixin:
         # 物资只能作用于屋内的房客；无目标物品（target_mode≠tenant）可省略对象。
         if item.target_mode == "tenant":
             if tenant_id is None:
-                raise RuleViolation("这件物资需要指定屋内房客。")
+                raise RuleViolation(TEXT["systems.item_system.use_item.8"])
             tenant = self._require_home_tenant(tenant_id)
         else:
             tenant = (
@@ -473,18 +444,16 @@ class ItemSystemMixin:
         if tenant is None:
             effect = ITEM_EFFECTS.get(item.on_use or "")
             if effect is None:
-                raise RuleViolation("该物资没有可执行的通用效果。")
+                raise RuleViolation(TEXT["systems.item_system.use_item.9"])
             effect(self, None, item)
             self._spend_item_use(item.item_id, item, None, inventory=inventory, spot=spot)
-        elif item.medical_target:
-            tag_use = self._item_tag_use(item)
-            if tag_use is None:
-                raise RuleViolation("该医疗物资没有对应的 tag 行为模块。")
-            tag_use(self, item, tenant, inventory, spot)
-        elif "anodyne" in item.tags:
-            self._use_analgesic(item, tenant, condition, inventory=inventory, spot=spot)
         else:
-            self._use_general_item(item, tenant, inventory=inventory, spot=spot)
+            # 有 tag 行为就用它（医药/镇痛等），否则走通用 on_use 消耗品。
+            tag_use = self._item_tag_fn(item, "use")
+            if tag_use is not None:
+                tag_use(self, item, tenant, inventory, spot, condition=condition)
+            else:
+                self._use_general_item(item, tenant, inventory=inventory, spot=spot)
         self.state.round.item_uses_this_turn += 1
         self._record_action("item", item=item_id, tenant=tenant.id, condition=condition)
 
@@ -511,55 +480,16 @@ class ItemSystemMixin:
             if self._rng(EVENT_IDS["item.fragile"], item_id).random() < chance:
                 self._take_item(item_id, inventory, spot=spot)
 
-    def _use_analgesic(
-        self, item: ItemDefinition, tenant: Tenant, condition: str | None, *,
-        inventory=None, spot=None,
-    ) -> None:
-        """使用镇痛剂为目标创伤/紊乱附加持续若干回合的额外效果免疫。"""
-        choices = {
-            "trauma": tenant.trauma,
-            "disorder": tenant.disorder,
-        }
-        if condition not in choices:
-            active = [key for key, value in choices.items() if value.active]
-            if not active:
-                raise RuleViolation("目标没有可镇痛的创伤或紊乱。")
-            condition = active[0]
-        target = choices[condition]
-        if not target.active or target.intensity > item.medical_max_intensity:
-            raise RuleViolation("该镇痛剂无法用于当前强度的状态。")
-        from weiren_game.data import NODE_HOOKS
-
-        duration = None
-        for hook in NODE_HOOKS.get("analgesic.duration", ()):
-            duration = hook(item.item_id)
-            if duration is not None:
-                break
-        if duration is None:
-            raise RuleViolation("该镇痛剂没有登记持续时间。")
-        status_id = None
-        for hook in NODE_HOOKS.get("analgesic.status_id", ()):
-            status_id = hook(self, condition)
-            if status_id:
-                break
-        if status_id is None:
-            raise RuleViolation("该镇痛剂没有登记对应状态。")
-        current = tenant.condition(status_id)
-        if not (current.active and current.layers > duration):
-            tenant.set_status(status_id, intensity=1, layers=duration)
-        self._spend_item_use(item.item_id, item, tenant, inventory=inventory, spot=spot)
-        self._log(f"{self.character(tenant).name}使用{item.name}，状态额外效果免疫至第{self.state.flow.turn + duration}回合。")
-
     def _use_general_item(
         self, item: ItemDefinition, tenant: Tenant, *, inventory=None, spot=None
     ) -> None:
         """经 on_use 效果注册表执行普通消耗品效果，并结算使用代价与该角色加成。"""
         effect = ITEM_EFFECTS.get(item.on_use or "")
         if effect is None:
-            raise RuleViolation("该物资不是可直接使用的消耗品。")
+            raise RuleViolation(TEXT["systems.item_system._use_general_item.1"])
         effect(self, tenant, item)
         self._spend_item_use(item.item_id, item, tenant, inventory=inventory, spot=spot)
-        after_food = self._item_tag_after_food(item)
+        after_food = self._item_tag_fn(item, "after_food")
         if after_food is not None:
             after_food(self, tenant, item)
-        self._log(f"{self.character(tenant).name}使用了{item.name}。")
+        self._log(TEXT["systems.item_system._use_general_item.2"].format(p1=self.character(tenant).name, p2=item.name))

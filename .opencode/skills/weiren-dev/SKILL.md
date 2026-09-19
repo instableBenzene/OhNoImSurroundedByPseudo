@@ -40,16 +40,38 @@ description: Use when working in the OhNoImSurroundedByPseudo repository ("完�
 - 选择/候选/图鉴补充一律由内容自描述（`TARGET_OPTIONS`、`CODEX_EXTRA/SECTION/SUMMARY`、`PENDING_VIEW` 等；注册表全集见 `AGENTS.md §3`），DLC 也可经 `codex/` 贡献分节。
 - **DLC 伪人的图鉴技能**：`codex_pack.PSEUDO_SKILLS` 是内置静态表；DLC 伪人应由其模块声明 `CODEX_SKILLS`
   （`((名称, 文案), ...)`），图鉴页会自动回退读它。
-- 图鉴文案属于内容层：集中在 `data/` 下的图鉴包与 `*_text.py`（**以代码为准**），不在系统/前端写死。
+- **面向玩家的文字一律先写进 lang 表**（见下条），不散落在定义里；图鉴正文仍在 `data/` 的图鉴包与 `*_text.py`
+  （**以代码为准**），但它们同样只从 lang 取字。
+
+### 2.1 文本（lang）：加一条就能用，没有注册动作
+
+- **表在哪**：base 是 `weiren_game/data/lang.py::TEXT`；每个 DLC 自带 `dlc/<包>/lang.py`
+  （模块顶部 `TEXT = pack_text_from_file(__file__)`）。
+- **键名用既有 id 拼**：`ability.<id>.name` / `ability.<id>.description` / `character.<id>.name|description|tag.N` /
+  `item.<id>.name|description|flavor` / `pseudo.<id>.*` / `info.<id>.*` / `mark.<id>.*`；
+  系统层与前端的键按位置生成（`<模块>.<函数>.<n>`、`ui.js.<n>`、`ui.markup.<n>`）。
+- **用法**：
+  ```python
+  # 1) lang.py 加一条（顺序随意）
+  "ability.call_friends.name": "呼朋引伴",
+  # 2) 使用点按 key 取
+  A("call_friends", TEXT["ability.call_friends.name"],
+    TEXT["ability.call_friends.description"], chips=(TEXT["ability.call_friends.chip.0"],))
+  ```
+  带占位符的模板写 `{名字}`，调用点 `.format(名字=…)`；前端 chrome 用 `TXT("ui.x")` 或槽位 `data-t="ui.x"`。
+- **加文本 = 只加一条**。没有注册步骤；打错 key 在 Python 侧当场 `KeyError`，
+  前端则原样显示 key（肉眼可见）。核对/盘点：`python tools/dump_text.py --out <目录>`。
+- **数据键不进 lang**：`path` / `source` / tag / 性别 / 年龄 / 兴趣参与规则命中，**禁止翻译**（见 `docs/ROADMAP.md` §7）。
 - **外观/材质也是内容**（三层：base → 资料包 → 独立资源包）。要动前端或材质，
   先读 **`.opencode/skills/weiren-frontend/SKILL.md`**（token/零件/素材位/文件资产、渲染规则、验证手法、坑）。
 
 ## 3. 验证（每次改完必跑）
 ```
 python -m compileall -q weiren_game
-python -m unittest discover -s tests -p "test_*.py"        # 当前 63 全绿（刻意精简，勿堆冗余用例）
+python -m unittest discover -s tests -p "test_*.py"        # 必须全绿（刻意精简，勿堆冗余用例）
 python tools/smoke_simulation.py --seeds 3 --log-dir <tmp>
 python tools/audit_separation.py                            # 分离度自检
+python tools/audit_text.py                                  # 动了文案就跑（规则见 docs/STYLE.md §11）
 python tools/dump_effects.py                                # 效果注册表 dump（核对 docs/ARCH.md 的闸门/数值目录）
 ```
 前端改动：抽出脚本 `node --check`；发布前跑浏览器压测：
@@ -90,5 +112,5 @@ node tools/browser_playtest.mjs url=http://127.0.0.1:8775/ games=30 turns=12 bud
 - **规则文档只写规则，不复制清单**：注册表、字段名、文件名、性格键、目录树这类清单一律指向唯一来源
   （代码 / `AGENTS.md` / `docs/*.md`），避免双维护漂移。
 - **测试保持精简**：合并同类断言、能用 `subTest` 就别开一堆方法；不写"镜像实现 / 重复基本行为"的用例。
-  当前 63 项，不要为一次性改动再堆冗余测试。
+  **别在文档里写用例数**（`AGENTS.md` §1 同规矩），更不要为一次性改动堆冗余测试。
 - **术语与文案属于内容层**；只清自己产生的文件（`WEIREN_SAVES_DIR` 隔离）。

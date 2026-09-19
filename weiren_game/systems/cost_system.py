@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from weiren_game.exceptions import RuleViolation
 from weiren_game.data.types import Term
+from weiren_game.data.lang import TEXT
 
 
 _DEFAULT_FORCED_COST_TERMS: tuple[Term, ...] = (
@@ -52,12 +53,6 @@ class CostSystemMixin:
         if branches:
             return branches[0]
         return _EmptyBranch()
-
-    def _cost_terms_of(self, branch: object, *, forced: bool = False) -> list[object]:
-        """取出该分支的 cost 条目；强制时整体替换为强制代价。"""
-        if forced:
-            return self._forced_cost_terms(branch)
-        return [term for term in branch.terms if term.side == "cost"]
 
     def _resolve_branch_cost(
         self,
@@ -116,7 +111,7 @@ class CostSystemMixin:
             if isinstance(ref, str):
                 term = tag_map.get(ref)
                 if term is None:
-                    return f"cost 表达式引用了未知 tag：{ref}"
+                    return TEXT["cost.unknown_tag"].format(ref=ref)
                 if term.optional and not (forced or include_optional):
                     return None
                 actual = target if term.payer == "target" else payer
@@ -130,7 +125,7 @@ class CostSystemMixin:
             for ref in expr.refs:
                 if ref_error(ref) is None:
                     return None
-            return "该消耗的每个“或”分支都不可支付。"
+            return TEXT["cost.or_unpayable"]
         for ref in expr.refs:
             error = ref_error(ref)
             if error:
@@ -199,7 +194,7 @@ class CostSystemMixin:
         if isinstance(ref, str):
             term = tag_map.get(ref)
             if term is None:
-                return f"cost 表达式引用了未知 tag：{ref}"
+                return TEXT["cost.unknown_tag"].format(ref=ref)
             if term.optional and not (forced or include_optional):
                 return None
             actual = target if term.payer == "target" else payer
@@ -214,19 +209,19 @@ class CostSystemMixin:
         amount = self._resolve_amount(term, payer)
         if term.resource == "sanity":
             if payer.sanity < amount:
-                return f"理智不足，需要{amount:g}。"
+                return TEXT["cost.sanity_short"].format(amount=amount)
         elif term.resource == "health":
             if payer.health < amount:
-                return f"生命不足，需要{amount:g}。"
+                return TEXT["cost.health_short"].format(amount=amount)
         elif term.resource == "mark":
             if self._role_mark_count(payer, term.key) < amount:
-                return f"{term.key}印记不足，需要{amount:g}枚。"
+                return TEXT["cost.mark_short"].format(key=term.key, amount=amount)
         elif term.resource == "turns":
             if payer.skip_until_turn > self.state.flow.turn:
-                return "该房客当前仍被禁止行动。"
+                return TEXT["cost.turns_forbidden"]
         elif term.resource == "game":
             if payer.turn_counters.get(term.key, 0):
-                return f"{term.key}每局仅能使用一次。"
+                return TEXT["cost.game_once"].format(key=term.key)
         return None
 
     # ------------------------------------------------------------------ payable
@@ -247,19 +242,19 @@ class CostSystemMixin:
             amount = self._resolve_amount(term, actual)
             if term.resource == "sanity":
                 if actual.sanity < amount:
-                    return f"理智不足，需要{amount:g}。"
+                    return TEXT["cost.sanity_short"].format(amount=amount)
             elif term.resource == "health":
                 if actual.health < amount:
-                    return f"生命不足，需要{amount:g}。"
+                    return TEXT["cost.health_short"].format(amount=amount)
             elif term.resource == "mark":
                 if self._role_mark_count(actual, term.key) < amount:
-                    return f"{term.key}印记不足，需要{amount:g}枚。"
+                    return TEXT["cost.mark_short"].format(key=term.key, amount=amount)
             elif term.resource == "turns":
                 if actual.skip_until_turn > self.state.flow.turn:
-                    return "该房客当前仍被禁止行动。"
+                    return TEXT["cost.turns_forbidden"]
             elif term.resource == "game":
                 if actual.turn_counters.get(term.key, 0):
-                    return f"{term.key}每局仅能使用一次。"
+                    return TEXT["cost.game_once"].format(key=term.key)
         return None
 
     def _cost_pack_payable(
@@ -322,13 +317,13 @@ class CostSystemMixin:
             actual = target if term.payer == "target" else payer
             amount = self._resolve_amount(term, actual)
             if term.resource == "sanity":
-                self._consume_sanity(actual, amount, "技能消耗")
+                self._consume_sanity(actual, amount, "ability_consume")
             elif term.resource == "health":
                 # 前置代价按原值直扣，不经过伤害管线（护甲/倍率只作用于
                 # 技能 effect 造成的伤害）。
                 actual.health = max(0.0, actual.health - amount)
             elif term.resource == "mark":
-                self._spend_role_mark(actual, term.key, amount)
+                self._consume_mark(actual, term.key, amount)
             elif term.resource == "turns":
                 actual.skip_until_turn = max(
                     actual.skip_until_turn, self.state.flow.turn + int(amount)
@@ -336,7 +331,7 @@ class CostSystemMixin:
             elif term.resource == "game":
                 actual.turn_counters[term.key] = 1
             else:
-                raise RuleViolation(f"未知的消耗类型：{term.resource}")
+                raise RuleViolation(TEXT["cost.unknown_resource"].format(resource=term.resource))
 
     def _pay_cost_pack(
         self,
@@ -380,11 +375,6 @@ class CostSystemMixin:
     def _role_mark_count(self, payer: object, key: str) -> float:
         """读取角色的印记资源：统一取自房客印记池。"""
         return float(self._mark_count(payer, key))
-
-    def _spend_role_mark(self, payer: object, key: str, amount: float) -> None:
-        """扣除角色的印记资源（印记池，最小实例优先）。"""
-        self._consume_mark(payer, key, amount)
-
 
 class _EmptyBranch:
     """无分支技能的空默认分支（此时本层什么都不扣）。"""

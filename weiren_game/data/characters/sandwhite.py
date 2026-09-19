@@ -6,21 +6,19 @@
 
 from ..types import A, CharacterDefinition, T
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "sandwhite", 24, "沙白", "17岁女孩，逃课高手，无论何时都显得困倦。", "loner", "gentle", 4,
-    ("高中生", "16-18岁", "女性"),
+    "sandwhite", 24, TEXT["character.sandwhite.name"], TEXT["character.sandwhite.description"], "loner", "gentle", 4,
+    (TEXT["character.sandwhite.tag.0"], TEXT["character.sandwhite.tag.1"], TEXT["character.sandwhite.tag.2"]),
     # 排版与去重（STYLE §12）：数值加粗、条件分行；冷却只留在 chips 里，不在正文重复。
-    (A("ordinary", "万事通",
-       "· 搜索返回时，有 **30%** 概率获得一件额外物资。"
-       "· 回合开始时，有 **20%** 概率使创伤强度 **≤3** 的房客创伤强度 **−3**。",
-       chips=("冷却 3 回合",)),
-     A("slow_perception", "感知迟钝／困倦",
-       "理智消耗/增加量均为 **×50%**。"
-       "· 入住时理智为 **50**。"
-       "· 搜索返回后，接下来 **3 个回合**不能搜索。")),
-    (A("encourage", "鼓舞", "令所有房客回复 **2** 理智，持续 **3 回合**。", chips=("冷却 2 回合",)),),
+    (A("ordinary", TEXT["ability.ordinary.name"],
+       TEXT["ability.ordinary.description"],
+       chips=(TEXT["ability.ordinary.chip.0"],)),
+     A("slow_perception", TEXT["ability.slow_perception.name"],
+       TEXT["ability.slow_perception.description"])),
+    (A("encourage", TEXT["ability.encourage.name"], TEXT["ability.encourage.description"], chips=(TEXT["ability.encourage.chip.0"],)),),
 )
 
 # ---------------------------------------------------------------- modifier
@@ -40,7 +38,7 @@ def sanity_reduce_multiplier(
 
     使用处：value_system._reduce_sanity 经 CHARACTER_VALUE_HOOKS 查表调用。
     """
-    if change_type != "消耗":
+    if change_type != "consume":
         return 1.0
     if not engine._passive_available(tenant, "sandwhite.slow_perception.consume"):
         return 1.0
@@ -88,7 +86,7 @@ def vitality_boost(engine: EngineProtocol, tenant: object) -> None:
     condition = tenant.condition("vitality_boost")
     if not condition.active:
         return
-    engine._restore_sanity(tenant, 2, "沙白的鼓舞")
+    engine._restore_sanity(tenant, 2, "sandwhite_inspire")
     remaining = condition.layers - 1
     if remaining <= 0:
         tenant.clear_status("vitality_boost")
@@ -101,14 +99,14 @@ from weiren_game.condition import StatusDefinition, register_status_definition
 register_status_definition(
     StatusDefinition(
         "vitality_boost",
-        "活力焕发",
+        TEXT["status.vitality_boost.label"],
         "other",
         shown=frozenset({"icon", "intensity", "layers", "description"}),
         source_id="ability:encourage@sandwhite",
         nodes=frozenset({"turn_end.status_effects"}),
         auto_decay=False,
         hook=vitality_boost,
-     description="被鼓起的劲头顺着血管烧起来，疲惫暂时退开。")
+     description=TEXT["status.vitality_boost.description"])
 )
 
 
@@ -131,7 +129,7 @@ def passive_heal(engine: EngineProtocol, tenant: object) -> None:
             target = max(candidates, key=lambda value: (value.trauma.intensity, value.trauma.layers))
             engine._recover_condition(target.trauma, 0, 3)
             engine._set_ability_cooldown(tenant, "ordinary", engine.state.flow.turn + 3)
-            engine._log(f"沙白迷迷糊糊地减轻了{engine.character(target).name}的创伤。")
+            engine._log(TEXT["data.characters.sandwhite.passive_heal.1"].format(p1=engine.character(target).name))
 
 
 def search_reward(engine: EngineProtocol, tenant: object, guaranteed: list[str]) -> None:
@@ -193,7 +191,7 @@ def _sandwhite_consume_modifier(context: object):
     if tenant.character_id != "sandwhite":
         return
     if engine._passive_available(tenant, "sandwhite.slow_perception.consume"):
-        yield spec("sanityConsume").path("消耗").mul(0.5).source("角色技能", "沙白", "缓慢感知")
+        yield spec("sanityConsume").path("consume").mul(0.5).source("ability", "sandwhite", "slow_perception")
 
 
 def _sandwhite_restore_modifier(context: object):
@@ -204,7 +202,7 @@ def _sandwhite_restore_modifier(context: object):
     if tenant.character_id != "sandwhite":
         return
     if engine._passive_available(tenant, "sandwhite.slow_perception.restore"):
-        yield spec("sanityRestore").path("回复").mul(0.5).source("角色技能", "沙白", "缓慢感知")
+        yield spec("sanityRestore").path("restore").mul(0.5).source("ability", "sandwhite", "slow_perception")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regsw

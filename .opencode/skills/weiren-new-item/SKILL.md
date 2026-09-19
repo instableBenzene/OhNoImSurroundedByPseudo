@@ -20,14 +20,19 @@ description: Use when adding items/物资 to OhNoImSurroundedByPseudo — "加�
 
 ```python
 from ..types import I          # DLC 里用 from weiren_game.data.types import I
+from weiren_game.data.lang import TEXT
 
 CATEGORY = "food"
 ITEMS = {
-    "my_item": I("my_item", "我的物品", CATEGORY, 2,
-                 "食用恢复 8 点生命。", ("food", "consumable"),
+    "my_item": I("my_item", TEXT["item.my_item.name"], CATEGORY, 2,
+                 TEXT["item.my_item.description"], ("food", "consumable"),
                  consumable=True, stack_size=16),
 }
 ```
+
+**文案写进 lang 表**（base = `weiren_game/data/lang.py`，DLC = `dlc/<包>/lang.py`）：
+`item.<id>.name` / `item.<id>.description` / `item.<id>.flavor`（风味另在 `data/items/flavor.py`）。
+加文本**只是加一条**、没有注册动作；数据键（tag / `path` / `source`）不进 lang。
 
 字段以 `ItemDefinition`（`weiren_game/types.py`）为准，常用：
 `consumable` / `stack_size` / `max_durability` / `use_cost` / `fragile_chance` /
@@ -42,16 +47,19 @@ ITEMS = {
 | 指名物的特殊效果 | 物品上 `on_use="my_effect"`，本文件里 `ITEM_EFFECTS = {"my_effect": fn}`（签名看 `item_system` 调用点） |
 | 生命周期（回合初/末背包实例、食用后…） | `ITEM_HOOKS = {item_id: {"<节点>": {名称: fn}}}`；**节点名由消费方定义**，用 `rg "ITEM_HOOKS" weiren_game` 找（如 `systems/round_effects.py` 读实例节点、`data/tags/food.py` 读 `after_food`） |
 | 按 tag 的通用行为 | `data/tags/<tag>.py`（`TAG_BEHAVIORS`）＋ `data/tags/<tag>.json` 条目合并 |
+| └ 使用行为 | 模块里写 `use(engine, item, tenant, inventory, spot, *, condition=None)`；核心按 tag 顺序找它，**不认识具体物资**（镇痛剂 / 医药都住这里） |
 
-数值/概率一律走通道 + 修饰器（`engine._apply_modifiers` / `_apply_chance`），见 `docs/ARCH.md`；
+数值/概率一律走通道 + 修饰器（`engine._apply_modifiers`；概率见 `docs/GUIDE.md` §4.3），见 `docs/ARCH.md`；
 概率 5%~95%，必定用 `.certain(0/1)`。
 
 ## 3. 文案与美术（都在内容层）
 
-- 中文名/tag 中文名/分类中文名：`data/labels.py` 的 `ITEM_TAG_LABELS` / `ITEM_CATEGORY_LABELS`
-  （DLC 用 `register_item_tag_label` / `register_item_category_label` / `register_item_tag_icon`，
-  或在 `__init__.register(ctx)` 里调用）。
-- 图鉴全文：`data/items/codex_text.py`；风味：`data/items/flavor.py`。
+- **文字先落 lang**：`item.<id>.name` / `.description` / `.flavor`，再加你在 `I(...)` 里引用。
+- 中文名/tag 中文名/分类中文名：文字仍住 lang；登记走 `data/labels.py` 的
+  `ITEM_TAG_LABELS` / `ITEM_CATEGORY_LABELS`（DLC 用 `register_item_tag_label` /
+  `register_item_category_label` / `register_item_tag_icon`，或在 `__init__.register(ctx)` 里调用），
+  参数传 `TEXT["tag.<新tag>.name"]` 这类 key。
+- 图鉴全文：`data/items/codex_text.py`；风味：`data/items/flavor.py`（两处都只从 lang 取字）。
 - 图标：内容层 `data/item/item/<物品id>.svg`（专属）或 `data/item/tag/<tag>.svg`（按标签兜底）；
   资料包放 `dlc/<包>/item/...`、资源包放 `resourcepacks/<包>/item/...` 即可覆盖（**不改代码**）。
   两色规则：`#d7ddd2`/`currentColor` = 底色（主题近白），其余颜色 = 特征色（自动取**品质色**）。
@@ -68,6 +76,8 @@ ITEMS = {
 7. 文案：图鉴描述要不要按设计稿原文；是否只要一句风味
 8. 约束：是否**可被搜索**（会改掉落池）、是否触碰平衡数值（单列、待评审）
 
+> 以上文字都会落进 `lang.py`（`item.<id>.name|description|flavor`）；**给需求时把文字写清楚**即可。
+
 ## 5. 字段速查（先想清楚这五个）
 
 | 字段 | 什么时候用 | 注意 |
@@ -80,7 +90,7 @@ ITEMS = {
 | `on_use="key"` | 需要特殊使用逻辑 | 解析到本文件 `ITEM_EFFECTS = {"key": fn}`，`fn(engine, tenant, item)` |
 | `searchable=False` | 不该出现在搜索池 | 默认 True |
 
-概率/数值一律走通道与收敛（`engine._apply_chance` / `_apply_modifiers`）；**必定** 用 0/1。
+概率/数值一律走通道与收敛（`engine._apply_modifiers` + `resolve(...)`）；**必定** 用 0/1。
 生命周期节点 / `source`·`path` / 闸门取舍：见 `docs/ARCH.md` §2/§4/§5，
 或以 `.opencode/skills/weiren-new-character/SKILL.md` §5 的三套速查为准。
 
@@ -90,7 +100,7 @@ ITEMS = {
 
 | 需求清单里的项 | 落在哪里 |
 | --- | --- |
-| 名称 / 分类 / 品质 / 标签 | `I("mcdangdang", "麦当当", "food", 4, "…", ("food","durability_consumable"))` |
+| 名称 / 分类 / 品质 / 标签 | `I("mcdangdang", TEXT["item.mcdangdang.name"], "food", 4, TEXT["item.mcdangdang.description"], ("food","durability_consumable"))` |
 | "能用 5 次"，每次消耗 1 | `max_durability=5, use_cost=1`（**耐久品**，不是 `consumable`） |
 | "回复 20 生命 / 5 理智" | `_effect_mcdangdang(engine, tenant, item)` 里 `engine._restore_health/_restore_sanity` |
 | "之后 3 回合每回合开始 +3 理智" | ① `tenant.set_status("mcdangdang_aftertaste", intensity=1, layers=3)`；② 状态**自带节点 hook**：`register_status_definition(StatusDefinition(..., source_id="item:mcdangdang", nodes=frozenset({"turn_start.status_effects"}), hook=mcdangdang_aftertaste))` |
@@ -99,7 +109,8 @@ ITEMS = {
 
 ```python
 ITEMS = {
-    "my_item": I("my_item", "我的物品", CATEGORY, 2, "回复 8 生命。",
+    "my_item": I("my_item", TEXT["item.my_item.name"], CATEGORY, 2,
+                 TEXT["item.my_item.description"],
                  ("food", "consumable"), consumable=True, stack_size=16, on_use="my_item"),
 }
 

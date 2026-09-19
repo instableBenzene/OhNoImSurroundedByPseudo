@@ -5,14 +5,15 @@
 
 from ..types import A, CharacterDefinition
 from weiren_game.types import EngineProtocol
+from weiren_game.data.lang import TEXT
 
 # ---------------------------------------------------------------- definition
 CHARACTER = CharacterDefinition(
-    "benzene", 4, "苯环", "沉默寡言的规培医生，总能在关键时刻做对的事。",
-    "loner", "steady", 4, ("规培医生", "研究生", "大学生", "18-24岁", "男性"),
-    (A("quiet_noise", "孤独／喧闹", "当屋内人数＞6或＜3时，苯环回合末理智消耗+3。当屋内人数≥3且≤6时，苯环回合末理智消耗-3，且回合末生命流失-3。"),
-     A("icu", "重症监护", "苯环在屋且自身理智 **>20** 时：\n· 屋内有房客生命值 **<20** → 立刻抬回 **20**，并消耗苯环 **10 理智**。\n· 该判定在**每次房客生命变动后**即时触发。")),
-    (A("emergency_treatment", "紧急处置", "移除一名房客的创伤或紊乱，并使其消耗等同于强度*层数的理智值。", "tenant_condition", prompt="要移除哪种状态？", options=(("trauma","创伤","i-trauma","清掉一层创伤"),("disorder","紊乱","i-disorder","清掉一层紊乱"))),),
+    "benzene", 4, TEXT["character.benzene.name"], TEXT["character.benzene.description"],
+    "loner", "steady", 4, (TEXT["character.benzene.tag.0"], TEXT["character.benzene.tag.1"], TEXT["character.benzene.tag.2"], TEXT["character.benzene.tag.3"], TEXT["character.benzene.tag.4"]),
+    (A("quiet_noise", TEXT["ability.quiet_noise.name"], TEXT["ability.quiet_noise.description"]),
+     A("icu", TEXT["ability.icu.name"], TEXT["ability.icu.description"])),
+    (A("emergency_treatment", TEXT["ability.emergency_treatment.name"], TEXT["ability.emergency_treatment.description"], "tenant_condition", prompt=TEXT["ability.emergency_treatment.prompt"], options=(("trauma",TEXT["ability.emergency_treatment.option.0"],"i-trauma",TEXT["data.characters.benzene.module.1"]),("disorder",TEXT["ability.emergency_treatment.option.1"],"i-disorder",TEXT["data.characters.benzene.module.2"]))),),
 )
 
 # ---------------------------------------------------------------- function
@@ -31,10 +32,10 @@ def use_emergency_treatment(engine: EngineProtocol, target_id: str | None, optio
         selected = "trauma" if target.trauma.active else "disorder"
     condition_obj = target.trauma if selected == "trauma" else target.disorder
     if not condition_obj.active:
-        raise RuleViolation("目标没有可移除的对应状态。")
+        raise RuleViolation(TEXT["data.characters.benzene.use_emergency_treatment.1"])
     cost = condition_obj.intensity * condition_obj.layers
     condition_obj.clear()
-    engine._consume_sanity(target, cost, "紧急处置")
+    engine._consume_sanity(target, cost, "emergency_treatment")
 
 
 def end_turn_cost(engine: EngineProtocol, tenant: object, cost: float) -> float:
@@ -70,7 +71,7 @@ def icu_maintain(engine: EngineProtocol) -> None:
         return
     for tenant in patients:
         tenant.health = 20.0
-    engine._consume_sanity(doctor, 10, "重症监护")
+    engine._consume_sanity(doctor, 10, "icu")
 
 
 HEALTH_CHANGED = icu_maintain
@@ -116,7 +117,7 @@ def _benzene_loss_modifier(context: object):
     if tenant.character_id != "benzene":
         return
     if engine.state.flow.phase == "turn_end" and 3 <= len(engine.home_tenants()) <= 6:
-        yield spec("healthLoss").path("生命流失").flat(-3).source("角色技能", "苯环", "孤独喧闹")
+        yield spec("healthLoss").path("health_loss").flat(-3).source("ability", "benzene", "quiet_noise")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regb
@@ -129,9 +130,9 @@ def _benzene_sanity_modifier(context: object):
     if tenant.character_id != "benzene" or not engine._passive_available(tenant, "benzene.solitude_noise"):
         return
     if 3 <= len(engine.home_tenants()) <= 6:
-        yield spec("sanityConsume").path("回合末消耗").flat(-3).source("角色技能", "苯环", "孤独喧闹")
+        yield spec("sanityConsume").path("turn_end_consume").flat(-3).source("ability", "benzene", "quiet_noise")
     else:
-        yield spec("sanityConsume").path("回合末消耗").flat(3).source("角色技能", "苯环", "孤独喧闹")
+        yield spec("sanityConsume").path("turn_end_consume").flat(3).source("ability", "benzene", "quiet_noise")
 
 
 from weiren_game.modifier_rules import register_modifier_provider as _regbs

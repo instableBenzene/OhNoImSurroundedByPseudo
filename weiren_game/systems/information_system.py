@@ -13,6 +13,7 @@ from weiren_game.data import (
     INFORMATION_TEMPLATES,
     LOCATION_INFORMATION_MODIFIERS,
 )
+from weiren_game.data.lang import TEXT
 CHARACTERS = CONTENT.characters()
 ITEMS = CONTENT.items()
 LOCATIONS = CONTENT.locations()
@@ -92,8 +93,8 @@ class InformationSystemMixin:
             predicted = self.state.world.visitors.next_pseudo_turn
             shown = predicted if truth else max(self.state.flow.turn + 1, predicted + self._rng(EVENT_IDS["information.visit.offset"]).choice((-1, 1, 2)))
             info = Information(
-                info_instance_id=info_id, title="伪人来访预告",
-                text=f"{source}指出：{self.state.pseudo_state.name}可能在第{shown}回合行动。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.1"],
+                text=TEXT["systems.information_system._create_random_information.2"].format(p1=source, p2=self.state.pseudo_state.name, p3=shown),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="visit", subtype="pseudo_visit", source=source,
                 data={"predicted_turn": shown, "actual_turn": predicted},
@@ -104,10 +105,10 @@ class InformationSystemMixin:
             if not truth:
                 alternatives = [key for key in self.state.world.visitors.visitor_pool[1:] if key != actual]
                 claim = self._rng(EVENT_IDS["information.human.false"]).choice(alternatives) if alternatives else ""
-            claim_name = CHARACTERS[claim].name if claim else "身份不明的人"
+            claim_name = CHARACTERS[claim].name if claim else TEXT["systems.information_system._create_random_information.3"]
             info = Information(
-                info_instance_id=info_id, title="访客来访预告",
-                text=f"{source}判断：下一位普通访客可能是{claim_name}。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.4"],
+                text=TEXT["systems.information_system._create_random_information.5"].format(p1=source, p2=claim_name),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="visit", subtype="human_visit", source=source,
                 data={"claimed_character": claim, "actual_character": actual},
@@ -118,8 +119,8 @@ class InformationSystemMixin:
             actual_turn = target.return_turn
             shown_turn = actual_turn if truth else max(self.state.flow.turn + 1, actual_turn + self._rng(EVENT_IDS["information.returning.offset"]).choice((-1, 1, 2)))
             info = Information(
-                info_instance_id=info_id, title="离开的访客返回预告",
-                text=f"{source}判断：{self.character(target).name}可能在第{shown_turn}回合再次敲门。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.6"],
+                text=TEXT["systems.information_system._create_random_information.7"].format(p1=source, p2=self.character(target).name, p3=shown_turn),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="visit", subtype="returning_visit", source=source,
                 target_ids=[target.id],
@@ -130,8 +131,8 @@ class InformationSystemMixin:
             actual_turn = self.state.flow.turn + mission.remain_search_turns
             shown_turn = actual_turn if truth else max(self.state.flow.turn + 1, actual_turn + self._rng(EVENT_IDS["information.search_return.offset"]).choice((-1, 1, 2)))
             info = Information(
-                info_instance_id=info_id, title="房客搜索返回预告",
-                text=f"{source}判断：{self.tenant_name(mission.tenant_id)}会在第{shown_turn}回合从{LOCATIONS[mission.location_id].name}返回。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.8"],
+                text=TEXT["systems.information_system._create_random_information.9"].format(p1=source, p2=self.tenant_name(mission.tenant_id), p3=shown_turn, p4=LOCATIONS[mission.location_id].name),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="visit", subtype="search_return", source=source,
                 target_ids=[mission.tenant_id], location_id=mission.location_id,
@@ -153,13 +154,13 @@ class InformationSystemMixin:
                 else:
                     skill_pairs.append((str(entry), str(entry)))
             if not skill_pairs:
-                skill_pairs = [("", "未知技能")]
+                skill_pairs = [("", TEXT["systems.information_system._create_random_information.10"])]
             skill_id, skill_label = self._rng(
                 EVENT_IDS["information.pseudo_skill.id"]
             ).choice(skill_pairs)
             info = Information(
-                info_instance_id=info_id, title="伪人技能触发提示",
-                text=f"{source}判断：{self.state.pseudo_state.name}近期{'将' if prediction == 'trigger' else '不会'}发动技能【{skill_label}】。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.11"],
+                text=TEXT["systems.information_system._create_random_information.12"].format(p1=source, p2=self.state.pseudo_state.name, p3='将' if prediction == 'trigger' else '不会', p4=skill_label),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="pseudo_skill", source=source,
                 data={"pseudo_id": self.state.pseudo_state.scenario_id, "skill_id": skill_id, "prediction": prediction},
@@ -175,8 +176,8 @@ class InformationSystemMixin:
                 humans = [tenant for tenant in candidates_tenant if not tenant.is_pseudo]
                 target = self._rng(EVENT_IDS["information.accusation.target"]).choice(humans or candidates_tenant)
             info = Information(
-                info_instance_id=info_id, title="指认房间内的伪人",
-                text=f"{source}怀疑{self.character(target).name if target else '某位房客'}是藏在屋内的伪人。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.13"],
+                text=TEXT["systems.information_system._create_random_information.14"].format(p1=source, p2=self.character(target).name if target else '某位房客'),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=bool(target and target.is_pseudo), kind="pseudo_inhome", source=source,
                 target_ids=[target.id] if target else [],
@@ -189,8 +190,8 @@ class InformationSystemMixin:
             label = {**EROSION_EMOTIONS, **AWAKENING_EMOTIONS}[emotion_key]
             duration = self._rng(EVENT_IDS["information.emotion.duration"]).randint(2, 4)
             info = Information(
-                info_instance_id=info_id, title="隐藏情绪观察",
-                text=f"{source}认为{self.character(target).name}正在隐藏“{label}”情绪。",
+                info_instance_id=info_id, title=TEXT["systems.information_system._create_random_information.15"],
+                text=TEXT["systems.information_system._create_random_information.16"].format(p1=source, p2=self.character(target).name, p3=label),
                 status=status, gained_turn=self.state.flow.turn, expires_turn=self.state.flow.turn + 5,
                 truth=truth, kind="emotion_reveal", subtype=emotion_key, source=source,
                 target_ids=[target.id], data={"reveal_duration": duration},
@@ -205,10 +206,6 @@ class InformationSystemMixin:
         if verified:
             self._resolve_information_effect(info)
         return info
-
-    def _create_visit_information(self, verified: bool, source: str) -> Information:
-        """生成一条访客来访类（预告）信息。"""
-        return self._create_random_information(verified, source, {"visit"})
 
     def _observe_visit_information(
         self,
@@ -250,7 +247,7 @@ class InformationSystemMixin:
         pseudo = self.state.pseudo_state
         if not pseudo.revealed and not pseudo.known:
             pseudo.known = True
-            self._log(f"伪人已确认：{pseudo.name}。")
+            self._log(TEXT["systems.information_system._observe_pseudo_skill.1"].format(p1=pseudo.name))
         for info in self.state.house.information:
             if (
                 info.status == "pending" and info.kind == "pseudo_skill"
@@ -270,13 +267,6 @@ class InformationSystemMixin:
             ):
                 self._verify_information_object(info)
 
-    def verify_information(self, info_id: str) -> None:
-        """无条件核实指定信息，作为技能、测试与后续界面的直接验证入口。"""
-        info = next((value for value in self.state.house.information if value.info_instance_id == info_id), None)
-        if not info or info.status != "pending":
-            raise RuleViolation("该信息不处于待验证状态。")
-        self._verify_information_object(info)
-
     def _discern_one_information(self, tenant: Tenant, *, false_only: bool = False) -> bool:
         """由指定房客的被动效果识破一条待验证信息（可仅限虚假信息）。"""
         candidates = [
@@ -286,19 +276,19 @@ class InformationSystemMixin:
         if not candidates:
             return False
         self._verify_information_object(candidates[0])
-        self._log(f"{self.character(tenant).name}识破了一条信息。")
+        self._log(TEXT["systems.information_system._discern_one_information.1"].format(p1=self.character(tenant).name))
         return True
 
     def _verify_information_object(self, info: Information) -> None:
         """将单条信息置为证实或证伪状态，记录验证信息并结算其效果。"""
         if self.state.world.global_events.active("information.false_lock"):
-            self._log(f"“{info.title}”被压制，暂时无法被验证。")
+            self._log(TEXT["systems.information_system._verify_information_object.1"].format(p1=info.title))
             return
         info.status = "confirmed" if info.truth else "refuted"
         info.verified_turn = self.state.flow.turn
         info.expires_turn = self.state.flow.turn + 10
         self._resolve_information_effect(info)
-        self._log(f"信息已{'证实' if info.truth else '证伪'}：{info.title}。")
+        self._log(TEXT["systems.information_system._verify_information_object.2"].format(p1='证实' if info.truth else '证伪', p2=info.title))
         self._emit_node("information.verified", info=info)
 
     def _resolve_information_effect(self, info: Information) -> None:
@@ -381,5 +371,5 @@ class InformationSystemMixin:
 
     def information_text(self, info: Information) -> str:
         """返回带状态标签与来源的信息展示文本。"""
-        label = {"pending": "待验证", "confirmed": "已证实", "refuted": "已证伪", "expired": "已失效"}.get(info.status, info.status)
-        return f"[{label}] {info.text}（来源：{info.source}）"
+        label = {"pending": TEXT["systems.information_system.information_text.1"], "confirmed": TEXT["systems.information_system.information_text.2"], "refuted": TEXT["systems.information_system.information_text.3"], "expired": TEXT["systems.information_system.information_text.4"]}.get(info.status, info.status)
+        return TEXT["systems.information_system.information_text.5"].format(p1=label, p2=info.text, p3=info.source)

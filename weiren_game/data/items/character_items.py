@@ -3,13 +3,14 @@
 from weiren_game.probability import resolve
 
 from ..types import I
+from weiren_game.data.lang import TEXT
 
 ITEMS = {
-    "star_doll": I("star_doll", "可爱的玩偶", "character", 3, "仅比格小星可用，回复25理智。", ("tool", "craft", "consumable", "star_doll"), consumable=True, on_use="star_doll"),
-    "walmart_bag": I("walmart_bag", "沃尔玛购物袋", "character", 4, "携带容量+5；返回时25%损坏，ED Tear仅15%。", ("tool", "fragile", "walmart_bag"), fragile_chance=.25, searchable=False),
-    "flintlock": I("flintlock", "燧发枪", "character", 4, "搜索中25%抵御伪人技能；消耗1枚弹药时提升至100%。抵御后25%消耗自身，若消耗了弹药则改为5%。", ("tool", "fragile", "flintlock"), fragile_chance=.25, searchable=False),
-    "flintlock_ammo": I("flintlock_ammo", "弹药-燧发枪", "character", 3, "供燧发枪消耗。", ("tool", "consumable", "ammo"), consumable=True, stack_size=16, searchable=False),
-    "stimulant": I("stimulant", "强心剂", "medical", 2, "急躁羁绊激活时获得；使用后主性格改为急躁并回复20生命。", ("medical_supply", "consumable"), consumable=True, stack_size=8, searchable=False, on_use="stimulant"),
+    "star_doll": I("star_doll", TEXT["item.star_doll.name"], "character", 3, TEXT["item.star_doll.description"], ("tool", "craft", "consumable", "star_doll"), consumable=True, on_use="star_doll"),
+    "walmart_bag": I("walmart_bag", TEXT["item.walmart_bag.name"], "character", 4, TEXT["item.walmart_bag.description"], ("tool", "fragile", "walmart_bag"), fragile_chance=.25, searchable=False),
+    "flintlock": I("flintlock", TEXT["item.flintlock.name"], "character", 4, TEXT["item.flintlock.description"], ("tool", "fragile", "flintlock"), fragile_chance=.25, searchable=False),
+    "flintlock_ammo": I("flintlock_ammo", TEXT["item.flintlock_ammo.name"], "character", 3, TEXT["item.flintlock_ammo.description"], ("tool", "consumable", "ammo"), consumable=True, stack_size=16, searchable=False),
+    "stimulant": I("stimulant", TEXT["item.stimulant.name"], "medical", 2, TEXT["item.stimulant.description"], ("medical_supply", "consumable"), consumable=True, stack_size=8, searchable=False, on_use="stimulant"),
 }
 
 
@@ -57,7 +58,7 @@ def _resist_flintlock(
         tenant.inventory.remove(ammo.item_instance_id)
         engine._recalculate_search(mission)
     context = {"engine": engine, "tenant": tenant, "used_ammo": used_ammo}
-    resist_source = ("抵御", "伪人使用主动能力", "伪人技能", "搜索")
+    resist_source = (TEXT["data.items.character_items._resist_flintlock.1"], TEXT["data.items.character_items._resist_flintlock.2"], TEXT["data.items.character_items._resist_flintlock.3"], TEXT["data.items.character_items._resist_flintlock.4"])
     resist_chance = calculate_modified_amount(
         0.0, collect_modifiers("chance", resist_source, context)
     ) - penalty
@@ -66,7 +67,7 @@ def _resist_flintlock(
     )
     engine._skill_outcome(tenant, "tool.flintlock", resisted)
     # 触发后无论是否抵御成功，都判定是否被消耗（base 25%，用弹药 -100% → 5%）。
-    break_source = ("易损", "燧发枪", "搜索", "触发后")
+    break_source = (TEXT["data.items.character_items._resist_flintlock.5"], TEXT["data.items.character_items._resist_flintlock.6"], TEXT["data.items.character_items._resist_flintlock.7"], TEXT["data.items.character_items._resist_flintlock.8"])
     break_chance = calculate_modified_amount(
         0.25, collect_modifiers("chance", break_source, context)
     )
@@ -86,16 +87,16 @@ def _flintlock_modifier(context: object):
         return
     yield (
         spec("chance").flat(0.25).match("all")
-        .path("抵御", "伪人使用主动能力").source("物品", "工具", "燧发枪")
+        .path("resist", "pseudo_active").source("item", "tool", "flintlock")
     )
     if context.get("used_ammo"):
         yield (
             spec("chance").flat(1.50).match("all")
-            .path("抵御", "伪人使用主动能力").source("物品", "工具", "弹药-燧发枪")
+            .path("resist", "pseudo_active").source("item", "tool", "flintlock_ammo")
         )
         yield (
             spec("chance").flat(-1.00).match("all")
-            .path("易损", "燧发枪").source("物品", "工具", "弹药-燧发枪")
+            .path("fragile", "flintlock").source("item", "tool", "flintlock_ammo")
         )
 
 
