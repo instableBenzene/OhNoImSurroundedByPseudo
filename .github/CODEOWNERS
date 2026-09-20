@@ -1,24 +1,25 @@
+* @instableBenzene
 # 归属声明：自留区改动必须由作者批准（配合分支保护「Require review from Code Owners」生效）。
 #
 # 开放区是 /dlc/ 与 /resourcepacks/ —— 它们**刻意不出现在本文件里**：
 # CODEOWNERS 没有"取消归属"的写法，所以只逐条声明自留区，其余路径自然无需作者审查。
 # 规则说明见 CONTRIBUTING.md。
 
-/weiren_game/      @instableBenzene
-/tools/            @instableBenzene
-/tests/            @instableBenzene
-/docs/             @instableBenzene
-/design/           @instableBenzene
+/weiren_game/ @instableBenzene
+/tools/ @instableBenzene
+/tests/ @instableBenzene
+/docs/ @instableBenzene
+/design/ @instableBenzene
 
 # 守卫与配置本身也要自留：否则别人可以先把检查删掉再改核心。
-/.github/          @instableBenzene
-/.opencode/        @instableBenzene
+/.github/ @instableBenzene
+/.opencode/ @instableBenzene
 
 # 根目录入口与配置
-/*.py              @instableBenzene
-/*.md              @instableBenzene
-/*.bat             @instableBenzene
-/*.vbs             @instableBenzene
-/*.json            @instableBenzene
-/.gitignore        @instableBenzene
-/.gitattributes    @instableBenzene
+/*.py @instableBenzene
+/*.md @instableBenzene
+/*.bat @instableBenzene
+/*.vbs @instableBenzene
+/*.json @instableBenzene
+/.gitignore @instableBenzene
+/.gitattributes @instableBenzene
