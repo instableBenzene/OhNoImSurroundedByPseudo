@@ -22,7 +22,7 @@ jobs:
       # Agent: replace this block after detecting the repository's package manager and build script.
       - name: Build static site
         run: |
-          python3
+          python3 tools/build_vibehub.py --out dist
 
       - name: Install verified VibeHub CLI
         if: github.event_name == 'push'
