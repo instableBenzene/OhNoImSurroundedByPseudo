@@ -19,11 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 构建：用仓库自带的脚本把纯 Python 引擎打成静态站点（产物顶层有 index.html，
-      # 与 github-setup 的 --output-dir dist 对齐）。脚本只读源码，Pyodide 从 npm registry 下载。
+      # Agent: replace this block after detecting the repository's package manager and build script.
       - name: Build static site
         run: |
-          python3 tools/build_vibehub.py --out dist
+          python3
 
       - name: Install verified VibeHub CLI
         if: github.event_name == 'push'
